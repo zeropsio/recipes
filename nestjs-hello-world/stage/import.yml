@@ -1,0 +1,7 @@
+project:
+  name: nestjs-hello-world-stage
+
+services:
+  - hostname: prod
+    type: nodejs@22
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-hello-world

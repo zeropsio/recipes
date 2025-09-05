@@ -1,5 +1,0 @@
-project:
-  name: nest-js-hello-world-stage
-
-services:
-  - hostname: prod
