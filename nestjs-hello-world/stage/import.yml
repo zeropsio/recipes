@@ -6,3 +6,6 @@ services:
     type: nodejs@22
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-hello-world-app
+    verticalAutoscaling: 
+      minRam: 2
+    maxContainers: 1
