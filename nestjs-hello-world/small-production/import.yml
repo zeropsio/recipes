@@ -6,3 +6,6 @@ services:
     type: nodejs@22
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-hello-world-app
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
