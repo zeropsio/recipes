@@ -1,5 +1,6 @@
 <!-- #ZEROPS_REMOVE_START# -->
 # Nest.js Hello World recipe
+![nestjs](https://github.com/zeropsio/recipe-shared-assets/blob/main/covers/svg/cover-nestjs.svg)
 <!-- #ZEROPS_REMOVE_END# -->
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
