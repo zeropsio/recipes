@@ -9,12 +9,13 @@ The most basic example of running [Nest.js](https://nestjs.com) on [Zerops](http
 <!-- #ZEROPS_EXTRACT_START:intro# -->
 
 <!-- #ZEROPS_REMOVE_START# -->
+[**See full recipe page with one-click deploy on Zerops**](https://app.zerops.io/recipes/nestjs-hello-world?environment=small-production).
 
 ![nestjs](https://github.com/zeropsio/recipe-shared-assets/blob/main/covers/svg/cover-nestjs.svg)
 
 Offered in examples for the whole development lifecycle — from environments for AI agents like [Claude Code](https://www.anthropic.com/claude-code) or [opencode](https://opencode.ai) through environments for remote (CDE) or local development of each developer to stage and productions of all sizes.
 
-- [AI agent](/0%20—%20AI%20Agent)
+- AI agent [(read more)](/0%20—%20AI%20Agent) — [(deploy with one click)[]]
 - [Remote (CDE)](/1%20—%20Remote%20(CDE))
 - [Local](/Local)
 - [Stage](/Stage)
