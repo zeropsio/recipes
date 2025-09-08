@@ -4,6 +4,7 @@ project:
 services:
   - hostname: app
     type: nodejs@22
+    minContainers: 2
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-hello-world-app
 
