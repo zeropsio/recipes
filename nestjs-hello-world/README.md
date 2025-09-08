@@ -9,7 +9,7 @@ The most basic example of running [Nest.js](https://nestjs.com) on [Zerops](http
 <!-- #ZEROPS_EXTRACT_START:intro# -->
 
 <!-- #ZEROPS_REMOVE_START# -->
-**See full recipe page and deploy with one-click on Zerops**
+**Full recipe page and deploy with one-click** ⬇️
 
 [![Deploy on Zerops](https://github.com/zeropsio/recipe-shared-assets/blob/main/deploy-button/light/deploy-button.svg)](https://app.zerops.io/recipes/nestjs-hello-world?environment=small-production)
 
