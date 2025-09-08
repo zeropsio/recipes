@@ -1,6 +1,5 @@
 <!-- #ZEROPS_REMOVE_START# -->
 # Nest.js Hello World recipe
-![nestjs](https://github.com/zeropsio/recipe-shared-assets/blob/main/covers/svg/cover-nestjs.svg)
 <!-- #ZEROPS_REMOVE_END# -->
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
@@ -10,6 +9,9 @@ The most basic example of running [Nest.js](https://nestjs.com) on [Zerops](http
 <!-- #ZEROPS_EXTRACT_START:intro# -->
 
 <!-- #ZEROPS_REMOVE_START# -->
+
+![nestjs](https://github.com/zeropsio/recipe-shared-assets/blob/main/covers/svg/cover-nestjs.svg)
+
 Offered in examples for the whole development lifecycle — from environments for AI agents like [Claude Code](https://www.anthropic.com/claude-code) or [opencode](https://opencode.ai) through environments for remote (CDE) or local development of each developer to stage and productions of all sizes.
 
 - [AI agent](/0 — AI Agent)
