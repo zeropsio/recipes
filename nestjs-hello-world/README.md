@@ -24,7 +24,11 @@ Offered in examples for the whole development lifecycle — from environments fo
 - **Small Production** [(read more)](/Small%20Production) — [(deploy with one click)](https://app.zerops.io/recipes/nestjs-hello-world?environment=small-production)
 - **Highly-available Production** [(read more)](/Highly-available%20Production) — [(deploy with one click)](https://app.zerops.io/recipes/nestjs-hello-world?environment=highly-available-production)
 
+---
+
 For more advanced examples see all [Nest.js recipes](https://app.zerops.io/recipes?lf=nest-js) on Zerops.
+
+Need help setting your project up? Join [Zerops Discord community](https://discord.gg/zeropsio).
 <!-- #ZEROPS_REMOVE_END# -->
 
 
