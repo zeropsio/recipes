@@ -1,0 +1,12 @@
+project:
+  name: go-hello-world-stage
+
+services:
+  - hostname: app
+    type: go@1
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/go-hello-world-app
+
+  - hostname: db
+    type: postgresql@17
+    mode: NON_HA

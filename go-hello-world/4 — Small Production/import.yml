@@ -1,0 +1,15 @@
+project:
+  name: go-hello-world-small-prod
+
+services:
+  - hostname: app
+    type: go@1
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/go-hello-world-app
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.25
+
+  - hostname: db
+    type: postgresql@17
+    mode: NON_HA

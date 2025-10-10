@@ -1,0 +1,19 @@
+project:
+  name: go-hello-world-ha-prod
+
+services:
+  - hostname: app
+    type: go@1
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/go-hello-world-app
+    minContainers: 2
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+
+  - hostname: db
+    type: postgresql@17
+    mode: HA
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1

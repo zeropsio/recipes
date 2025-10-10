@@ -1,0 +1,13 @@
+project:
+  name: go-hello-world-agent
+
+services:
+  - hostname: appstage
+    type: go@1
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/go-hello-world-app
+
+  - hostname: appdev
+    type: go@1
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/go-hello-world-app
