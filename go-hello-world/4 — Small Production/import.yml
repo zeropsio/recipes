@@ -2,14 +2,24 @@ project:
   name: go-hello-world-small-prod
 
 services:
+  # Spin up the production service using the 'prod' setup.
+  # Subdomain access should be disabled,
+  # after setting up HTTPS for your own domain.
+  # Setting higher minimal resources, so we can handle
+  # same basic traffic.
   - hostname: app
     type: go@1
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/go-hello-world-app
+    enableSubdomainAccess: true
     minContainers: 2
     verticalAutoscaling:
       minRam: 0.25
-
+    
+  # Our app requires database.
+  # Using single-container 'NON_HA' database mode,
+  # for our small production setup. Automatic daily encrypted
+  # backups are ON by default.
   - hostname: db
     type: postgresql@17
     mode: NON_HA

@@ -5,6 +5,6 @@ This is a highly-available production environment for [Go Hello World (info + de
 
 <!-- #ZEROPS_REMOVE_START# -->
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-**Highly-available Production** environment. TODO
+**Highly-available production** environment. TODO
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 <!-- #ZEROPS_REMOVE_END# -->

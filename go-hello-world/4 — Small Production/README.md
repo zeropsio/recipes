@@ -5,6 +5,6 @@ This is a small production environment for [Go Hello World (info + deploy)](http
 
 <!-- #ZEROPS_REMOVE_START# -->
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-**Small Production** environment. TODO
+**Small production** environment. TODO
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 <!-- #ZEROPS_REMOVE_END# -->

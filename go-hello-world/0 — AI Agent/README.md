@@ -5,6 +5,6 @@ This is an AI agent environment for [Go Hello World (info + deploy)](https://app
 
 <!-- #ZEROPS_REMOVE_START# -->
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-**AI Agent** environment. TODO
+**AI agent** environment. TODO
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 <!-- #ZEROPS_REMOVE_END# -->
