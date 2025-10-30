@@ -2,35 +2,34 @@ project:
   name: go-hello-world-agent
 
 services:
-  # Spin up the staging service, where the agents can continuously deploy
-  # changes made to your code, thus testing the deployment process
-  # and also allowing to test the app behavior in 'prod' setup
-  # (the web app is publicly available via Zerops subdomain).
+  # Deploy the staging service, where agents can continuously deploy
+  # code changes to test the deployment process
+  # and verify app behavior in the 'prod' setup.
+  # The web app is publicly accessible via the Zerops subdomain.
   - hostname: appstage
     type: go@1
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/go-hello-world-app
     enableSubdomainAccess: true
 
-  # Spin up the agentic development environment with the 'dev' setup,
-  # which has Go pre-installed (as per the zerops.yaml from 'buildFromGit' repository).
+  # Set up the AI agent development environment using the 'dev' setup,
+  # which includes Go pre-installed based on the zerops.yaml from the 'buildFromGit' repository.
   - hostname: appdev
     type: go@1
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/go-hello-world-app
     enableSubdomainAccess: true
-    # Agents, which run Go or linters can demand more resources.
-    # Feel free to set higher limits. Services where agents live,
-    # can be freely stopped when not used, thus saving costs.
+    # Agents running Go or linters may require more resources.
+    # Adjust limits as needed. Agent services can be stopped when inactive to reduce costs.
     # verticalAutoscaling:
     #   minRam: 2
     #   cpu: 4
     #   cpuMode: DEDICATED
 
-  # In order to develop the Hello World Go app, database is required.
-  # Spin up the database in Zerops, making it available on 'db' hostname
-  # for development inside the 'appdev' service.
-  # The deployed stage app in 'appstage' also uses this database. 
+  # The Hello World Go app requires a database for development.
+  # Deploy the database in Zerops, accessible as 'db' hostname
+  # within the 'appdev' service.
+  # The staged app in 'appstage' also connects to this database.
   - hostname: db
     type: postgresql@17
     mode: NON_HA

@@ -1,14 +1,13 @@
 project:
   name: go-hello-world-ha-prod
-  # Specifying the highly-available and more performant core service.
+  # Specifies the highly available, higher-performance core service.
   corePackage: SERIOUS
 
 services:
-  # Spin up the production service using the 'prod' setup.
-  # Subdomain access should be disabled,
-  # after setting up HTTPS for your own domain.
-  # Setting higher minimal resources and dedicated CPUs,
-  # so we can handle a lot of traffic.
+  # Deploy the production service using the 'prod' setup.
+  # Disable subdomain access after configuring HTTPS for your custom domain.
+  # Allocates higher minimum resources and dedicated CPUs
+  # to manage high traffic volumes.
   - hostname: app
     type: go@1
     zeropsSetup: prod
@@ -19,10 +18,10 @@ services:
       cpuMode: DEDICATED
       minRam: 0.5
     
-  # Our app requires database.
-  # Spin up HA database to make it more resilient
-  # and performant, with higher minimal resource limits.
-  # In addition, automatic daily encrypted backups are ON by default.
+  # The app requires a database.
+  # Deploys an HA database for improved resilience
+  # and performance, with increased minimum resource limits.
+  # Automatic daily encrypted backups are enabled by default.
   - hostname: db
     type: postgresql@17
     mode: HA

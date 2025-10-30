@@ -2,16 +2,15 @@ project:
   name: go-hello-world-stage
 
 services:
-  # Spin up the staging service for our app.
-  # Using the 'prod' setup,
-  # meaning we care to test the close-to-final-production setup.
+  # Deploy the staging service for the app.
+  # Uses the 'prod' setup to test near-production conditions.
   - hostname: app
     type: go@1
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/go-hello-world-app
     enableSubdomainAccess: true
     
-    # Our app requires database.
+  # The app requires a database.
   - hostname: db
     type: postgresql@17
     mode: NON_HA

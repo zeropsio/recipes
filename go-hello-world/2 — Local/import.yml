@@ -2,17 +2,17 @@ project:
   name: go-hello-world-local
 
 services:
-  # In order to develop the Hello World Go app, database is required.
-  # Spin up the database in Zerops, and connect to the project via 'zcli vpn up',
-  # making it locally available on 'db' or 'db.zerops' hostname.
+  # The Hello World Go app requires a database for development.
+  # Deploy the database in Zerops and connect via 'zcli vpn up'
+  # to access it locally as 'db' or 'db.zerops'.
   - hostname: db
     type: postgresql@17
     mode: NON_HA
     
-  # Also spin up the staging service, where you can continuously deploy
-  # changes you make to your code, thus testing the deployment process
-  # and also allowing to test the app behavior in 'prod' setup
-  # (the web app is publicly available via Zerops subdomain).
+  # Additionally, deploy the staging service to continuously deploy
+  # code changes, test the deployment process, and verify
+  # app behavior in the 'prod' setup.
+  # The web app is accessible via the Zerops subdomain.
   - hostname: appstage
     type: go@1
     zeropsSetup: prod

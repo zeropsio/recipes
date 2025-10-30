@@ -2,36 +2,35 @@ project:
   name: go-hello-world-remote
 
 services:
-  # Spin up the staging service, where you can continuously deploy
-  # changes made to your code, thus testing the deployment process
-  # and also allowing to test the app behavior in 'prod' setup
-  # (the web app is publicly available via Zerops subdomain).
+  # Deploy the staging service, where you can continuously deploy
+  # code changes to test the deployment process
+  # and verify app behavior in the 'prod' setup.
+  # The web app is publicly accessible via the Zerops subdomain.
   - hostname: appstage
     type: go@1
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/go-hello-world-app
     enableSubdomainAccess: true
 
-  # Spin up the remote development environment with the 'dev' setup,
-  # which has Go pre-installed (as per the zerops.yaml from 'buildFromGit' repository).
+  # Set up the remote development environment using the 'dev' setup,
+  # which includes Go pre-installed based on the zerops.yaml from the 'buildFromGit' repository.
   - hostname: appdev
     type: go@1
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/go-hello-world-app
     enableSubdomainAccess: true
-    # Building Go or running some IDE's in remote container
-    # can be demanding on resources. Feel free to uncomment the following section
-    # to add more resources. Development services can be freely stopped
-    # when not used, thus saving costs.
+    # Building Go applications or running IDEs in the remote container
+    # may require significant resources. Uncomment the section below
+    # to allocate more resources. Development services can be stopped when not in use to save costs.
     # verticalAutoscaling:
     #   minRam: 4
     #   cpu: 4
     #   cpuMode: DEDICATED
     
-  # In order to develop the Hello World Go app, database is required.
-  # Spin up the database in Zerops, making it available on 'db' hostname
-  # for development inside the 'appdev' service.
-  # The deployed stage app in 'appstage' also uses this database. 
+  # The Hello World Go app requires a database for development.
+  # Deploy the database in Zerops, accessible as 'db' hostname
+  # within the 'appdev' service.
+  # The staged app in 'appstage' also connects to this database.
   - hostname: db
     type: postgresql@17
     mode: NON_HA
