@@ -5,7 +5,7 @@ This is an AI agent environment for [Go Hello World (info + deploy)](https://app
 
 <!-- #ZEROPS_REMOVE_START# -->
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-**AI agent** environment serves as a playground for terminal AI agents to further develop and version the app.
-Includes dev service with the code repository and required development tool-set, staging service and low-resource database.
+**AI agent** environment provides a development space for AI agents to build and version the app.
+It includes a dev service with the code repository and necessary development tools, a staging service, and a low-resource database.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 <!-- #ZEROPS_REMOVE_END# -->

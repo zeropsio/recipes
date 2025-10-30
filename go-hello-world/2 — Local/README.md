@@ -5,7 +5,7 @@ This is a local environment for [Go Hello World (info + deploy)](https://app.zer
 
 <!-- #ZEROPS_REMOVE_START# -->
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-**Local** environment enables you to further develop the app locally (using zCLI VPN to connect to the database),
-while maintaining valid deployment process with staged app deployed in Zerops. 
+**Local** environment supports local app development using zCLI VPN for database access,
+while ensuring valid deployment processes using a staged app in Zerops.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 <!-- #ZEROPS_REMOVE_END# -->

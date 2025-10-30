@@ -5,8 +5,7 @@ This is a highly-available production environment for [Go Hello World (info + de
 
 <!-- #ZEROPS_REMOVE_START# -->
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-**Highly-available production** environment is production setup
-with higher scaling limits, dedicated resources and HA components
-for increased durability and performance.
+**Highly-available production** environment provides a production setup
+with enhanced scaling, dedicated resources, and HA components for improved durability and performance.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 <!-- #ZEROPS_REMOVE_END# -->
