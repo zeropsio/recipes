@@ -13,7 +13,7 @@ services:
   # code changes, test the deployment process, and verify
   # app behavior in the 'prod' setup.
   # The web app is accessible via the Zerops subdomain.
-  - hostname: appstage
+  - hostname: app
     type: go@1
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/go-hello-world-app

@@ -5,6 +5,7 @@ This is a stage environment for [Go Hello World (info + deploy)](https://app.zer
 
 <!-- #ZEROPS_REMOVE_START# -->
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-**Stage** environment has the exact same configuration as production, the difference comes down to running on a single container and having lowest scaling configuration.
+**Stage** environment has the exact same configuration as production,
+the difference comes down to running on a single container and having lower scaling configuration.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 <!-- #ZEROPS_REMOVE_END# -->
