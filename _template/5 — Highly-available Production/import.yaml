@@ -1,0 +1,8 @@
+project:
+  name: PLACEHOLDER_PROJECT_NAME-ha-prod
+  # Specifies the highly available, higher-performance core service.
+  corePackage: SERIOUS
+
+services:
+  - hostname: todo
+    type: runtime

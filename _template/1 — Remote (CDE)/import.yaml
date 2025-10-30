@@ -1,0 +1,6 @@
+project:
+  name: PLACEHOLDER_PROJECT_NAME-remote
+
+services:
+  - hostname: todo
+    type: runtime
