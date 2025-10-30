@@ -1,0 +1,13 @@
+project:
+  name: bun-hello-world-local
+
+services:
+  - hostname: app
+    type: bun@1.2
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
+    enableSubdomainAccess: true
+    
+  - hostname: db
+    type: postgresql@17
+    mode: NON_HA

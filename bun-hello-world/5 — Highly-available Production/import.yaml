@@ -1,0 +1,22 @@
+project:
+  name: bun-hello-world-ha-prod
+  # Specifies the highly available, higher-performance core service.
+  corePackage: SERIOUS
+
+services:
+  - hostname: app
+    type: bun@1.2
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+  
+  - hostname: db
+    type: postgresql@17
+    mode: HA
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1

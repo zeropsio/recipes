@@ -4,7 +4,8 @@
 
 <!-- #ZEROPS_REMOVE_START# -->
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-Basic example of running [Go](https://go.dev) applications on [Zerops](https://zerops.io). Simple Go API with single endpoint that reads from and writes to a PostgreSQL database.
+Basic example of running [Go](https://go.dev) applications on [Zerops](https://zerops.io).
+Simple Go API with single endpoint that reads from and writes to a PostgreSQL database.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 <!-- #ZEROPS_REMOVE_END# -->
 

@@ -1,0 +1,23 @@
+project:
+  name: bun-hello-world-agent
+
+services:
+  - hostname: appstage
+    type: bun@1.2
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
+    enableSubdomainAccess: true
+
+  - hostname: appdev
+    type: bun@1.2
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
+    enableSubdomainAccess: true
+    # verticalAutoscaling:
+    #   minRam: 2
+    #   cpu: 4
+    #   cpuMode: DEDICATED
+
+  - hostname: db
+    type: postgresql@17
+    mode: NON_HA
