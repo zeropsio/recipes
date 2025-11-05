@@ -2,12 +2,20 @@ project:
   name: bun-hello-world-stage
 
 services:
+  # Deploy the app with minimal default resources
+  # and Zerops subdomain enabled, so we can access it
+  # from the internet.
+  # The 'buildFromGit' directive says where to fetch source code
+  # and 'zerops.yaml', where we take 'prod' setup to build, deploy
+  # and run the app. It must be a public Git repository.
   - hostname: app
     type: bun@1.2
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
     enableSubdomainAccess: true
   
+  # The app requires a database. Create a PostgreSQL database
+  # in single node setup ('NON_HA') for testing/staging purposes.
   - hostname: db
     type: postgresql@17
     mode: NON_HA

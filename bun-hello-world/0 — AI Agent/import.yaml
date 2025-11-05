@@ -2,22 +2,43 @@ project:
   name: bun-hello-world-agent
 
 services:
+  # Deploy the staging app, which would serve
+  # as means to test the build and deploy process
+  # and behavior of the deployed app. Enable Zerops
+  # subdomain access for easy public access via HTTPS.
+  # Agents can continuously deploy to this
+  # service via zCLI or Git push integration from 
+  # the agent 'appdev' service.
   - hostname: appstage
     type: bun@1.2
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
     enableSubdomainAccess: true
 
+  # Deploy the agent service, which
+  # contains the source code from recipe's public repository,
+  # and is ready for an AI agent to start making
+  # changes to the code.
+  # Public Zerops subdomain access is enabled, so the app's behavior
+  # can be tested from the outside via HTTPS.
   - hostname: appdev
     type: bun@1.2
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
     enableSubdomainAccess: true
+    # Building and running Bun applications or running agents in the remote container
+    # may require more than minimal resources. Uncomment the section below
+    # to allocate more resources. AI agent services can be stopped
+    # when not in use to save costs.
     # verticalAutoscaling:
     #   minRam: 2
-    #   cpu: 4
+    #   cpu: 2
     #   cpuMode: DEDICATED
-
+  
+  # The app requires a database. Create a PostgreSQL database
+  # in single node setup for development/staging purposes.
+  # The database is accessible via it's hostname both from
+  # the deployed staging 'appstage' and for agents from 'appdev' service.
   - hostname: db
     type: postgresql@17
     mode: NON_HA

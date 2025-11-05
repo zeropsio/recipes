@@ -2,6 +2,13 @@ project:
   name: bun-hello-world-prod
 
 services:
+  # Deploy the app with Zerops subdomain enabled,
+  # so we can access it from the internet. We recommend
+  # setting up access through your own custom domains
+  # and disabling the Zerops subdomain after.
+  # The 'buildFromGit' directive says where to fetch source code
+  # and 'zerops.yaml', where we take 'prod' setup to build, deploy
+  # and run the app. It must be a public Git repository.
   - hostname: app
     type: bun@1.2
     zeropsSetup: prod
@@ -10,7 +17,10 @@ services:
     minContainers: 2
     verticalAutoscaling:
       minRam: 0.25
-  
+
+  # The app requires a database. Create a PostgreSQL database
+  # in single node setup ('NON_HA'). Single node database are vulnerable
+  # to data loss, that's why automatic encrypted backups are on by default.
   - hostname: db
     type: postgresql@17
     mode: NON_HA
