@@ -1,0 +1,32 @@
+#yamlPreprocessor=on
+project:
+  name: laravel-jetstream-prod
+
+services:
+  - hostname: app
+    type: php-nginx@8.4
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-jetstream-app
+    enableSubdomainAccess: true
+    envSecrets:
+      APP_KEY: <@generateRandomString(<32>)>
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
+
+  - hostname: db
+    type: postgresql@16
+    mode: HA
+    priority: 10
+
+  - hostname: redis
+    type: valkey@7.2
+    mode: HA
+    priority: 10
+
+  - hostname: storage
+    type: object-storage
+    objectStorageSize: 5
+    objectStoragePolicy: public-read
+    priority: 10

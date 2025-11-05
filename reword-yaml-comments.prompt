@@ -1,3 +1,9 @@
 Read all the files recursively in the current directory to get the gist. And then try to revise all the comments in the .yaml files.
-Don't make any information up, just try to reword phrases that are off, keep the same tone, try to be professional and helpful.
-Replace occurrences of "our app" to "the app" and consolidate tense and addressing to "we" and present time.
+Don't make any information up, try to reword phrases that are off, keep the same tone, try to be professional and helpful.
+Replace occurrences of "our app" to "the app" and consolidate addressing and tense to present time.
+
+For zerops.yaml in app:
+We have an example Laravel Jetstream app here.
+I want you to skim through some of the key files and help me correct and/or improve the comments in the associated `zerops.yaml`.
+Don't make any information up, try to reword phrases that are off, keep the same tone, try to be professional and helpful.
+Replace occurrences of "our app" to "the app" and consolidate addressing and tense to present time.
