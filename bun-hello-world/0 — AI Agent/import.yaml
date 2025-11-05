@@ -2,12 +2,12 @@ project:
   name: bun-hello-world-agent
 
 services:
-  # Deploy the staging app, which would serve
-  # as means to test the build and deploy process
+  # Deploy the staging app, which serves
+  # as a way to test the build and deploy process
   # and behavior of the deployed app. Enable Zerops
   # subdomain access for easy public access via HTTPS.
   # Agents can continuously deploy to this
-  # service via zCLI or Git push integration from 
+  # service via zCLI or Git push integration from
   # the agent 'appdev' service.
   - hostname: appstage
     type: bun@1.2
@@ -37,7 +37,7 @@ services:
   
   # The app requires a database. Create a PostgreSQL database
   # in single node setup for development/staging purposes.
-  # The database is accessible via it's hostname both from
+  # The database is accessible via its hostname both from
   # the deployed staging 'appstage' and for agents from 'appdev' service.
   - hostname: db
     type: postgresql@17

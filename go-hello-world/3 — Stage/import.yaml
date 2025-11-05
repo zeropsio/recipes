@@ -9,7 +9,7 @@ services:
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/go-hello-world-app
     enableSubdomainAccess: true
-    
+  
   # The app requires a database.
   - hostname: db
     type: postgresql@17

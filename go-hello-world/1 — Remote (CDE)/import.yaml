@@ -14,6 +14,7 @@ services:
 
   # Set up the remote development environment using the 'dev' setup,
   # which includes Go pre-installed based on the zerops.yaml from the 'buildFromGit' repository.
+  # More about remote development at https://docs.zerops.io/references/remote-development.
   - hostname: appdev
     type: go@1
     zeropsSetup: dev
@@ -26,7 +27,7 @@ services:
     #   minRam: 4
     #   cpu: 4
     #   cpuMode: DEDICATED
-    
+  
   # The Hello World Go app requires a database for development.
   # Deploy the database in Zerops, accessible as 'db' hostname
   # within the 'appdev' service.

@@ -5,8 +5,8 @@ services:
   # Deploy the app with minimal default resources
   # and Zerops subdomain enabled, so we can access it
   # from the internet.
-  # The 'buildFromGit' directive says where to fetch source code
-  # and 'zerops.yaml', where we take 'prod' setup to build, deploy
+  # The 'buildFromGit' directive specifies where to fetch the source code
+  # and 'zerops.yaml', from which we use the 'prod' setup to build, deploy,
   # and run the app. It must be a public Git repository.
   - hostname: app
     type: bun@1.2

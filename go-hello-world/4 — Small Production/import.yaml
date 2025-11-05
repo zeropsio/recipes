@@ -14,7 +14,7 @@ services:
     minContainers: 2
     verticalAutoscaling:
       minRam: 0.25
-    
+  
   # The app requires a database.
   # Uses single-container 'NON_HA' mode for this small production setup.
   # Automatic daily encrypted backups are enabled by default.

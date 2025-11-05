@@ -2,25 +2,26 @@ project:
   name: bun-hello-world-remote
 
 services:
-  # Deploy the staging app, which would serve
-  # as means to test the build and deploy process
+  # Deploy the staging app, which serves
+  # as a way to test the build and deploy process
   # and behavior of the deployed app. Enable Zerops
   # subdomain access for public access via HTTPS.
   # One would typically continuously deploy to this
-  # service via zCLI or Git push integration from 
+  # service via zCLI or Git push integration from
   # the remote development 'appdev' service.
   - hostname: appstage
     type: bun@1.2
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
     enableSubdomainAccess: true
-
+  
   # Deploy the remote development service, which
   # contains the source code from recipe's public repository,
-  # and is ready for a developer to hop-in and start making
+  # and is ready for a developer to hop in and start making
   # changes to the code.
   # Public Zerops subdomain access is enabled, so one can
   # test the app's behavior from the outside via HTTPS.
+  # More about remote development: https://docs.zerops.io/references/remote-development
   - hostname: appdev
     type: bun@1.2
     zeropsSetup: dev
@@ -37,7 +38,7 @@ services:
   
   # The app requires a database. Create a PostgreSQL database
   # in single node setup for development/staging purposes.
-  # The database is accessible via it's hostname both from
+  # The database is accessible via its hostname both from
   # the deployed staging 'appstage' and development 'appdev' service.
   - hostname: db
     type: postgresql@17

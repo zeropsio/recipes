@@ -17,7 +17,7 @@ services:
     verticalAutoscaling:
       cpuMode: DEDICATED
       minRam: 0.5
-    
+  
   # The app requires a database.
   # Deploys an HA database for improved resilience
   # and performance, with increased minimum resource limits.

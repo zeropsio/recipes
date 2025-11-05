@@ -2,9 +2,9 @@ project:
   name: bun-hello-world-local
 
 services:
-  # Deploy our app even for the 'local' setup,
-  # so we can test our build and deploy process
-  # and deployed app's behavior. Enabled Zerops subdomain
+  # Deploy the app even for the 'local' setup,
+  # so we can test the build and deploy process
+  # and deployed app's behavior. The enabled Zerops subdomain
   # allows us to test the app via HTTPS.
   # Typical development workflow in 'local' environment
   # includes running and testing the app locally
@@ -19,7 +19,7 @@ services:
   # The app requires a database. Create a PostgreSQL database
   # in single node setup with close to minimal default resources.
   # You would typically connect to the database locally
-  # over zCLI Zerops VPN, which would make accessible the database
+  # over zCLI Zerops VPN, which would make the database accessible
   # on its hostname 'db' or 'db.zerops'. So you would connect
   # the same as the above staging service would.
   - hostname: db
