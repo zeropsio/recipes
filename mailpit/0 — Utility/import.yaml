@@ -1,0 +1,8 @@
+# Service utility serves as a single-service addon deployment into existing projects.
+services:
+  # Deploy the 'mailpit' service and expose it
+  # publicly on HTTPS via Zerops subdomain. 
+  - hostname: mailpit
+    type: alpine@3.21
+    buildFromGit: https://github.com/zerops-recipe-apps/mailpit-app
+    enableSubdomainAccess: true

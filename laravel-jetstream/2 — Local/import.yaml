@@ -35,6 +35,5 @@ services:
     
   - hostname: mailpit
     type: go@1
-    # FIXME(tikinang): Replace with apps repository.
-    buildFromGit: https://github.com/zeropsio/recipe-mailpit
+    buildFromGit: https://github.com/zerops-recipe-apps/mailpit-app
     enableSubdomainAccess: true
