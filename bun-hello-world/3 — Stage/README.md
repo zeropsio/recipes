@@ -6,6 +6,6 @@ This is a stage environment for [Bun Hello World (info + deploy)](https://app.ze
 <!-- #ZEROPS_REMOVE_START# -->
 <!-- #ZEROPS_EXTRACT_START:intro# -->
 **Stage** environment uses the same configuration as production,
-but runs on a single containers with lower scaling settings.
+but runs on a single container with lower scaling settings.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 <!-- #ZEROPS_REMOVE_END# -->

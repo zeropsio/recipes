@@ -6,6 +6,6 @@ This is an AI agent environment for [Laravel Jetstream (info + deploy)](https://
 <!-- #ZEROPS_REMOVE_START# -->
 <!-- #ZEROPS_EXTRACT_START:intro# -->
 **AI agent** environment provides a development space for AI agents to build and version the app.
-*TODO: Change app to one of (app|framework|project). Add summary of deployed services.*
+Comes with a dev service with the source code and necessary development tools, a staging service, email & SMTP testing tool, and a low-resource databases and storage.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 <!-- #ZEROPS_REMOVE_END# -->

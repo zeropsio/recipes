@@ -1,7 +1,11 @@
 #yamlPreprocessor=on
+
+# Highly-available production environment provides a production setup
+# with enhanced scaling, dedicated resources, and HA components for improved durability and performance.
+
 project:
   name: laravel-jetstream-ha-prod
-  # Specifies the highly available, higher-performance core service.
+  # Use the highly available, higher-performance core service.
   corePackage: SERIOUS
 
 services:

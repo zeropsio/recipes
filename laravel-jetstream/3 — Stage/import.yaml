@@ -1,4 +1,8 @@
 #yamlPreprocessor=on
+
+# Stage environment uses the same configuration as production,
+# but runs on the lowest scaling settings.
+
 project:
   name: laravel-jetstream-stage
 

@@ -7,6 +7,6 @@ This is a remote (CDE) environment for [Laravel Jetstream (info + deploy)](https
 <!-- #ZEROPS_EXTRACT_START:intro# -->
 **Remote (CDE)** environment allows developers to build the app **within Zerops** via SSH,
 supporting the full development lifecycle without local tool installation.
-*TODO: Change app to one of (app|framework|project). Add summary of deployed services.*
+Comes with a dev service with the source code and necessary development tools, a staging service, email & SMTP testing tool, and a low-resource databases and storage.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 <!-- #ZEROPS_REMOVE_END# -->

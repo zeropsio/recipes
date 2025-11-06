@@ -6,6 +6,6 @@ This is a stage environment for [PLACEHOLDER_PRETTY_RECIPE_NAME (info + deploy)]
 <!-- #ZEROPS_REMOVE_START# -->
 <!-- #ZEROPS_EXTRACT_START:intro# -->
 **Stage** environment uses the same configuration as production,
-but runs on a single containers with lower scaling settings.
+but runs on a single container with lower scaling settings.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 <!-- #ZEROPS_REMOVE_END# -->

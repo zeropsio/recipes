@@ -7,6 +7,6 @@ This is a local environment for [Laravel Jetstream (info + deploy)](https://app.
 <!-- #ZEROPS_EXTRACT_START:intro# -->
 **Local** environment supports local app development using zCLI VPN for database access,
 while ensuring valid deployment processes using a staged app in Zerops.
-*TODO: Change app to one of (app|framework|project). Add summary of deployed services.*
+Comes with a dev service with the source code and necessary development tools, a staging service, email & SMTP testing tool, and a low-resource databases and storage.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 <!-- #ZEROPS_REMOVE_END# -->

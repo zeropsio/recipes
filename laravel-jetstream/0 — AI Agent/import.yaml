@@ -1,4 +1,9 @@
 #yamlPreprocessor=on
+
+# AI agent environment provides a development space for AI agents to build and version the app.
+# Comes with a dev service with the source code and necessary development tools,
+# a staging service, email & SMTP testing tool, and a low-resource databases and storage.
+
 project:
   name: laravel-jetstream-agent
 

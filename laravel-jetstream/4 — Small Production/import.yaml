@@ -1,4 +1,7 @@
 #yamlPreprocessor=on
+
+# Small production environment offers a production-ready setup optimized for moderate throughput.
+
 project:
   name: laravel-jetstream-prod
 
