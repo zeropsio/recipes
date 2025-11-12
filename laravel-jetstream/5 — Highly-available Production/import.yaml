@@ -1,4 +1,4 @@
-#yamlPreprocessor=on
+# yamlPreprocessor=on
 
 # Highly-available production environment provides a production setup
 # with enhanced scaling, dedicated resources, and HA components for improved durability and performance.
@@ -9,30 +9,58 @@ project:
   corePackage: SERIOUS
 
 services:
+  # Deploy the Laravel Jetstream app, running on
+  # PHP 8.4 with Nginx (FastCGI) as webserver. 
   - hostname: app
     type: php-nginx@8.4
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-jetstream-app
+    # Disabling the subdomain access is recommended,
+    # after you set up access through your own domain(s).
     enableSubdomainAccess: true
     envSecrets:
+      # Let Zerops generate random App key,
+      # used for encryption, signing and random data generation. 
+      # Using the Zerops YAML preprocessing:
+      # see https://docs.zerops.io/references/import-yaml/pre-processor.
       APP_KEY: <@generateRandomString(<32>)>
+    # Scale the app to at least 2 runtime containers
+    # running simultaneously, with higher than minimal
+    # assigned resources.
     minContainers: 2
     verticalAutoscaling:
       minRam: 0.25
       minFreeRamGB: 0.125
+  
+  # Set higher priority for databases and storages,
+  # because the app depends on those services.
 
+  # Deploy the PostgreSQL database in highly-available mode,
+  # used by the Laravel app to store data. Automatic,
+  # encrypted backups are enabled by default too.
   - hostname: db
     type: postgresql@16
     mode: HA
     priority: 10
 
+  # Spin up Valkey, an open-source Redis-compatible
+  # key/value storage for caching, sessions, queues, etc.
   - hostname: redis
     type: valkey@7.2
     mode: HA
     priority: 10
 
+  # Create 'public-read' object storage bucket,
+  # with 100GB of storage capacity.
+  # The capacity can be easily increased later,
+  # in the service settings.
   - hostname: storage
     type: object-storage
     objectStorageSize: 100
     objectStoragePolicy: public-read
     priority: 10
+  
+  # FIXME(tikinang): Deploy Mailpit? Use 'envSecrets'? Or what?
+  # This environment is deployed without the 'mailpit'
+  # SMTP sink tool. Please, update the 'zerops.yaml' of the app,
+  # to use your SMTP provider ('MAIL_' environment variables).

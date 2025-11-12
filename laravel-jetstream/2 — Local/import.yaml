@@ -1,38 +1,64 @@
-#yamlPreprocessor=on
+# yamlPreprocessor=on
 
 # Local environment supports local app development using zCLI VPN for database access,
 # while ensuring valid deployment processes using a staged app in Zerops.
-# Comes with a dev service with the source code and necessary development tools,
-# a staging service, email & SMTP testing tool, and a low-resource databases and storage.
+# Comes with an email & SMTP testing tool, and a low-resource databases and storage.
 
 project:
   name: laravel-jetstream-local
 
 services:
+  # Deploy the Laravel Jetstream stage app, running on
+  # PHP 8.4 with Nginx (FastCGI) as webserver.
+  # In a typical local development workflow, developers
+  # continuously deploy to this stage 'app' service
+  # (via zCLI or Git integration) from their local workstation,
+  # thus testing the deployment process and deployed
+  # app's behavior.
   - hostname: app
     type: php-nginx@8.4
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-jetstream-app
     enableSubdomainAccess: true
     envSecrets:
+      # Let Zerops generate random App key,
+      # used for encryption, signing and random data generation. 
+      # Using the Zerops YAML preprocessing:
+      # see https://docs.zerops.io/references/import-yaml/pre-processor.
+      # You'll may have to later copy this generated key to your local variables.
       APP_KEY: <@generateRandomString(<32>)>
-    
+  
+  # Deploy low-resource PostgreSQL database,
+  # used by the app to store data. Both the staged
+  # 'app' service and locally developed app
+  # connect to this database. Make this database service
+  # locally available via Zerops VPN (zCLI VPN command), making
+  # it available on 'db' or 'db.zerops' hostname.
   - hostname: db
     type: postgresql@16
     mode: NON_HA
     priority: 10
-
+  
+  # Spin up Redis-compatible Valkey,
+  # used by the app for caching, sessions, queues, etc.
+  # Like the 'db' service, this service is used
+  # by both the staging 'app' service
+  # and locally via zCLI VPN.
   - hostname: redis
     type: valkey@7.2
     mode: NON_HA
     priority: 10
-
+  
+  # Create 'public-read' object storage bucket,
+  # with minimal storage capacity.
   - hostname: storage
     type: object-storage
     objectStorageSize: 2
     objectStoragePolicy: public-read
     priority: 10
-    
+  
+  # Spin up the single-service email and SMTP testing tool,
+  # and make it available on Zerops subdomain.
   - hostname: mailpit
     type: go@1
     buildFromGit: https://github.com/zerops-recipe-apps/mailpit-app

@@ -1,4 +1,4 @@
-#yamlPreprocessor=on
+# yamlPreprocessor=on
 
 # Stage environment uses the same configuration as production,
 # but runs on the lowest scaling settings.
@@ -7,6 +7,8 @@ project:
   name: laravel-jetstream-stage
 
 services:
+  # Deploy the Laravel Jetstream stage app, running on
+  # PHP 8.4 with Nginx (FastCGI) as webserver. 
   - hostname: app
     type: php-nginx@8.4
     zeropsSetup: prod
@@ -14,19 +16,39 @@ services:
     enableSubdomainAccess: true
     envSecrets:
       APP_KEY: <@generateRandomString(<32>)>
+  
+  # Set higher priority for databases and storages,
+  # because the app depends on those services.
 
+  # Deploy single node PostgreSQL database,
+  # used by the Laravel app to store data. Automatic,
+  # encrypted backups are enabled by default.
   - hostname: db
     type: postgresql@16
     mode: NON_HA
     priority: 10
 
+  # Spin up Valkey in single-node mode.
+  # Valkey is an open-source Redis-compatible
+  # key/value storage for caching, sessions, queues, etc.
   - hostname: redis
     type: valkey@7.2
     mode: NON_HA
     priority: 10
-
+  
+  # Create 'public-read' object storage bucket,
+  # with minimal storage capacity.
   - hostname: storage
     type: object-storage
     objectStorageSize: 2
     objectStoragePolicy: public-read
     priority: 10
+
+  # Optionally, spin up the single-service email and SMTP
+  # testing tool.
+  # Feel free to remove this service, if you wish to stage-test
+  # your app with as-close-as-possible production setup.
+  - hostname: mailpit
+    type: go@1
+    buildFromGit: https://github.com/zerops-recipe-apps/mailpit-app
+    enableSubdomainAccess: true

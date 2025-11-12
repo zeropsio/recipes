@@ -1,4 +1,4 @@
-#yamlPreprocessor=on
+# yamlPreprocessor=on
 
 # AI agent environment provides a development space for AI agents to build and version the app.
 # Comes with a dev service with the source code and necessary development tools,
@@ -8,38 +8,68 @@ project:
   name: laravel-jetstream-agent
 
 services:
+  # Deploy the Laravel Jetstream stage app, running on
+  # PHP 8.4 with Nginx (FastCGI) as webserver.
+  # In a typical agentic development workflow, AI agents
+  # continuously deploy to this staging 'appstage' service
+  # (via zCLI or Git integration) from the 'appdev' workstation,
+  # thus testing the deployment process and deployed
+  # app's behavior.
   - hostname: appstage
     type: php-nginx@8.4
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-jetstream-app
     enableSubdomainAccess: true
     envSecrets:
+      # Let Zerops generate random App key,
+      # used for encryption, signing and random data generation. 
+      # Using the Zerops YAML preprocessing:
+      # see https://docs.zerops.io/references/import-yaml/pre-processor.
       APP_KEY: <@generateRandomString(<32>)>
 
+  # Deploy the workstation of the AI agent.
   - hostname: appdev
     type: php-nginx@8.4
+    # Notice that 'dev' setup is used,
+    # deploying this service with only source code
+    # and required development toolset (PHP, Node.js, ...).
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-jetstream-app
+    # Enable Zerops subdomain,
+    # allowing testing the developed app from outside.
     enableSubdomainAccess: true
     envSecrets:
       APP_KEY: <@generateRandomString(<32>)>
-
+  
+  # Deploy low-resource PostgreSQL database,
+  # used by the app to store data. Both the staged
+  # 'appstage' service and AI agents from 'appdev'
+  # typically connect to this database.
   - hostname: db
     type: postgresql@16
     mode: NON_HA
     priority: 10
-
+  
+  # Spin up Redis-compatible Valkey,
+  # used by the app for caching, sessions, queues, etc.
+  # Like the 'db' service, this service is used
+  # by both the staging 'appstage' service
+  # and AI agents from the 'appdev' service.
   - hostname: redis
     type: valkey@7.2
     mode: NON_HA
     priority: 10
-
+  
+  # Create 'public-read' object storage bucket,
+  # with minimal storage capacity.
   - hostname: storage
     type: object-storage
     objectStorageSize: 2
     objectStoragePolicy: public-read
     priority: 10
-
+  
+  # Spin up the single-service email and SMTP testing tool,
+  # and make it available on Zerops subdomain.
   - hostname: mailpit
     type: go@1
     buildFromGit: https://github.com/zerops-recipe-apps/mailpit-app
