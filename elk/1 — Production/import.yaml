@@ -1,0 +1,33 @@
+#zeropsPreprocessor=on
+project:
+  name: recipe-elk
+  tags:
+    - zerops-recipe
+services:
+  - hostname: elkstorage
+    type: elasticsearch@8.16
+    mode: HA
+    priority: 10
+
+  - hostname: kibana
+    type: ubuntu@24.04
+    buildFromGit: https://github.com/zerops-recipe-apps/elk-kibana-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 1
+    maxContainers: 1
+
+  - hostname: logstash
+    type: ubuntu@24.04
+    buildFromGit: https://github.com/zerops-recipe-apps/elk-logstash-app
+    verticalAutoscaling:
+      minRam: 1
+      minFreeRamGB: 0.5
+    maxContainers: 1
+
+  - hostname: apmserver
+    type: ubuntu@24.04
+    buildFromGit: https://github.com/zerops-recipe-apps/elk-apm-server-app
+    maxContainers: 1
+    envSecrets:
+      SECRET_TOKEN: <@generateRandomString(<32>)>

@@ -1,0 +1,34 @@
+#zeropsPreprocessor=on
+project:
+  name: recipe-elk-development
+
+services:
+  # Centerpiece of the ELK stack, Elasticsearch service.
+  - hostname: elkstorage
+    type: elasticsearch@8.16
+    mode: NON_HA
+    priority: 10
+
+  - hostname: kibana
+    type: ubuntu@24.04
+    buildFromGit: https://github.com/zerops-recipe-apps/elk-kibana-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.75
+    maxContainers: 1
+
+  # Feel free to comment this service, if you not wish to use logging.
+  - hostname: logstash
+    type: ubuntu@24.04
+    buildFromGit: https://github.com/zerops-recipe-apps/elk-logstash-app
+    verticalAutoscaling:
+      minRam: 1
+    maxContainers: 1
+
+  # Feel free to comment this service, if you not wish to use APM tracing.
+  - hostname: apmserver
+    type: ubuntu@24.04
+    buildFromGit: https://github.com/zerops-recipe-apps/elk-apm-server-app
+    envSecrets:
+      SECRET_TOKEN: <@generateRandomString(<32>)>
+    maxContainers: 1

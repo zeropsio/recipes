@@ -1,0 +1,18 @@
+TODO: Describe the system as a whole, with differentiation of the categories (examples/frameworks, single-service utility, project utility/OSS). 
+TODO: Tell it to whom and where and when will the text talk.
+TODO: Open agent at ~/code/zerops/recipes, where all recipes live, tell it that we will do the revision and pushing to repos. It should only make changes to the filesystem.
+TODO: Rename the recipe folders from 'recipe-bun' to 'bun-hello-world-app' to reflect the the repo structure.
+TODO: Tell it that we will do the testing.
+TODO: Prepare some form for us, and give it examples of the form with the already existing recipes, eg:
+Category: language-example
+Tags: bun, node-js
+Name: bun-hello-world
+Pretty name: Bun Hello World
+High-level description: Simple language example recipe showcasing basics of how to use Bun on Zerops. It contains simple HTTP API application that connects, reads from and writes to a database.
+Apps:
+- bun-hello-world-app: The Bun application source code with commented zerops.yaml.
+Notes:
+- Bun is a JavaScript runtime, similar to Node.js.
+- Another note.
+
+TODO: Don't touch recipes (folders) and their related apps, that are marked with the .human file. It means that the content from those is written by us and should serve only as inspiration for you, the LLM agent. 
