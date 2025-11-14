@@ -3,7 +3,8 @@ project:
   name: recipe-elk-development
 
 services:
-  # Centerpiece of the ELK stack, Elasticsearch service.
+  # Centerpiece of the ELK stack, Elasticsearch service
+  # Serves as a storage for the logs, traces, settings, etc.
   - hostname: elkstorage
     type: elasticsearch@8.16
     mode: NON_HA
@@ -15,20 +16,20 @@ services:
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 0.75
+    # Kibana needs extra settings and care to run in multiple instances,
+    # limiting the amount of running instances to 1. See 'Scaling' section.
     maxContainers: 1
 
-  # Feel free to comment this service, if you not wish to use logging.
+  # Feel free to remove this service, if you do not wish to use logging.
   - hostname: logstash
     type: ubuntu@24.04
     buildFromGit: https://github.com/zerops-recipe-apps/elk-logstash-app
     verticalAutoscaling:
-      minRam: 1
-    maxContainers: 1
+      minRam: 0.5
 
-  # Feel free to comment this service, if you not wish to use APM tracing.
+  # Feel free to remove this service, if you do not wish to use APM tracing.
   - hostname: apmserver
     type: ubuntu@24.04
     buildFromGit: https://github.com/zerops-recipe-apps/elk-apm-server-app
     envSecrets:
       SECRET_TOKEN: <@generateRandomString(<32>)>
-    maxContainers: 1
