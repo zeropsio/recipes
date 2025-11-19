@@ -1,6 +1,6 @@
 project:
   name: bun-hello-world-ha-prod
-    # Create the recipe project with highly-available, performant core service,
+  # Create the recipe project with highly-available, performant core service,
   # which takes care of project's traffic, logs, metrics and more.
   corePackage: SERIOUS
 

@@ -12,9 +12,23 @@ This is a small production environment for [Bun Hello World (info + deploy)](htt
 <!-- #ZEROPS_REMOVE_END# -->
 
 <!-- #ZEROPS_EXTRACT_START:maintenance_guide# -->
+> [!TIP]
+> To play around with settings, scaling and upgrades effectively,
+> it proved successful for us - the maintainers of this recipe -
+> to use the following or similar workflow (demonstrating on Kibana service):
+>
+> 1. enter "Remote Terminal" in GUI or [login via SSH](https://docs.zerops.io/references/networking/ssh)
+> 2. `sudo su` to gain permission for editing `kibana`'s files
+> 3. fiddle with settings in `/etc/kibana/`
+> 4. `systemctl restart kibana`
+> 5. `journalctl -f -u kibana` to see what's happening
+> 
+> Another useful tip is temporarily disabling the `deploy.readinessCheck` in `zerops.yaml`,
+> allowing to tweak and finalize the unsuccessful deployments at runtime, and permeating the changes into `zerops.yaml` after. 
+
 ## Scaling
 
-### Elasticsearch (storage)
+### Elasticsearch
 
 _TBD: Currently, Zerops only supports two operating modes (single-node, 3-node), without direct support for upgrading between them. Different modes and machine-managed upgrades are coming soon._
 
@@ -171,6 +185,7 @@ Scaling Kibana instances horizontally (adding more containers) is theoretically 
 ### Logstash and APM Server
 
 Logstash and AMP server allows for horizontal scaling, simply increase minimum number of containers in the "Automatic Scaling Configuration" menu.
+For more information visit the individual apps README's below. 
 
 ## Upgrades
 

@@ -1,4 +1,4 @@
-#zeropsPreprocessor=on
+# zeropsPreprocessor=on
 project:
   name: recipe-elk-development
 
@@ -25,7 +25,7 @@ services:
     type: ubuntu@24.04
     buildFromGit: https://github.com/zerops-recipe-apps/elk-logstash-app
     verticalAutoscaling:
-      minRam: 0.5
+      minRam: 0.625
 
   # Feel free to remove this service, if you do not wish to use APM tracing.
   - hostname: apmserver
@@ -33,3 +33,4 @@ services:
     buildFromGit: https://github.com/zerops-recipe-apps/elk-apm-server-app
     envSecrets:
       SECRET_TOKEN: <@generateRandomString(<32>)>
+      

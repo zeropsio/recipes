@@ -1,6 +1,7 @@
-#zeropsPreprocessor=on
+# zeropsPreprocessor=on
 project:
   name: recipe-elk-production
+  corePackage: SERIOUS
 
 services:
   # Centerpiece of the ELK stack, Elasticsearch service.
@@ -14,6 +15,8 @@ services:
     type: ubuntu@24.04
     buildFromGit: https://github.com/zerops-recipe-apps/elk-kibana-app
     enableSubdomainAccess: true
+    envSecrets:
+      NODE_OPTIONS_MAX_OLD_SPACE_SIZE_OVERRIDE: '4096'
     verticalAutoscaling:
       minRam: 0.75
     # Kibana needs extra settings and care to run in multiple instances,
@@ -24,10 +27,12 @@ services:
   - hostname: logstash
     type: ubuntu@24.04
     buildFromGit: https://github.com/zerops-recipe-apps/elk-logstash-app
+    # Set higher heap memory for Logstash to handle more throughput.
     envSecrets:
-      LOGSTASH_TARGET_MEMORY: 2g
+      LOGSTASH_HEAP_MEMORY_OVERRIDE: 1g
     verticalAutoscaling:
-      minRam: 2
+      minRam: 1
+      minFreeRamGB: 0.25
 
   # Feel free to remove this service, if you do not wish to use APM tracing.
   - hostname: apmserver
