@@ -14,7 +14,7 @@ with all the essentials for modern development: login flow, 2FA, sessions, queue
 
 [![Deploy on Zerops](https://github.com/zeropsio/recipe-shared-assets/blob/main/deploy-button/light/deploy-button.svg)](https://app.zerops.io/recipes/laravel-jetstream?environment=small-production)
 
-![cover](https://github.com/zeropsio/recipe-shared-assets/blob/main/covers/svg/cover-laravel-jetstream.svg)
+![cover](https://github.com/zeropsio/recipe-shared-assets/blob/main/covers/svg/cover-laravel.svg)
 
 Offered in examples for the whole development lifecycle — from environments for AI agents like [Claude Code](https://www.anthropic.com/claude-code) or [opencode](https://opencode.ai) through environments for remote (CDE) or local development of each developer to stage and productions of all sizes.
 
