@@ -1,4 +1,4 @@
-# yamlPreprocessor=on
+# zeropsPreprocessor=on
 
 # Stage environment uses the same configuration as production,
 # but runs on the lowest scaling settings.

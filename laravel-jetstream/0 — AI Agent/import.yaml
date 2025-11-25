@@ -1,4 +1,4 @@
-# yamlPreprocessor=on
+# zeropsPreprocessor=on
 
 # AI agent environment provides a development space for AI agents to build and version the app.
 # Comes with a dev service with the source code and necessary development tools,

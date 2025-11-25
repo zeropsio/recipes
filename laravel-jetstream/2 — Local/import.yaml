@@ -1,4 +1,4 @@
-# yamlPreprocessor=on
+# zeropsPreprocessor=on
 
 # Local environment supports local app development using zCLI VPN for database access,
 # while ensuring valid deployment processes using a staged app in Zerops.

@@ -1,4 +1,4 @@
-# yamlPreprocessor=on
+# zeropsPreprocessor=on
 
 # Highly-available production environment provides a production setup
 # with enhanced scaling, dedicated resources, and HA components for improved durability and performance.

@@ -1,4 +1,4 @@
-# yamlPreprocessor=on
+# zeropsPreprocessor=on
 
 # Remote (CDE) environment allows developers to build the app within Zerops via SSH,
 # supporting the full development lifecycle without local tool installation.
