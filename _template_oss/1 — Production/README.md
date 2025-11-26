@@ -12,6 +12,4 @@ _TODO: Update the description to better fit the software._
 # Takeover and Maintenance Guide
 <!-- #ZEROPS_REMOVE_END# -->
 
-<!-- #ZEROPS_EXTRACT_START:maintenance_guide# -->
 _TODO: Takeover and maintenance guide._
-<!-- #ZEROPS_EXTRACT_END:maintenance_guide# -->
