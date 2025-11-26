@@ -1,0 +1,18 @@
+# zeropsPreprocessor=on
+project:
+  name: umami-production
+  corePackage: SERIOUS
+
+services:
+  - hostname: db
+    type: postgresql@17
+    mode: HA
+    priority: 10
+
+  - hostname: umami
+    type: nodejs@22
+    buildFromGit: https://github.com/zerops-recipe-apps/umami-app
+    enableSubdomainAccess: true
+    envSecrets:
+      APP_SECRET: <@generateRandomString(<64>)>
+    minContainers: 2
