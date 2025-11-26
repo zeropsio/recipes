@@ -1,0 +1,7 @@
+# zeropsPreprocessor=on
+project:
+  name: PLACEHOLDER_PROJECT_NAME-development
+
+services:
+  - hostname: todo
+    type: runtime

@@ -27,7 +27,7 @@ Offered in examples for the whole development lifecycle — from environments fo
 
 ---
 
-For more advanced examples see all [Go recipes](https://app.zerops.io/recipes?lf=PLACEHOLDER_RECIPE_TAG) on Zerops.
+For more advanced examples see all [PLACEHOLDER_PRETTY_RECIPE_TAGS recipes](https://app.zerops.io/recipes?lf=PLACEHOLDER_RECIPE_TAGS) on Zerops.
 
 Need help setting your project up? Join [Zerops Discord community](https://discord.gg/zeropsio).
 <!-- #ZEROPS_REMOVE_END# -->

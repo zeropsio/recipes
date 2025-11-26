@@ -27,7 +27,7 @@ Offered in examples for the whole development lifecycle — from environments fo
 
 ---
 
-For more advanced examples see all [Go recipes](https://app.zerops.io/recipes?lf=php) on Zerops.
+For more advanced examples see all [PHP recipes](https://app.zerops.io/recipes?lf=php) on Zerops.
 
 Need help setting your project up? Join [Zerops Discord community](https://discord.gg/zeropsio).
 <!-- #ZEROPS_REMOVE_END# -->
