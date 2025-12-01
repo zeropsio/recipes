@@ -1,15 +1,10 @@
-<!-- #ZEROPS_REMOVE_START# -->
 # Bun Hello World Recipe
-<!-- #ZEROPS_REMOVE_END# -->
 
-<!-- #ZEROPS_REMOVE_START# -->
 <!-- #ZEROPS_EXTRACT_START:intro# -->
 Basic example of running [Bun](https://bun.com/) applications on [Zerops](https://zerops.io).
 Simple Bun API with single endpoint that reads from and writes to a PostgreSQL database.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
-<!-- #ZEROPS_REMOVE_END# -->
 
-<!-- #ZEROPS_REMOVE_START# -->
 ⬇️ **Full recipe page and deploy with one-click**
 
 [![Deploy on Zerops](https://github.com/zeropsio/recipe-shared-assets/blob/main/deploy-button/light/deploy-button.svg)](https://app.zerops.io/recipes/bun-hello-world?environment=small-production)
@@ -30,6 +25,3 @@ Offered in examples for the whole development lifecycle — from environments fo
 For more advanced examples see all [Bun recipes](https://app.zerops.io/recipes?lf=bun,node-js) on Zerops.
 
 Need help setting your project up? Join [Zerops Discord community](https://discord.gg/zeropsio).
-<!-- #ZEROPS_REMOVE_END# -->
-
-

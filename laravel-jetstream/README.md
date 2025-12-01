@@ -1,15 +1,10 @@
-<!-- #ZEROPS_REMOVE_START# -->
 # Laravel Jetstream Recipe
-<!-- #ZEROPS_REMOVE_END# -->
 
-<!-- #ZEROPS_REMOVE_START# -->
 <!-- #ZEROPS_EXTRACT_START:intro# -->
 A showcase of running [Laravel Jetstream](https://jetstream.laravel.com/introduction.html) - an advanced starter kit by Laravel - on [Zerops](https://zerops.io),
 with all the essentials for modern development: login flow, 2FA, sessions, queues, mailing, and cloud-ready file storage.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
-<!-- #ZEROPS_REMOVE_END# -->
 
-<!-- #ZEROPS_REMOVE_START# -->
 ⬇️ **Full recipe page and deploy with one-click**
 
 [![Deploy on Zerops](https://github.com/zeropsio/recipe-shared-assets/blob/main/deploy-button/light/deploy-button.svg)](https://app.zerops.io/recipes/laravel-jetstream?environment=small-production)
@@ -30,6 +25,3 @@ Offered in examples for the whole development lifecycle — from environments fo
 For more advanced examples see all [PHP recipes](https://app.zerops.io/recipes?lf=php) on Zerops.
 
 Need help setting your project up? Join [Zerops Discord community](https://discord.gg/zeropsio).
-<!-- #ZEROPS_REMOVE_END# -->
-
-

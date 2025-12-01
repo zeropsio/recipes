@@ -1,15 +1,13 @@
-<!-- #ZEROPS_REMOVE_START# -->
 # ELK — Development Environment
 This is a development environment for [ELK (info + deploy)](https://app.zerops.io/recipes/elk?environment=development) recipe on [Zerops](https://zerops.io).
-<!-- #ZEROPS_REMOVE_END# -->
 
-<!-- #ZEROPS_REMOVE_START# -->
 <!-- #ZEROPS_EXTRACT_START:intro# -->
 **Development** environment provides a low-resource ELK setup, suitable for small productions or development.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 
 # Takeover and Maintenance Guide
-<!-- #ZEROPS_REMOVE_END# -->
+
+<!-- #ZEROPS_EXTRACT_START:maintenance-guide# -->
 
 > [!TIP]
 > To play around with settings, scaling and upgrades effectively,
@@ -200,3 +198,5 @@ This can be done by forking the app repository and/or `zcli push` with the chang
 Automatic encrypted backups are enabled by default for the Elasticsearch service.
 The backup format is of the [elasticdump](https://github.com/elasticsearch-dump/elasticsearch-dump) utility (i.e. output of this command `elasticdump --input=http://localhost:9200 --output=$ --limit=100`).
 Feel free to enable snapshots by adding Object Storage service, see "Scaling > Elasticsearch".
+
+<!-- #ZEROPS_EXTRACT_END:maintenance-guide# -->
