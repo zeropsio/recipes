@@ -1,0 +1,34 @@
+# zeropsPreprocessor=on
+project:
+  name: strapi-production
+  corePackage: SERIOUS
+  
+services:
+  - hostname: strapi
+    type: nodejs@22
+    buildFromGit: https://github.com/zerops-recipe-apps/strapi-app
+    zeropsSetup: prod
+    envSecrets:
+      APP_KEYS: <@generateRandomString(<32>)>,<@generateRandomString(<32>)>
+      API_TOKEN_SALT: <@generateRandomString(<32>)>
+      ADMIN_JWT_SECRET: <@generateRandomString(<32>)>
+      TRANSFER_TOKEN_SALT: <@generateRandomString(<32>)>
+      JWT_SECRET: <@generateRandomString(<32>)>
+      ENCRYPTION_KEY: <@generateRandomString(<32>)>
+    enableSubdomainAccess: true
+
+  - hostname: db
+    type: postgresql@17
+    priority: 10
+    mode: HA
+
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 50
+    objectStoragePolicy: public-read
+
+  - hostname: mailpit
+    type: go@1
+    buildFromGit: https://github.com/zerops-recipe-apps/mailpit-app
+    enableSubdomainAccess: true

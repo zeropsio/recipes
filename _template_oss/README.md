@@ -13,8 +13,8 @@ PLACEHOLDER_RECIPE_DESCRIPTION
 
 Offered in two basic environments:
 
-- **Development** [[info]](/0%20—%20Development) — [[deploy with one click]](https://app.zerops.io/recipes/PLACEHOLDER_RECIPE_DIRECTORY?environment=ai-agent)
-- **Production** [[info]](/1%20—%20Production) — [[deploy with one click]](https://app.zerops.io/recipes/PLACEHOLDER_RECIPE_DIRECTORY?environment=remote-cde)
+- **Development** [[info]](/0%20—%20Development) — [[deploy with one click]](https://app.zerops.io/recipes/PLACEHOLDER_RECIPE_DIRECTORY?environment=development)
+- **Production** [[info]](/1%20—%20Production) — [[deploy with one click]](https://app.zerops.io/recipes/PLACEHOLDER_RECIPE_DIRECTORY?environment=production)
 
 ---
 

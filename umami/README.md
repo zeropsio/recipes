@@ -12,8 +12,8 @@ One-click deployment of [Umami](https://umami.is/) - modern analytics platform t
 
 Offered in two basic environments:
 
-- **Development** [[info]](/0%20—%20Development) — [[deploy with one click]](https://app.zerops.io/recipes/umami?environment=ai-agent)
-- **Production** [[info]](/1%20—%20Production) — [[deploy with one click]](https://app.zerops.io/recipes/umami?environment=remote-cde)
+- **Development** [[info]](/0%20—%20Development) — [[deploy with one click]](https://app.zerops.io/recipes/umami?environment=development)
+- **Production** [[info]](/1%20—%20Production) — [[deploy with one click]](https://app.zerops.io/recipes/umami?environment=production)
 
 ---
 
