@@ -1,0 +1,32 @@
+# zeropsPreprocessor=true
+
+
+
+project:
+  name: django-ha-prod
+  # Specifies the highly available, higher-performance core service.
+  corePackage: SERIOUS
+
+services:
+  - hostname: app
+    type: python@3.12
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/django-app
+    enableSubdomainAccess: true
+    envSecrets:
+      SECRET_KEY: <@generateRandomBytes(<32>) | toString>
+      # Default superuser password can be found in the environment variables section of the service in GUI.
+      DJANGO_SUPERUSER_PASSWORD: <@generateRandomString(<12>)>
+    minContainers: 2
+    # FIXME(tikinang): Min scaling.
+
+  - hostname: db
+    type: postgresql@17
+    mode: HA
+    priority: 10
+
+  - hostname: storage
+    type: object-storage
+    objectStorageSize: 100
+    objectStoragePolicy: public-read
+    priority: 10

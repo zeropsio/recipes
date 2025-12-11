@@ -1,0 +1,8 @@
+# Django — Remote Environment
+This is a remote (CDE) environment for [Django (info + deploy)](https://app.zerops.io/recipes/django?environment=remote) recipe on [Zerops](https://zerops.io).
+
+<!-- #ZEROPS_EXTRACT_START:intro# -->
+**Remote (CDE)** environment allows developers to build the app **within Zerops** via SSH,
+supporting the full development lifecycle without local tool installation.
+*TODO: Change app to one of (app|framework|project). Add summary of deployed services.*
+<!-- #ZEROPS_EXTRACT_END:intro# -->

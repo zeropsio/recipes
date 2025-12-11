@@ -1,0 +1,38 @@
+# zeropsPreprocessor=true
+
+
+
+project:
+  name: django-stage
+
+services:
+  - hostname: app
+    type: python@3.12
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/django-app
+    enableSubdomainAccess: true
+    envSecrets:
+      SECRET_KEY: <@generateRandomBytes(<32>) | toString>
+      # Default superuser password can be found in the environment variables section of the service in GUI.
+      DJANGO_SUPERUSER_PASSWORD: <@generateRandomString(<12>)>
+
+  - hostname: db
+    type: postgresql@17
+    mode: NON_HA
+    priority: 10
+
+  - hostname: storage
+    type: object-storage
+    objectStorageSize: 5
+    objectStoragePolicy: public-read
+    priority: 10
+
+  - hostname: mailpit
+    type: go@1
+    buildFromGit: https://github.com/zeropsio/recipe-mailpit
+    enableSubdomainAccess: true
+
+  - hostname: adminer
+    type: php-apache@8.3
+    buildFromGit: https://github.com/zeropsio/recipe-adminer
+    enableSubdomainAccess: true
