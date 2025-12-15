@@ -12,7 +12,7 @@ services:
     buildFromGit: https://github.com/zerops-recipe-apps/django-app
     enableSubdomainAccess: true
     envSecrets:
-      SECRET_KEY: <@generateRandomBytes(<32>) | toString>
+      SECRET_KEY: <@generateRandomString(<32>)>
       # Default superuser password can be found in the environment variables section of the service in GUI.
       DJANGO_SUPERUSER_PASSWORD: <@generateRandomString(<12>)>
 
