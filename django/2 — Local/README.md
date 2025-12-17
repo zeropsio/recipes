@@ -4,5 +4,5 @@ This is a local environment for [Django (info + deploy)](https://app.zerops.io/r
 <!-- #ZEROPS_EXTRACT_START:intro# -->
 **Local** environment supports local app development using zCLI VPN for database access,
 while ensuring valid deployment processes using a staged app in Zerops.
-*TODO: Change app to one of (app|framework|project). Add summary of deployed services.*
+Comes with a staging service, email testing tool, web database viewer and a low-resource databases and storage.
 <!-- #ZEROPS_EXTRACT_END:intro# -->

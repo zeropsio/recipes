@@ -1,6 +1,6 @@
 # zeropsPreprocessor=true
 
-
+# Small production environment offers a production-ready setup optimized for moderate throughput.
 
 project:
   name: django-prod

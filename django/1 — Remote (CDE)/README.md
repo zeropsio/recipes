@@ -4,5 +4,6 @@ This is a remote (CDE) environment for [Django (info + deploy)](https://app.zero
 <!-- #ZEROPS_EXTRACT_START:intro# -->
 **Remote (CDE)** environment allows developers to build the app **within Zerops** via SSH,
 supporting the full development lifecycle without local tool installation.
-*TODO: Change app to one of (app|framework|project). Add summary of deployed services.*
+Comes with a dev service containing the source code and necessary development tools,
+a staging service, email testing tool, web database viewer and a low-resource database and storage.
 <!-- #ZEROPS_EXTRACT_END:intro# -->

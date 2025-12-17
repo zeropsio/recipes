@@ -1,6 +1,7 @@
 # zeropsPreprocessor=true
 
-
+# Stage environment uses the same configuration as production,
+# but runs on a single container with lower scaling settings.
 
 project:
   name: django-stage
