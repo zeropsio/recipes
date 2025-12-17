@@ -1,5 +1,77 @@
 # How to Write a Zerops Recipe
 
+## How the Recipe System Works
+
+The Zerops recipe system collects source code, READMEs, import.yamls, and logos from multiple locations and aggregates
+them in Strapi for display in the Zerops GUI.
+
+### Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           STRAPI DATABASE                               │
+│  (Recipe metadata: name, slug, icon, categories, languages/frameworks)  │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    │ references
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    github.com/zeropsio/recipes                          │
+│                                                                         │
+│   bun-hello-world/                                                      │
+│   ├── README.md              (intro fragment)                           │
+│   ├── agent/                                                            │
+│   │   ├── import.yaml        (service definitions + buildFromGit refs)  │
+│   │   └── README.md          (environment intro fragment)               │
+│   ├── stage/                                                            │
+│   │   ├── import.yaml                                                   │
+│   │   └── README.md                                                     │
+│   └── highly-available-production/                                      │
+│       ├── import.yaml                                                   │
+│       └── README.md                                                     │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    │ buildFromGit references
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                  github.com/zerops-recipe-apps                          │
+│                                                                         │
+│   bun-hello-world-app/                                                  │
+│   ├── README.md              (integration-guide, knowledge-base)        │
+│   ├── zerops.yaml            (build/deploy instructions)                │
+│   └── src/...                (application source code)                  │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Data Flow
+
+1. **User browses recipes** in Zerops GUI (filtered by category, language/framework)
+2. **User selects a recipe** → GUI fetches recipe detail from Strapi
+3. **Strapi calls Zerops API** with the recipe folder name (e.g., `bun-hello-world`)
+4. **API fetches from GitHub:**
+    - Recipe folder from `zeropsio/recipes`
+    - Extracts all environments and their `import.yaml` files
+    - Parses `buildFromGit` references to find "app" repositories
+    - Fetches each app repo from `zerops-recipe-apps`
+    - Extracts fragments from all READMEs
+5. **API compiles response** with:
+    - Environment configurations
+    - Integration guides and knowledge base content
+    - Default scaling information and estimated pricing
+6. **Response is cached in Strapi** (must manually refresh during development)
+
+### Key Concepts
+
+| Term             | Description                                                                   |
+|------------------|-------------------------------------------------------------------------------|
+| **Recipe**       | A complete deployable solution (folder in `zeropsio/recipes` + Strapi record) |
+| **Environment**  | A deployment configuration variant (agent, stage, production, etc.)           |
+| **App**          | A single service's source code repository (in `zerops-recipe-apps`)           |
+| **Fragment**     | Extractable section of README marked with special comments                    |
+| **buildFromGit** | Reference in `import.yaml` pointing to an app repository                      |
+
+---
+
 ## Quick Links
 
 | Resource               | URL                                                                                            | Notes                                                                                                |
@@ -218,7 +290,44 @@ Documenting YAML files serves two purposes:
 
 ---
 
+## Human-Written Reference Recipes
+
+These recipes are maintained by humans and serve as canonical examples:
+
+| Recipe               | Category         | Notable For                                           |
+|----------------------|------------------|-------------------------------------------------------|
+| `bun-hello-world`    | language-example | Simple structure, good comments                       |
+| `go-hello-world`     | language-example | Compiled language example                             |
+| `nestjs-hello-world` | language-example | Node.js framework variant                             |
+| `django`             | framework        | Python framework with migrations                      |
+| `laravel-jetstream`  | framework        | PHP framework with full stack                         |
+| `strapi`             | oss-source       | npm prepare workflow, CMS                             |
+| `umami`              | oss-install      | Install-based OSS, analytics                          |
+| `elk`                | oss-install      | Multi-service stack (Elasticsearch, Logstash, Kibana) |
+| `mailpit`            | oss-install      | Single-service utility, email testing                 |
+
+---
+
 ## Open Questions
 
 - **Cache duration** — How long does the GitHub cache last before auto-refresh? (For now: always manually refresh during
   development)
+
+---
+
+## Reference Documentation
+
+- [Pipeline (Build & Deploy)](https://docs.zerops.io/features/pipeline)
+- [Build Cache](https://docs.zerops.io/features/build-cache)
+- [Scaling & High Availability](https://docs.zerops.io/features/scaling-ha)
+- [Environment Variables](https://docs.zerops.io/features/env-variables)
+- [zerops.yaml Specification](https://docs.zerops.io/zerops-yaml/specification)
+- [Runtime Base List](https://docs.zerops.io/zerops-yaml/base-list)
+- [zsc CLI Reference](https://docs.zerops.io/references/zsc)
+- [Import Reference](https://docs.zerops.io/references/import)
+- [Service Type List](https://docs.zerops.io/references/import-yaml/type-list)
+
+### YAML Schemas
+
+- **import.yaml:** https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
+- **zerops.yaml:** https://api.app-prg1.zerops.io/api/rest/public/settings/zerops-yaml-json-schema.json
