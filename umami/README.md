@@ -15,6 +15,23 @@ Offered in two basic environments:
 - **Development** [[info]](/0%20—%20Development) — [[deploy with one click]](https://app.zerops.io/recipes/umami?environment=development)
 - **Production** [[info]](/1%20—%20Production) — [[deploy with one click]](https://app.zerops.io/recipes/umami?environment=production)
 
+## Take-over guide
+
+<!-- #ZEROPS_EXTRACT_START:takeover-guide# -->
+
+After deploying one of the environments you'll have full control over configuration, updates, and scaling from this point forward. 
+
+### Run Umami on your domain
+By default the recipe is set up to run on a Zerops preview domain, to run it on your own, do xyz.
+
+### Upgrading Umami
+When Umami releases a new version, you can either clone our source repository, modify the version number and setup deployment. If our recipes already includes the version you want to upgrade to, go to pipeline trigger and do xyz
+
+### Backing up / restoring Umami data
+Database backups are created daily by default, if you need to restore data, do xyz.
+
+<!-- #ZEROPS_EXTRACT_END:takeover-guide# -->
+
 ## Knowledge Base
 
 <!-- #ZEROPS_EXTRACT_START:knowledge-base# -->
