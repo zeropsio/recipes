@@ -19,8 +19,6 @@ Offered in two basic environments:
 
 <!-- #ZEROPS_EXTRACT_START:takeover-guide# -->
 
-After deploying one of the environments you'll have full control over configuration, updates, and scaling from this point forward. 
-
 ### Run Umami on your domain
 By default the recipe is set up to run on a Zerops preview domain, to run it on your own, do xyz.
 
