@@ -21,8 +21,8 @@ services:
     enableSubdomainAccess: true
     # Agents running Go or linters may require more resources.
     # Adjust limits as needed. Agent services can be stopped when inactive to reduce costs.
-    # verticalAutoscaling:
-    #   minRam: 2
+    verticalAutoscaling:
+      minRam: 0.5
     #   cpu: 4
     #   cpuMode: DEDICATED
 
