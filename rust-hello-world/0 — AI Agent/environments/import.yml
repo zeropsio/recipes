@@ -1,0 +1,18 @@
+project:
+  name: rust-hello-world
+services:
+  - hostname: rust-app
+    type: rust@stable
+    buildConfig:
+      buildCommands:
+        - cargo build --release
+      deployCommands:
+        - ./target/release/rust-hello-world
+    envVariables:
+      DB_URL: ${db_hostname}:${db_port}
+      DB_USER: ${db_user}
+      DB_PASSWORD: ${db_password}
+  
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA

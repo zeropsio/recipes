@@ -1,0 +1,6 @@
+project:
+  name: PLACEHOLDER_PROJECT_NAME-local
+
+services:
+  - hostname: todo
+    type: runtime
