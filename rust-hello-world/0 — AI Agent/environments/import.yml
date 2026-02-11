@@ -1,18 +1,25 @@
+# zeropsPreprocessor=on
+
 project:
-  name: rust-hello-world
+  # Specific name for the AI Agent scenario
+  name: rust-hello-world-agent
+
 services:
-  - hostname: rust-app
+  # Dev service: shell container where the agent builds and versions code
+  - hostname: rust-app-dev
     type: rust@stable
-    buildConfig:
-      buildCommands:
-        - cargo build --release
-      deployCommands:
-        - ./target/release/rust-hello-world
-    envVariables:
-      DB_URL: ${db_hostname}:${db_port}
-      DB_USER: ${db_user}
-      DB_PASSWORD: ${db_password}
-  
+
+  # Staging service: used to verify production-ready builds
+  - hostname: rust-app-stage
+    type: rust@stable
+
+  # Managed PostgreSQL database in NON_HA mode for dev efficiency
   - hostname: db
     type: postgresql@16
     mode: NON_HA
+    envSecrets:
+      # Pre-processor generates a secure password upon import
+      DB_PASSWORD: <@generateRandomString(<20>)>
+
+
+      

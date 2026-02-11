@@ -1,6 +1,0 @@
-project:
-  name: PLACEHOLDER_PROJECT_NAME-agent
-
-services:
-  - hostname: todo
-    type: runtime
