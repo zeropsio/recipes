@@ -1,0 +1,13 @@
+project:
+  name: rust-hello-world-ha
+services:
+  - hostname: app
+    type: rust@stable
+    enableSubdomainAccess: true
+    buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
+    zeropsSetup: prod
+    minContainers: 2
+    maxContainers: 6
+  - hostname: db
+    type: postgresql@16
+    mode: HA

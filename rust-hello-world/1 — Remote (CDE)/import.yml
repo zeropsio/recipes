@@ -1,0 +1,8 @@
+project:
+  name: rust-hello-world-cde
+services:
+  - hostname: app
+    type: rust@stable
+    enableSubdomainAccess: true
+    buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
+    zeropsSetup: dev
