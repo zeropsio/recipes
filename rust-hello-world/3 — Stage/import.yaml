@@ -1,6 +1,0 @@
-project:
-  name: PLACEHOLDER_PROJECT_NAME-stage
-
-services:
-  - hostname: todo
-    type: runtime
