@@ -1,0 +1,11 @@
+project:
+  name: rust-hello-world-local
+services:
+  - hostname: app
+    type: rust@stable
+    enableSubdomainAccess: true
+    buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
+    zeropsSetup: dev
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA

@@ -1,0 +1,24 @@
+project:
+  name: rust-hello-world-agent
+
+services:
+  # Staging service: public access, runs the 'prod' setup
+  - hostname: appstage
+    type: rust@stable
+    enableSubdomainAccess: true
+    buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
+    zeropsSetup: prod
+
+  # Dev service: development environment, runs the 'dev' setup
+  - hostname: appdev
+    type: rust@stable
+    enableSubdomainAccess: true
+    buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
+    zeropsSetup: dev
+
+  # Database
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+
+      
