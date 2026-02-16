@@ -1,24 +1,43 @@
+# AI agent environment provides a development space for AI agents to build and version the app.
+# Comes with a dev service with the source code and necessary development tools (Rust, Cargo, ...),
+# a staging service, and a low-resource database.
+
 project:
   name: rust-hello-world-agent
 
 services:
-  # Staging service: public access, runs the 'prod' setup
+  # Deploy the Rust Hello World stage app, running on
+  # Rust stable with the compiled binary.
+  # In a typical agentic development workflow, AI agents
+  # continuously deploy to this staging 'appstage' service
+  # (via zCLI or Git integration) from the 'appdev' workstation,
+  # thus testing the deployment process and deployed
+  # app's behavior.
   - hostname: appstage
     type: rust@stable
-    enableSubdomainAccess: true
-    buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
     zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
+    # Enable Zerops subdomain,
+    # allowing testing the deployed app from outside.
+    enableSubdomainAccess: true
 
-  # Dev service: development environment, runs the 'dev' setup
+  # Deploy the workstation of the AI agent.
   - hostname: appdev
     type: rust@stable
-    enableSubdomainAccess: true
-    buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
+    # Notice that 'dev' setup is used,
+    # deploying this service with only source code
+    # and required development toolset (Rust, Cargo, ...).
     zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
+    # Enable Zerops subdomain,
+    # allowing testing the developed app from outside.
+    enableSubdomainAccess: true
 
-  # Database
+  # Deploy low-resource PostgreSQL database,
+  # used by the app to store data. Both the staged
+  # 'appstage' service and AI agents from 'appdev'
+  # typically connect to this database.
   - hostname: db
     type: postgresql@16
     mode: NON_HA
-
-      
+    priority: 10
