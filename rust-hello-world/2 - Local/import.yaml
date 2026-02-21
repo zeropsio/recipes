@@ -3,22 +3,18 @@ project:
 
 services:
   # Application service using the production build pipeline.
-  # Run 'zcli push --setup=prod' from your local machine to deploy changes.
-  # Access the cloud-hosted database from your local machine via Zerops VPN:
-  #   zcli vpn up        — connect to the project network
-  #   zcli vpn down      — disconnect when done
-  # With VPN active, DB_HOST resolves to the 'db' container — the same
-  # connection string your production app uses.
+  # Deploy changes from a local machine using 'zcli push --setup=prod'.
+  # Connect to the cloud-hosted database via Zerops VPN:
+  #   zcli vpn up   — connect to the project network
+  #   zcli vpn down — disconnect when done
   - hostname: app
     type: rust@stable
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
     enableSubdomainAccess: true
 
-  # Deploy PostgreSQL database for app data.
-  # Priority 10 ensures the database starts before application containers,
-  # preventing connection errors during deployment. This startup ordering
-  # pattern applies to all data services in this project.
+  # PostgreSQL database service
+  # Priority 10 ensures the DB is available before application services start.
   - hostname: db
     type: postgresql@17
     mode: NON_HA

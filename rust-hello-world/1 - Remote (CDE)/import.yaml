@@ -2,12 +2,10 @@ project:
   name: rust-hello-world-remote-cde
 
 services:
-  # Development container for remote IDE and SSH-based development.
-  # Receives 'zcli push --setup=dev' deployments — the full source tree and
-  # downloaded Cargo registry are deployed so 'cargo run' works immediately
-  # via SSH. Mount /var/www into your IDE (e.g. VS Code Remote SSH) for a
-  # full cloud development environment with the database already wired up.
-  # The 'dev' setup starts with 'zsc noop --silent': you control the app.
+  # Remote Cloud Development Environment (CDE)
+  # Supports remote IDEs (e.g., VS Code Remote SSH) with the source tree and
+  # Cargo registry pre-deployed. The 'dev' setup allows manual application
+  # control via SSH.
   - hostname: appdev
     type: rust@stable
     zeropsSetup: dev
@@ -15,25 +13,22 @@ services:
     enableSubdomainAccess: true
     minContainers: 1
     maxContainers: 1
-    # Recommended: increase minRam to 4 GB for a comfortable Rust dev experience.
-    # Rust compilation is RAM-intensive; 4 GB prevents OOM kills during builds.
-    # minRam: 4
-    minRam: 0.5
+    verticalAutoscaling:
+      minRam: 0.5
+    # Note: 0.5 GB is minimal. For heavy compilation, consider increasing 
+    # minRam to 4 GB to prevent OOM errors during builds.
 
-  # Staging container for validating the production build pipeline.
-  # Receives 'zcli push --setup=prod' deployments — the binary is compiled,
-  # deployed, and started automatically. Confirms that release builds work
-  # before promoting changes to production.
+  # Staging service for production pipeline validation
+  # Receives 'zcli push --setup=prod' deployments.
+  # Confirms that release builds and readiness checks pass before production.
   - hostname: appstage
     type: rust@stable
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
     enableSubdomainAccess: true
 
-  # Deploy PostgreSQL database for app data.
-  # Priority 10 ensures the database starts before application containers,
-  # preventing connection errors during deployment. This startup ordering
-  # pattern applies to all data services in this project.
+  # PostgreSQL database service
+  # Priority 10 ensures the DB is ready before application services attempt to connect.
   - hostname: db
     type: postgresql@17
     mode: NON_HA
