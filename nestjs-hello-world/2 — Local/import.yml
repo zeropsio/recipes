@@ -1,8 +1,0 @@
-project:
-  name: nestjs-hello-world-local
-
-services:
-  - hostname: app
-    type: nodejs@22
-    zeropsSetup: prod
-    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-hello-world-app

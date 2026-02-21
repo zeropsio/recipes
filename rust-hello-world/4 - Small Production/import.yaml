@@ -2,14 +2,9 @@ project:
   name: rust-hello-world-small-production
 
 services:
-  # Production application with horizontal autoscaling.
-  # minContainers: 2 ensures zero-downtime deploys: new containers start
-  # and pass the readiness check before old ones are removed from the
-  # project balancer. With a single container, every deploy causes a brief gap.
-  #
-  # minFreeRamGB reserves headroom above the baseline allocation, protecting
-  # against OOM kills during traffic spikes. Rust has no GC, but the Tokio
-  # async runtime and connection handling do allocate under load.
+  # Production service with horizontal and vertical autoscaling.
+  # minContainers: 2 enables zero-downtime deployments by ensuring new 
+  # containers are ready before old ones are decommissioned.
   - hostname: app
     type: rust@stable
     zeropsSetup: prod
@@ -17,13 +12,14 @@ services:
     enableSubdomainAccess: true
     minContainers: 2
     maxContainers: 10
-    minRam: 0.125
-    minFreeRamGB: 0.05
+    verticalAutoscaling:
+      minRam: 0.125
+      minFreeRamGB: 0.05
+    # Note: minFreeRamGB provides headroom for the Tokio runtime and 
+    # connection handling under load, preventing OOM kills.
 
-  # Deploy PostgreSQL database for app data.
-  # Priority 10 ensures the database starts before application containers,
-  # preventing connection errors during deployment. This startup ordering
-  # pattern applies to all data services in this project.
+  # PostgreSQL database service
+  # Priority 10 ensures the database is available before application services start.
   - hostname: db
     type: postgresql@17
     mode: NON_HA
