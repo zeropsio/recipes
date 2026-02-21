@@ -1,0 +1,22 @@
+project:
+  name: rust-hello-world-stage
+
+services:
+  # Staging application — mirrors the production build pipeline on a
+  # single container. Deploy here to validate that 'cargo build --release --locked'
+  # produces a working binary and the readiness check passes before promoting
+  # to a production environment.
+  - hostname: app
+    type: rust@stable
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
+    enableSubdomainAccess: true
+
+  # Deploy PostgreSQL database for app data.
+  # Priority 10 ensures the database starts before application containers,
+  # preventing connection errors during deployment. This startup ordering
+  # pattern applies to all data services in this project.
+  - hostname: db
+    type: postgresql@17
+    mode: NON_HA
+    priority: 10

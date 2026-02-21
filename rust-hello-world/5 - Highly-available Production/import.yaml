@@ -1,0 +1,36 @@
+project:
+  name: rust-hello-world-ha-production
+  # Serious core allocates dedicated physical infrastructure for this project,
+  # eliminating noisy-neighbor effects from shared resources. Use this for
+  # production workloads where consistent latency and throughput matter.
+  corePackage: SERIOUS
+
+services:
+  # Production application with dedicated CPU and horizontal autoscaling.
+  # cpuMode: DEDICATED pins this service to reserved CPU cores — no sharing
+  # with other projects. Combined with minContainers: 2, this provides both
+  # performance consistency and zero-downtime deploys.
+  #
+  # minFreeRamGB: 0.25 reserves 50% of minRam as free headroom, protecting
+  # against OOM kills under load spikes and connection bursts.
+  - hostname: app
+    type: rust@stable
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    maxContainers: 10
+    minRam: 0.5
+    minFreeRamGB: 0.25
+    cpuMode: DEDICATED
+
+  # Highly-available PostgreSQL with streaming replication across two nodes.
+  # HA mode survives a single node failure without data loss or manual failover.
+  # Dedicated CPU prevents database latency from competing with application CPU.
+  # Priority 10 ensures both DB nodes are ready before app containers start.
+  - hostname: db
+    type: postgresql@17
+    mode: HA
+    priority: 10
+    minRam: 1
+    cpuMode: DEDICATED
