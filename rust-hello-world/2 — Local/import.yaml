@@ -1,0 +1,27 @@
+project:
+  name: rust-hello-world-local
+
+services:
+  # Production-mode app service running in the cloud as your remote database peer.
+  # There is no dev container here — you run the Rust app locally on your machine
+  # with 'cargo run'. Connect to the cloud database by running 'zcli vpn up'
+  # first, which creates an encrypted tunnel into the Zerops private network.
+  - hostname: app
+    type: rust@stable
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Deploy PostgreSQL database for app data.
+  # Priority 10 ensures the database starts before app containers, preventing
+  # connection errors during deployment. This pattern applies to all data services.
+  #
+  # Local workflow: run 'zcli vpn up' to access this database directly at
+  # db:5432 from your local machine using the DB_HOST/DB_PORT/DB_USER/DB_PASS
+  # env variables shown in the Zerops dashboard.
+  - hostname: db
+    type: postgresql@17
+    mode: NON_HA
+    priority: 10
