@@ -2,26 +2,22 @@ project:
   name: rust-hello-world-small-production
 
 services:
-  # Production app — two containers minimum for zero-downtime deployments.
-  # When you deploy a new version, Zerops starts new containers alongside the
-  # running ones, only switching traffic once the readiness check passes.
-  # minContainers: 2 ensures this handoff always has a warm container to replace.
+  # Production app — two containers for zero-downtime deploys and basic redundancy.
+  # Zerops autoscales vertically within minRam..maxRam; horizontal scale is fixed here.
   - hostname: app
     type: rust@stable
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
     enableSubdomainAccess: true
+    # Two containers: new containers start before old ones stop (zero-downtime by default).
     minContainers: 2
     verticalAutoscaling:
-      minRam: 0.25
-      # Reserve ~40% of minRam as free headroom. Rust has no GC, but actix-web
-      # spawns worker threads per CPU core and each request allocates on the heap.
-      # Without this reserve, a traffic spike can exhaust RAM and trigger an OOM kill.
-      minFreeRamGB: 0.1
+      # 128MB base + 50MB free reserve — Rust has no GC, but spikes need breathing room.
+      minRam: 0.125
+      minFreeRamGB: 0.05
 
-  # Deploy PostgreSQL database for app data.
-  # Priority 10 ensures the database starts before app containers, preventing
-  # connection errors during deployment. This pattern applies to all data services.
+  # PostgreSQL for app data. Priority 10 starts data services
+  # before app containers, preventing connection errors on startup.
   - hostname: db
     type: postgresql@17
     mode: NON_HA
