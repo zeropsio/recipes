@@ -1,0 +1,37 @@
+project:
+  name: rust-hello-world-ai-agent
+
+services:
+  # Development service — runs the 'dev' zerops.yaml setup.
+  # The build container fetches dependencies and deploys the full source tree,
+  # so an AI agent can SSH in and invoke 'cargo run' without downloading anything first.
+  # Priority is not set here (default 0) because appdev depends on db (priority 10)
+  # starting first — see the 'db' service below for that pattern.
+  - hostname: appdev
+    type: rust@stable
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      # 0.5 GB minimum: 'cargo run' (debug mode) pulls in regex-automata and other
+      # heavy crates that can OOM-kill the container at 0.25 GB. Keep this at 0.5.
+      minRam: 0.5
+
+  # Staging service — runs the 'prod' zerops.yaml setup.
+  # The AI agent pushes to appstage via 'zcli push <appstage-id> --setup=prod'
+  # to test the full compile-and-deploy pipeline before committing the recipe.
+  - hostname: appstage
+    type: rust@stable
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Deploy PostgreSQL database for app data.
+  # Priority 10 ensures the database starts before app containers, preventing
+  # connection errors during deployment. This pattern applies to all data services.
+  - hostname: db
+    type: postgresql@17
+    mode: NON_HA
+    priority: 10
