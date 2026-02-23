@@ -1,6 +1,7 @@
 # Rust Hello World - Highly-available Production
-This is highly-available production environment for [Rust Hello World (info + deploy)](https://app.zerops.io/recipes/rust-hello-world?environment=highly-available-production) recipe on [Zerops](https://zerops.io).
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-Actix Web application connected to a highly-available PostgreSQL cluster with streaming replication, running on dedicated CPU resources under a Serious core for enterprise-grade performance consistency, zero-downtime deploys, and automatic database failover.
+This is an enterprise-grade production environment for [Rust Hello World (info + deploy)](https://app.zerops.io/recipes/rust-hello-world?environment=highly-available-production) recipe on [Zerops](https://zerops.io).
+
+A Rust application with dedicated CPU cores and two minimum containers, paired with a high-availability PostgreSQL cluster running streaming replication — built on the Serious core package for predictable latency at enterprise scale.
 <!-- #ZEROPS_EXTRACT_END:intro# -->

@@ -1,18 +1,28 @@
+# Zerops project import for the Rust Hello World Stage environment.
+# Pre-production environment that mirrors the production build pipeline with
+# minimal resource allocation — validates the full compile-and-deploy cycle
+# before changes are promoted to production.
+
 project:
   name: rust-hello-world-stage
 
 services:
-  # Staging environment for build pipeline validation.
-  # Mirrors the production setup on a single container to verify 
-  # 'cargo build --release' and readiness checks.
+  # Staging app — compiled via the production setup, single container, minimal resources.
+  # Receives 'zcli push --setup=prod' deployments to test the full build pipeline
+  # (cargo build --release --locked) before any change reaches production.
   - hostname: app
     type: rust@stable
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
     enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.25
+      # Reserve ~30% free RAM for request bursts and the tokio-postgres connection pool.
+      minFreeRamGB: 0.05
 
-  # PostgreSQL database service
-  # Priority 10 ensures the DB is available before application containers start.
+  # Deploy PostgreSQL database for app data.
+  # Priority 10 ensures data services start before app containers, preventing
+  # connection errors during deployment. This pattern applies to all data services.
   - hostname: db
     type: postgresql@17
     mode: NON_HA

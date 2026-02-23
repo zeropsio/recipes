@@ -1,33 +1,44 @@
+# Zerops project import for the Rust Hello World AI Agent environment.
+# This configuration provisions two application containers and a database,
+# giving an AI agent a complete dev-and-test workspace in a single project.
+#
+# 'appdev' deploys source code with the full Rust toolchain — the agent SSHs in
+# and runs 'cargo run' directly. 'appstage' builds an optimized release binary via
+# the production pipeline, so the agent can push code and immediately verify the
+# build-and-deploy process end to end.
+
 project:
   name: rust-hello-world-ai-agent
 
 services:
-  # AI agent development workstation
-  # Receives 'zcli push --setup=dev' deployments.
-  # The 'dev' setup allows the agent to manage the application lifecycle via SSH.
+  # AI agent development container — full source tree and pre-fetched crate registry deployed,
+  # Rust toolchain available inside. The agent SSHs in and drives builds manually.
+  # minRam: 0.5 GB is the minimum for 'cargo run'; a cold compile of the dependency graph
+  # may push RAM higher. Scale up verticalAutoscaling.maxRam if OOM events occur.
   - hostname: appdev
     type: rust@stable
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
     enableSubdomainAccess: true
-    minContainers: 1
-    maxContainers: 1
     verticalAutoscaling:
       minRam: 0.5
-    # Note: Rust compilation requires at least 0.5 GB RAM. 
-    # Increase minRam if build processes encounter OOM errors.
 
-  # Staging service for build pipeline validation
-  # Receives 'zcli push --setup=prod' deployments.
-  # Used to verify release builds and readiness checks before production.
+  # Staging container for the production build pipeline — receives 'zcli push --setup=prod'
+  # deployments so the agent can test the full compile-and-deploy cycle before promoting
+  # changes to a real production environment.
   - hostname: appstage
     type: rust@stable
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
     enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.25
+      # Reserve ~30% free RAM for request bursts on the production binary.
+      minFreeRamGB: 0.05
 
-  # PostgreSQL database service
-  # Priority 10 ensures the DB is available before application services start.
+  # Deploy PostgreSQL database for app data.
+  # Priority 10 ensures data services start before app containers, preventing
+  # connection errors during deployment. This pattern applies to all data services.
   - hostname: db
     type: postgresql@17
     mode: NON_HA

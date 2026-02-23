@@ -1,20 +1,23 @@
+# Zerops project import for the Rust Hello World Local development environment.
+# This configuration provisions only a cloud database — the developer runs the
+# Rust application locally and connects to Zerops PostgreSQL via the Zerops VPN.
+#
+# Workflow:
+#   1. zcli vpn up       — connect your local machine to the Zerops project network
+#   2. cargo run         — run the app locally, DB_HOST resolves via VPN
+#   3. zcli vpn down     — disconnect when done
+
 project:
   name: rust-hello-world-local
 
 services:
-  # Application service using the production build pipeline.
-  # Deploy changes from a local machine using 'zcli push --setup=prod'.
-  # Connect to the cloud-hosted database via Zerops VPN:
-  #   zcli vpn up   — connect to the project network
-  #   zcli vpn down — disconnect when done
-  - hostname: app
-    type: rust@stable
-    zeropsSetup: prod
-    buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
-    enableSubdomainAccess: true
-
-  # PostgreSQL database service
-  # Priority 10 ensures the DB is available before application services start.
+  # Cloud database accessible from the developer's local machine via Zerops VPN.
+  # After 'zcli vpn up', the DB_HOST (db_hostname) resolves on your local machine,
+  # allowing local 'cargo run' to connect as if the database were running locally.
+  #
+  # Priority 10 ensures the database is ready before any app containers start.
+  # In this local-dev environment there are no app containers, but the pattern
+  # applies consistently across all Zerops recipes.
   - hostname: db
     type: postgresql@17
     mode: NON_HA

@@ -1,25 +1,31 @@
+# Zerops project import for the Rust Hello World Small Production environment.
+# Production environment with horizontal scaling — two minimum containers ensure
+# zero-downtime deploys and absorb moderate traffic bursts.
+
 project:
   name: rust-hello-world-small-production
 
 services:
-  # Production service with horizontal and vertical autoscaling.
-  # minContainers: 2 enables zero-downtime deployments by ensuring new 
-  # containers are ready before old ones are decommissioned.
+  # Production app — two minimum containers behind the project balancer.
+  # minContainers: 2 guarantees availability during rolling deploys: when a new
+  # application artifact is deployed, new containers start alongside old ones before
+  # old containers are removed from the project balancer. Traffic never drops to zero.
   - hostname: app
     type: rust@stable
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
     enableSubdomainAccess: true
     minContainers: 2
-    maxContainers: 10
     verticalAutoscaling:
-      minRam: 0.125
+      minRam: 0.25
+      # Reserve ~30% free RAM for request bursts and the tokio-postgres connection pool.
+      # Without this reserve, sustained traffic that fills minRam triggers an OOM kill
+      # before Zerops can scale RAM up (scaling checks run every 10 seconds).
       minFreeRamGB: 0.05
-    # Note: minFreeRamGB provides headroom for the Tokio runtime and 
-    # connection handling under load, preventing OOM kills.
 
-  # PostgreSQL database service
-  # Priority 10 ensures the database is available before application services start.
+  # Deploy PostgreSQL database for app data.
+  # Priority 10 ensures data services start before app containers, preventing
+  # connection errors during deployment. This pattern applies to all data services.
   - hostname: db
     type: postgresql@17
     mode: NON_HA
