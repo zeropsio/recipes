@@ -1,0 +1,39 @@
+project:
+  name: rust-hello-world-remote-cde
+
+services:
+  # Development service — runs the 'dev' zerops.yaml setup.
+  # The build container fetches dependencies and deploys the full source tree,
+  # so you can SSH in and invoke 'cargo run' without any setup step. Your IDE
+  # (VS Code Remote, JetBrains Gateway) mounts the container filesystem via SSHFS,
+  # giving you a fully prepared Rust workspace with all crates pre-fetched.
+  - hostname: appdev
+    type: rust@stable
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      # 0.5 GB minimum for interactive development — 'cargo run' in debug mode
+      # compiles with full debug symbols, which peaks higher than the release binary.
+      # For a comfortable experience with multiple SSH sessions, consider bumping to:
+      # minRam: 4
+      minRam: 0.5
+
+  # Staging service — runs the 'prod' zerops.yaml setup.
+  # Use this to validate that the full build pipeline (cargo build --release --locked)
+  # works correctly before promoting to production environments.
+  - hostname: appstage
+    type: rust@stable
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Deploy PostgreSQL database for app data.
+  # Priority 10 ensures the database starts before app containers, preventing
+  # connection errors during deployment. This pattern applies to all data services.
+  - hostname: db
+    type: postgresql@17
+    mode: NON_HA
+    priority: 10

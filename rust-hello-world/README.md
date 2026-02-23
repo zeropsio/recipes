@@ -1,14 +1,14 @@
+<!-- #ZEROPS_EXTRACT_START:intro# -->
 # Rust Hello World Recipe
 
-<!-- #ZEROPS_EXTRACT_START:intro# -->
-Actix-web application connected to PostgreSQL, with a health check endpoint verifying database connectivity. Offered across six environment configurations spanning AI agent workspaces, remote and local development, staging, and production deployments of varying scale.
-<!-- #ZEROPS_EXTRACT_END:intro# -->
+Actix-Web application connected to PostgreSQL, with a health check endpoint at `/` that verifies database connectivity and queries data seeded by an idempotent migration.
 
 **Full recipe page and deploy with one-click**
 
-[![Deploy on Zerops](https://github.com/zeropsio/recipe-shared-assets/blob/main/deploy-button/light/deploy-button.svg)](https://app.zerops.io/recipes/rust-hello-world?environment=small-production)
+[![Deploy on Zerops](https://github.com/zeropsio/recipe-shared-assets/blob/main/deploy-button/light/deploy-button.svg)](https://app.zerops.io/recipes/rust-hello-world)
 
 ![rust](https://github.com/zeropsio/recipe-shared-assets/blob/main/covers/svg/cover-rust.svg)
+<!-- #ZEROPS_EXTRACT_END:intro# -->
 
 Offered in examples for the whole development lifecycle - from environments for AI agents like [Claude Code](https://www.anthropic.com/claude-code) or [opencode](https://opencode.ai) through environments for remote (CDE) or local development of each developer to stage and productions of all sizes.
 
