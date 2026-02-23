@@ -1,7 +1,7 @@
 # Rust Hello World Recipe
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-Actix Web application connected to PostgreSQL, with a health check endpoint verifying live database connectivity.
+Actix-web application connected to PostgreSQL, with a health check endpoint verifying database connectivity. Offered across six environment configurations spanning AI agent workspaces, remote and local development, staging, and production deployments of varying scale.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 
 **Full recipe page and deploy with one-click**

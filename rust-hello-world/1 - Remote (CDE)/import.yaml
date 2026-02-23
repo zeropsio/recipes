@@ -1,34 +1,49 @@
+# Zerops project import for the Rust Hello World Remote (CDE) environment.
+# This configuration provisions two application containers and a database,
+# designed for a developer working via SSH or a cloud IDE (VS Code Remote, Zed, etc.)
+# mounted over SSHFS.
+#
+# 'appdev' is the live workspace — the developer mounts it as a remote filesystem,
+# edits code locally in their IDE, and runs 'cargo run' (or 'cargo watch') via SSH.
+# 'appstage' mirrors the production pipeline so the developer can validate the full
+# build-and-deploy process without touching a real production environment.
+
 project:
   name: rust-hello-world-remote-cde
 
 services:
-  # Remote Cloud Development Environment (CDE)
-  # Supports remote IDEs (e.g., VS Code Remote SSH) with the source tree and
-  # Cargo registry pre-deployed. The 'dev' setup allows manual application
-  # control via SSH.
+  # Developer workspace — full source tree with the Rust toolchain available inside.
+  # Connect via SSH or mount with SSHFS: sftp://appdev/var/www
+  #
+  # minRam: 0.5 GB is the minimum for 'cargo run' on this project's dependency set.
+  # Compiling from cold (no build cache) or running 'cargo check' on a large codebase
+  # can spike RAM to 2–4 GB. Uncomment and raise maxRam if the compiler is OOM-killed:
+  #   verticalAutoscaling:
+  #     minRam: 4
+  #     maxRam: 8
   - hostname: appdev
     type: rust@stable
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
     enableSubdomainAccess: true
-    minContainers: 1
-    maxContainers: 1
     verticalAutoscaling:
       minRam: 0.5
-    # Note: 0.5 GB is minimal. For heavy compilation, consider increasing 
-    # minRam to 4 GB to prevent OOM errors during builds.
 
-  # Staging service for production pipeline validation
-  # Receives 'zcli push --setup=prod' deployments.
-  # Confirms that release builds and readiness checks pass before production.
+  # Staging container for production pipeline validation — receives 'zcli push --setup=prod'
+  # to test the full compile-and-deploy cycle before changes reach production.
   - hostname: appstage
     type: rust@stable
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
     enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.25
+      # Reserve ~30% free RAM for request bursts on the production binary.
+      minFreeRamGB: 0.05
 
-  # PostgreSQL database service
-  # Priority 10 ensures the DB is ready before application services attempt to connect.
+  # Deploy PostgreSQL database for app data.
+  # Priority 10 ensures data services start before app containers, preventing
+  # connection errors during deployment. This pattern applies to all data services.
   - hostname: db
     type: postgresql@17
     mode: NON_HA

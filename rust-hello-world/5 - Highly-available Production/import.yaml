@@ -1,30 +1,37 @@
+# Zerops project import for the Rust Hello World Highly-available Production environment.
+# Enterprise-grade configuration: Serious core package, dedicated CPU cores, HA database
+# with streaming replication, and horizontally scaled app containers.
+
 project:
-  name: rust-hello-world-ha-production
-  # corePackage: SERIOUS allocates dedicated physical infrastructure to ensure
-  # consistent latency and throughput by eliminating noisy-neighbor effects.
+  name: rust-hello-world-highly-available-production
+  # Serious core provides a dedicated hardware node for the project balancer and internal
+  # routing infrastructure. Lightweight (default) is shared and sufficient for development
+  # or small production; Serious eliminates noisy-neighbor effects for enterprise workloads.
+  # Docs: https://docs.zerops.io/features/infrastructure#project-core-options
   corePackage: SERIOUS
 
 services:
-  # High-availability production service with dedicated CPU.
-  # minContainers: 2 ensures zero-downtime deployments. 
-  # cpuMode: DEDICATED reserves CPU cores exclusively for this service.
+  # Production app — dedicated CPU cores, two minimum containers, generous RAM reserve.
+  # cpuMode: DEDICATED allocates exclusive vCPU cores to this service, preventing other
+  # tenants from affecting response latency during CPU-intensive request handling.
   - hostname: app
     type: rust@stable
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
     enableSubdomainAccess: true
     minContainers: 2
-    maxContainers: 10
     cpuMode: DEDICATED
     verticalAutoscaling:
       minRam: 0.5
+      # Reserve ~40% free RAM — higher baseline for enterprise traffic patterns
+      # and to absorb connection pool growth during load spikes.
       minFreeRamGB: 0.25
-    # Note: minFreeRamGB provides headroom against OOM kills during 
-    # connection bursts and high-traffic periods.
 
-  # Highly-available PostgreSQL with streaming replication.
-  # HA mode survives single-node failure without data loss. 
-  # Priority 10 ensures the database is ready before app containers start.
+  # Deploy PostgreSQL database with high-availability replication.
+  # mode: HA provisions a primary and at least one replica with automatic failover,
+  # eliminating the database as a single point of failure.
+  # Priority 10 ensures data services start before app containers, preventing
+  # connection errors during deployment. This pattern applies to all data services.
   - hostname: db
     type: postgresql@17
     mode: HA
@@ -32,3 +39,6 @@ services:
     cpuMode: DEDICATED
     verticalAutoscaling:
       minRam: 1
+      # HA PostgreSQL runs WAL shipping and replication concurrently with query serving —
+      # reserve RAM for replication overhead on top of query workload.
+      minFreeRamGB: 0.5

@@ -1,6 +1,7 @@
 # Rust Hello World - Small Production
-This is small production environment for [Rust Hello World (info + deploy)](https://app.zerops.io/recipes/rust-hello-world?environment=small-production) recipe on [Zerops](https://zerops.io).
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-Actix Web application connected to PostgreSQL, running in a horizontally-scalable production configuration with a minimum of two containers for zero-downtime deploys, RAM reservation to protect against load spikes, and autoscaling up to ten containers.
+This is a small production environment for [Rust Hello World (info + deploy)](https://app.zerops.io/recipes/rust-hello-world?environment=small-production) recipe on [Zerops](https://zerops.io).
+
+A Rust application with two minimum containers for zero-downtime deploys and a PostgreSQL database — suitable for production workloads with moderate traffic and standard availability requirements.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
