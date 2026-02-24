@@ -1,33 +1,36 @@
+# Remote (CDE) environment allows developers to build the app within
+# Zerops via SSH, supporting the full development lifecycle without
+# local tool installation. It includes a dev service with the code
+# repository and necessary development tools, a staging service,
+# and a low-resource database.
+
 project:
-  name: rust-hello-world-remote-cde
+  name: rust-hello-world-remote
 
 services:
-  # Dev workspace — source code + downloaded registry deployed for remote development.
-  # Mount /var/www via SSHFS from your IDE (VS Code Remote SSH, JetBrains Gateway, etc.).
+  # Set up the remote development environment using the 'dev' setup,
+  # which includes Rust pre-installed. Mount this service via SSHFS
+  # from your IDE for a full cloud development experience.
   - hostname: appdev
     type: rust@stable
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
     enableSubdomainAccess: true
     verticalAutoscaling:
-      # cargo run (debug mode) requires ~512MB — OOM-kills at 256MB on regex-automata.
-      # Increase to 4GB for comfortable development with parallel cargo jobs:
-      # minRam: 4
       minRam: 0.5
+      # minRam: 4  # For comfortable IDE-backed development with Rust compilation
 
-  # Staging app — validates production build pipeline before team deploys to production.
+  # Deploy the staging service for testing deployments in the 'prod' setup.
   - hostname: appstage
     type: rust@stable
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
     enableSubdomainAccess: true
     verticalAutoscaling:
-      # Rust binary is lean — 128MB base with 50MB free covers request spikes.
-      minRam: 0.125
-      minFreeRamGB: 0.05
+      minRam: 0.5
 
   # PostgreSQL for app data. Priority 10 starts data services
-  # before app containers, preventing connection errors on startup.
+  # before app containers, preventing connection errors at startup.
   - hostname: db
     type: postgresql@17
     mode: NON_HA
