@@ -1,45 +1,37 @@
+# Remote (CDE) environment allows developers to build the app within Zerops via SSH,
+# supporting the full development lifecycle without local tool installation.
+# Includes a dev service with the code repository and necessary development tools,
+# a staging service, and a low-resource database.
+
 project:
   name: bun-hello-world-remote
 
 services:
-  # Deploy the staging app, which serves
-  # as a way to test the build and deploy process
-  # and behavior of the deployed app. Enable Zerops
-  # subdomain access for public access via HTTPS.
-  # One would typically continuously deploy to this
-  # service via zCLI or Git push integration from
-  # the remote development 'appdev' service.
-  - hostname: appstage
-    type: bun@1.2
-    zeropsSetup: prod
-    buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
-    enableSubdomainAccess: true
-  
-  # Deploy the remote development service, which
-  # contains the source code from recipe's public repository,
-  # and is ready for a developer to hop in and start making
-  # changes to the code.
-  # Public Zerops subdomain access is enabled, so one can
-  # test the app's behavior from the outside via HTTPS.
-  # More about remote development: https://docs.zerops.io/references/remote-development
+  # Set up the remote development environment using the 'dev' setup. Bun and all
+  # dependencies are pre-installed — SSH in and run 'bun run dev' immediately.
+  # Tip: increase minRam to 4 GB if mounting this workspace from an IDE (e.g. VS Code Remote SSH).
   - hostname: appdev
     type: bun@1.2
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
     enableSubdomainAccess: true
-    # Building and running Bun applications or running IDEs in the remote container
-    # may require more than minimal resources. Uncomment the section below
-    # to allocate more resources. Development services can be stopped
-    # when not in use to save costs.
-    # verticalAutoscaling:
-    #   minRam: 4
-    #   cpu: 4
-    #   cpuMode: DEDICATED
-  
-  # The app requires a database. Create a PostgreSQL database
-  # in single node setup for development/staging purposes.
-  # The database is accessible via its hostname both from
-  # the deployed staging 'appstage' and development 'appdev' service.
+    verticalAutoscaling:
+      minRam: 0.5
+      # minRam: 4  # Uncomment for IDE mounting (VS Code Remote SSH, JetBrains Gateway)
+
+  # Deploy the staging service to validate production builds alongside the dev workspace.
+  - hostname: appstage
+    type: bun@1.2
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Database accessible as 'db' hostname from both appdev and appstage services.
   - hostname: db
     type: postgresql@17
     mode: NON_HA
+    # Priority 10 starts data services before app containers, preventing connection errors.
+    priority: 10

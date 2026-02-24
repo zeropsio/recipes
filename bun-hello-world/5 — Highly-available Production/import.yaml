@@ -1,36 +1,34 @@
+# Highly-available production environment provides a production setup with enhanced scaling,
+# dedicated resources, and HA components for improved durability and performance.
+
 project:
   name: bun-hello-world-ha-prod
-  # Create the recipe project with highly-available, performant core service,
-  # which takes care of project's traffic, logs, metrics and more.
+  # Serious core provides dedicated infrastructure resources for production workloads
   corePackage: SERIOUS
 
 services:
-  # Deploy the app with Zerops subdomain enabled.
-  # We highly recommend setting up access through your own custom domains
-  # and disabling the Zerops subdomain after.
-  # The 'buildFromGit' directive specifies where to fetch the source code
-  # and 'zerops.yaml', from which we use the 'prod' setup to build, deploy,
-  # and run the app. It must be a public Git repository.
+  # Production app with dedicated CPUs and HA-grade scaling.
+  # minContainers: 2 ensures zero-downtime deploys and request distribution.
   - hostname: app
     type: bun@1.2
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
     enableSubdomainAccess: true
-    # Run the app always at least in 2 containers,
-    # with dedicated CPUs and higher minimum available RAM
-    # to support higher production loads.
     minContainers: 2
     verticalAutoscaling:
+      # DEDICATED mode: guaranteed CPU cores — no throttling under sustained load
       cpuMode: DEDICATED
       minRam: 0.5
-  
-  # The app requires a database. Create a PostgreSQL database
-  # in highly-available setup with dedicated CPUs
-  # and higher minimal RAM to support more traffic. 
-  # Automatic encrypted backups are on by default even for HA databases.
+      # Reserve 50% free RAM for runtime GC cycles and traffic spikes
+      minFreeRamGB: 0.25
+
+  # PostgreSQL HA mode replicates data across multiple nodes — no single point of failure.
+  # Priority 10 starts data services before app containers, preventing connection errors.
   - hostname: db
     type: postgresql@17
     mode: HA
+    priority: 10
     verticalAutoscaling:
       cpuMode: DEDICATED
       minRam: 1
+      minFreeRamGB: 0.5
