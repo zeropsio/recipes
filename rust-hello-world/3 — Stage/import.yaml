@@ -1,21 +1,23 @@
+# Stage environment uses the same configuration as production,
+# but runs on a single container with lower scaling settings.
+
 project:
   name: rust-hello-world-stage
 
 services:
-  # Staging app — mirrors production config to catch integration issues before release.
-  # Uses the same 'prod' setup (release binary, readiness check) as production.
+  # Stage app — same prod build pipeline and configuration as production,
+  # running on a single container with lower resource allocation.
   - hostname: app
     type: rust@stable
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
     enableSubdomainAccess: true
     verticalAutoscaling:
-      # Rust binary is lean — 128MB base with 50MB free covers request spikes.
-      minRam: 0.125
-      minFreeRamGB: 0.05
+      minRam: 0.25
+      minFreeRamGB: 0.1
 
   # PostgreSQL for app data. Priority 10 starts data services
-  # before app containers, preventing connection errors on startup.
+  # before app containers, preventing connection errors at startup.
   - hostname: db
     type: postgresql@17
     mode: NON_HA
