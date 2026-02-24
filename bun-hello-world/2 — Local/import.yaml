@@ -1,27 +1,25 @@
+# Local environment supports local app development using zCLI VPN for database access,
+# while ensuring valid deployment processes using a staged app in Zerops.
+
 project:
   name: bun-hello-world-local
 
 services:
-  # Deploy the app even for the 'local' setup,
-  # so we can test the build and deploy process
-  # and deployed app's behavior. The enabled Zerops subdomain
-  # allows us to test the app via HTTPS.
-  # Typical development workflow in 'local' environment
-  # includes running and testing the app locally
-  # and then deploying it via zCLI or Git push integration
-  # into this Zerops staging service.
+  # Staged app for validating production builds while developing locally.
+  # Run 'zcli vpn up' to connect your local machine to the Zerops network,
+  # then point your local app at the 'db' hostname for database access.
   - hostname: app
     type: bun@1.2
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
     enableSubdomainAccess: true
-  
-  # The app requires a database. Create a PostgreSQL database
-  # in single node setup with close to minimal default resources.
-  # You would typically connect to the database locally
-  # over zCLI Zerops VPN, which would make the database accessible
-  # on its hostname 'db' or 'db.zerops'. So you would connect
-  # the same as the above staging service would.
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Database accessible via VPN on your local machine using the 'db' hostname.
   - hostname: db
     type: postgresql@17
     mode: NON_HA
+    # Priority 10 starts data services before app containers, preventing connection errors.
+    priority: 10
