@@ -1,21 +1,23 @@
+# Stage environment uses the same configuration as production,
+# but runs on a single container with lower scaling settings.
+
 project:
   name: bun-hello-world-stage
 
 services:
-  # Deploy the app with minimal default resources
-  # and Zerops subdomain enabled, so we can access it
-  # from the internet.
-  # The 'buildFromGit' directive specifies where to fetch the source code
-  # and 'zerops.yaml', from which we use the 'prod' setup to build, deploy,
-  # and run the app. It must be a public Git repository.
+  # Staging app — test the production build pipeline via 'zcli push' before promoting to prod.
   - hostname: app
     type: bun@1.2
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
     enableSubdomainAccess: true
-  
-  # The app requires a database. Create a PostgreSQL database
-  # in single node setup ('NON_HA') for testing/staging purposes.
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL for app data. Priority 10 starts data services
+  # before app containers, preventing connection errors.
   - hostname: db
     type: postgresql@17
     mode: NON_HA
+    priority: 10

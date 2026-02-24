@@ -1,14 +1,10 @@
+# Small production environment offers a production-ready setup optimized for moderate throughput.
+
 project:
-  name: bun-hello-world-prod
+  name: bun-hello-world-small-prod
 
 services:
-  # Deploy the app with Zerops subdomain enabled,
-  # so we can access it from the internet. We recommend
-  # setting up access through your own custom domains
-  # and disabling the Zerops subdomain after.
-  # The 'buildFromGit' directive specifies where to fetch the source code
-  # and 'zerops.yaml', from which we use the 'prod' setup to build, deploy,
-  # and run the app. It must be a public Git repository.
+  # Production app — minContainers: 2 ensures high availability and horizontal scaling.
   - hostname: app
     type: bun@1.2
     zeropsSetup: prod
@@ -17,10 +13,12 @@ services:
     minContainers: 2
     verticalAutoscaling:
       minRam: 0.25
-  
-  # The app requires a database. Create a PostgreSQL database
-  # in single node setup ('NON_HA'). Single node databases are vulnerable
-  # to data loss, that's why automatic encrypted backups are on by default.
+      # Reserve ~50% free RAM — V8-based runtimes need headroom for traffic spikes
+      minFreeRamGB: 0.125
+
+  # PostgreSQL for app data. Priority 10 starts data services
+  # before app containers, preventing connection errors.
   - hostname: db
     type: postgresql@17
     mode: NON_HA
+    priority: 10
