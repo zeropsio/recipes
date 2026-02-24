@@ -1,11 +1,16 @@
+# Highly-available production environment provides a production setup
+# with enhanced scaling, dedicated resources, and HA components for
+# improved durability and performance.
+
+# Serious core provides enhanced infrastructure reliability
+# for production workloads with stricter SLA requirements.
 project:
-  name: rust-hello-world-highly-available-production
-  # Serious core: dedicated physical CPUs for the project balancer — eliminates
-  # noisy-neighbor interference under sustained production load.
+  name: rust-hello-world-ha-prod
   corePackage: SERIOUS
 
 services:
-  # HA production app — dedicated CPUs and RAM reserve for consistent latency.
+  # Production app with dedicated CPUs for consistent performance
+  # under load. Two containers minimum for zero-downtime deploys.
   - hostname: app
     type: rust@stable
     zeropsSetup: prod
@@ -13,19 +18,17 @@ services:
     enableSubdomainAccess: true
     minContainers: 2
     verticalAutoscaling:
-      # DEDICATED: physical CPU cores, no sharing — eliminates scheduling jitter.
       cpuMode: DEDICATED
-      # 256MB base + 100MB free. More headroom than Small Production for sustained load.
-      minRam: 0.25
-      minFreeRamGB: 0.1
+      minRam: 0.5
+      minFreeRamGB: 0.25
 
-  # HA PostgreSQL — primary + replica, automatic failover, no single point of failure.
-  # Priority 10 starts data services before app containers, preventing connection errors.
+  # HA PostgreSQL — automatic failover across availability zones.
+  # Dedicated CPUs prevent noisy-neighbor latency on queries.
   - hostname: db
     type: postgresql@17
     mode: HA
     priority: 10
     verticalAutoscaling:
-      cpuMode: DEDICATED  # Consistent query performance under load
+      cpuMode: DEDICATED
       minRam: 1
-      minFreeRamGB: 0.5   # 50% reserve — WAL writes and vacuuming need headroom
+      minFreeRamGB: 0.5

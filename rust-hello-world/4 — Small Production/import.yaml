@@ -1,23 +1,24 @@
+# Small production environment offers a production-ready setup
+# optimized for moderate throughput.
+
 project:
-  name: rust-hello-world-small-production
+  name: rust-hello-world-small-prod
 
 services:
-  # Production app — two containers for zero-downtime deploys and basic redundancy.
-  # Zerops autoscales vertically within minRam..maxRam; horizontal scale is fixed here.
+  # Production app — two containers minimum for zero-downtime deploys
+  # and basic redundancy. Autoscaling adds more under load.
   - hostname: app
     type: rust@stable
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
     enableSubdomainAccess: true
-    # Two containers: new containers start before old ones stop (zero-downtime by default).
     minContainers: 2
     verticalAutoscaling:
-      # 128MB base + 50MB free reserve — Rust has no GC, but spikes need breathing room.
-      minRam: 0.125
-      minFreeRamGB: 0.05
+      minRam: 0.25
+      minFreeRamGB: 0.1
 
   # PostgreSQL for app data. Priority 10 starts data services
-  # before app containers, preventing connection errors on startup.
+  # before app containers, preventing connection errors at startup.
   - hostname: db
     type: postgresql@17
     mode: NON_HA
