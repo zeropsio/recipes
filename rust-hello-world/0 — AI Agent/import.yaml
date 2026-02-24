@@ -1,31 +1,36 @@
+# AI agent environment provides a development space for AI agents
+# to build and version the app. It includes a dev service with the
+# code repository and necessary development tools, a staging service,
+# and a low-resource database.
+
 project:
-  name: rust-hello-world-ai-agent
+  name: rust-hello-world-agent
 
 services:
-  # Dev workspace — source code + downloaded registry deployed for interactive use.
-  # AI agent SSHes in, runs cargo build/run, edits files directly.
+  # Set up the AI agent development environment using the 'dev' setup,
+  # which includes Rust pre-installed based on the zerops.yaml from
+  # the 'buildFromGit' repository.
   - hostname: appdev
     type: rust@stable
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
     enableSubdomainAccess: true
     verticalAutoscaling:
-      # cargo run (debug mode) requires ~512MB — OOM-kills at 256MB on regex-automata.
       minRam: 0.5
 
-  # Staging app — tests the production build pipeline via 'zcli push --setup=prod'.
+  # Deploy the staging service, where agents can continuously deploy
+  # code changes to test the deployment process and verify app
+  # behavior in the 'prod' setup.
   - hostname: appstage
     type: rust@stable
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
     enableSubdomainAccess: true
     verticalAutoscaling:
-      # Rust binary is lean — 128MB base with 50MB free covers request spikes.
-      minRam: 0.125
-      minFreeRamGB: 0.05
+      minRam: 0.5
 
   # PostgreSQL for app data. Priority 10 starts data services
-  # before app containers, preventing connection errors on startup.
+  # before app containers, preventing connection errors at startup.
   - hostname: db
     type: postgresql@17
     mode: NON_HA

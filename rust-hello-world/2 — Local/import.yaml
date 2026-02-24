@@ -1,21 +1,26 @@
+# Local environment supports local app development using zCLI VPN
+# for database access, while ensuring valid deployment processes
+# using a staged app in Zerops.
+
 project:
   name: rust-hello-world-local
 
 services:
-  # Production app — used as a local staging target while developing on your machine.
-  # Connect via 'zcli vpn up' to access the database directly from localhost.
+  # Staging app for validating the 'prod' build pipeline.
+  # Run the app locally via 'zcli vpn up', deploy to this service
+  # with 'zcli push' to verify the full build and deploy process.
   - hostname: app
     type: rust@stable
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/rust-hello-world-app
     enableSubdomainAccess: true
     verticalAutoscaling:
-      # Rust binary is lean — 128MB base with 50MB free covers request spikes.
-      minRam: 0.125
-      minFreeRamGB: 0.05
+      minRam: 0.25
+      minFreeRamGB: 0.1
 
-  # PostgreSQL for app data. Priority 10 starts data services
-  # before app containers, preventing connection errors on startup.
+  # PostgreSQL for app data. Access from your local machine
+  # via 'zcli vpn up' using the 'db' hostname. Priority 10 starts
+  # data services before app containers, preventing connection errors.
   - hostname: db
     type: postgresql@17
     mode: NON_HA
