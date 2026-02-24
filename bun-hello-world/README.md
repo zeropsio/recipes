@@ -1,15 +1,14 @@
 # Bun Hello World Recipe
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-Basic example of running [Bun](https://bun.com/) applications on [Zerops](https://zerops.io).
-Simple Bun API with single endpoint that reads from and writes to a PostgreSQL database.
+Basic example of running [Bun](https://bun.sh) applications on [Zerops](https://zerops.io). Simple Bun HTTP server connected to PostgreSQL, with health check verifying database connectivity and data seeded by the migration.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 
 ⬇️ **Full recipe page and deploy with one-click**
 
 [![Deploy on Zerops](https://github.com/zeropsio/recipe-shared-assets/blob/main/deploy-button/light/deploy-button.svg)](https://app.zerops.io/recipes/bun-hello-world?environment=small-production)
 
-![cover](https://github.com/zeropsio/recipe-shared-assets/blob/main/covers/svg/cover-bun.svg)
+![bun](https://github.com/zeropsio/recipe-shared-assets/blob/main/covers/svg/cover-bun.svg)
 
 Offered in examples for the whole development lifecycle — from environments for AI agents like [Claude Code](https://www.anthropic.com/claude-code) or [opencode](https://opencode.ai) through environments for remote (CDE) or local development of each developer to stage and productions of all sizes.
 
@@ -22,6 +21,6 @@ Offered in examples for the whole development lifecycle — from environments fo
 
 ---
 
-For more advanced examples see all [Bun recipes](https://app.zerops.io/recipes?lf=bun,node-js) on Zerops.
+For more advanced examples see all [Bun recipes](https://app.zerops.io/recipes?lf=bun) on Zerops.
 
 Need help setting your project up? Join [Zerops Discord community](https://discord.gg/zeropsio).
