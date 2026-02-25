@@ -47,7 +47,8 @@ services:
     mode: NON_HA
     priority: 10
 
-  # S3-compatible object storage for original images, thumbnails, and resized variants.
+  # S3-compatible object storage for images,
+  # thumbnails, and resized variants.
   - hostname: storage
     type: object-storage
     objectStorageSize: 2

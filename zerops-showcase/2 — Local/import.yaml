@@ -9,7 +9,8 @@ services:
   # Staging app — Zerops pulls source and zerops.yaml from the 'buildFromGit'
   # repo, using the 'prod' setup to build and deploy. Validates the production
   # pipeline while the developer runs the app locally via `zcli vpn up`.
-  # Subdomain access provides a public HTTPS URL for testing the deployed version.
+  # Subdomain access provides a public HTTPS URL
+  # for testing the deployed version.
   - hostname: app
     type: bun@1.2
     zeropsSetup: prod
@@ -21,7 +22,8 @@ services:
       minRam: 0.5
       minFreeRamGB: 0.25
 
-  # Staging worker — production build, listens on NATS for image processing jobs.
+  # Worker — production build, listens on NATS
+  # for image processing jobs.
   # The worker runs in Zerops even during local development since it needs
   # persistent NATS subscription for processing events.
   - hostname: worker
@@ -52,7 +54,8 @@ services:
     mode: NON_HA
     priority: 10
 
-  # S3-compatible object storage for original images, thumbnails, and resized variants.
+  # S3-compatible object storage for images,
+  # thumbnails, and resized variants.
   - hostname: storage
     type: object-storage
     objectStorageSize: 2
