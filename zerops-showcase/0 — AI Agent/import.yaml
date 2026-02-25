@@ -1,0 +1,82 @@
+# AI agent environment provides a development space for AI agents
+# to build and version the app. Comes with dev and staging services
+# for both the Bun frontend app and the Python image processing worker,
+# plus low-resource PostgreSQL, Valkey, NATS, and S3 object storage.
+
+project:
+  name: showcase-recipe-agent
+  envVariables:
+    GH_TOKEN: <your-github-personal-access-token>
+
+services:
+  # Development app — Zerops pulls source from the 'buildFromGit' repo
+  # and uses the 'dev' zeropsSetup to deploy full source for live editing.
+  # Agents SSH in and start the dev server directly.
+  # Subdomain access provides a public HTTPS URL for testing.
+  - hostname: appdev
+    type: bun@1.2
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/showcase-recipe-app
+    enableSubdomainAccess: true
+    envSecrets:
+      CORE_MODE: serious
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Staging app — validates the production build pipeline. Zerops pulls
+  # source and zerops.yaml from 'buildFromGit', using the 'prod' setup
+  # to build optimized artifacts and deploy minimal footprint.
+  - hostname: appstage
+    type: bun@1.2
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/showcase-recipe-app
+    enableSubdomainAccess: true
+    envSecrets:
+      CORE_MODE: serious
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Development worker — source deployed for live editing via SSH.
+  # No HTTP port needed; the worker subscribes to NATS for processing jobs.
+  - hostname: workerdev
+    type: python@3.12
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/showcase-recipe-worker
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Staging worker — production build, listens on NATS for image processing jobs.
+  - hostname: workerstage
+    type: python@3.12
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/showcase-recipe-worker
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL for persistent image metadata and processing state.
+  # Priority 10 starts data services before app containers,
+  # preventing connection errors on first deploy.
+  - hostname: db
+    type: postgresql@17
+    mode: NON_HA
+    priority: 10
+
+  # Valkey (Redis-compatible) for event caching and active job tracking.
+  - hostname: redis
+    type: valkey@7.2
+    mode: NON_HA
+    priority: 10
+
+  # NATS message queue — decouples the app from the worker. Upload events
+  # flow through NATS so workers can process images independently.
+  - hostname: queue
+    type: nats@2.12
+    mode: NON_HA
+    priority: 10
+
+  # S3-compatible object storage for original images, thumbnails, and resized variants.
+  - hostname: storage
+    type: object-storage
+    objectStorageSize: 2
+    priority: 10
