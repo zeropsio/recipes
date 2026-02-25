@@ -1,7 +1,7 @@
 # Bun Hello World Recipe
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-Basic example of running [Bun](https://bun.sh) applications on [Zerops](https://zerops.io). Simple Bun HTTP server connected to PostgreSQL, with health check verifying database connectivity and data seeded by the migration.
+A [Bun](https://bun.sh) application connected to [PostgreSQL](https://www.postgresql.org/), running on [Zerops](https://zerops.io) with six ready-made environment configurations — from AI agent and remote development to stage and highly-available production.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 
 ⬇️ **Full recipe page and deploy with one-click**

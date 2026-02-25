@@ -5,21 +5,25 @@ project:
   name: bun-hello-world-local
 
 services:
-  # Staged app for validating production builds while developing locally.
-  # Run 'zcli vpn up' to connect your local machine to the Zerops network,
-  # then point your local app at the 'db' hostname for database access.
+  # Staging service validates that local changes build and run correctly on Zerops
+  # before pushing to production. Zerops pulls source from 'buildFromGit' and uses
+  # the 'prod' zeropsSetup to bundle TypeScript and deploy minimal artifacts.
+  # Run 'zcli push' from your local machine to trigger a deploy.
   - hostname: app
     type: bun@1.2
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
-    enableSubdomainAccess: true
+    enableSubdomainAccess: true  # Preview deployed app via public HTTPS subdomain
     verticalAutoscaling:
       minRam: 0.5
-      minFreeRamGB: 0.25
 
-  # Database accessible via VPN on your local machine using the 'db' hostname.
+  # PostgreSQL database running in Zerops — accessible from your local machine via
+  # 'zcli vpn up'. Once connected, use $db_connectionString from your Zerops project
+  # environment variables to connect from localhost.
+  # Priority 10 ensures the database starts before the app service.
   - hostname: db
-    type: postgresql@17
+    type: postgresql@18
     mode: NON_HA
-    # Priority 10 starts data services before app containers, preventing connection errors.
     priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
