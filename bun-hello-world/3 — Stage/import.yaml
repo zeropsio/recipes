@@ -5,19 +5,25 @@ project:
   name: bun-hello-world-stage
 
 services:
-  # Staging app — test the production build pipeline via 'zcli push' before promoting to prod.
+  # Staging app — mirrors production configuration to catch integration issues before
+  # they reach live users. Zerops pulls source from the 'buildFromGit' repo and runs
+  # the 'prod' zeropsSetup: bundle TypeScript, deploy ~300 KB artifact, no node_modules.
+  # Use 'zcli push' or git integration to trigger deploys from your CI pipeline.
   - hostname: app
     type: bun@1.2
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
-    enableSubdomainAccess: true
+    enableSubdomainAccess: true  # Public HTTPS URL for QA and stakeholder review
     verticalAutoscaling:
       minRam: 0.5
-      minFreeRamGB: 0.25
+      minFreeRamGB: 0.25  # Reserve headroom for request spikes and GC pressure
 
-  # PostgreSQL for app data. Priority 10 starts data services
-  # before app containers, preventing connection errors.
+  # PostgreSQL single-node database for staging. NON_HA is appropriate here — staging
+  # data is replaceable and does not need production-grade durability.
+  # Priority 10 starts the database first, preventing app connection errors on deploy.
   - hostname: db
-    type: postgresql@17
+    type: postgresql@18
     mode: NON_HA
     priority: 10
+    verticalAutoscaling:
+      minRam: 0.25

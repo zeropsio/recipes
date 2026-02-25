@@ -1,13 +1,15 @@
 # AI agent environment provides a development space for AI agents to build and version the app.
-# Includes a dev service with the code repository and necessary development tools,
+# It includes a dev service with the code repository and necessary development tools,
 # a staging service, and a low-resource database.
 
 project:
   name: bun-hello-world-agent
 
 services:
-  # Set up the AI agent development environment using the 'dev' setup, which includes
-  # Bun pre-installed based on the zerops.yaml from the 'buildFromGit' repository.
+  # Development workspace for AI agents. Zerops pulls source code and zerops.yaml from
+  # the 'buildFromGit' repo, then uses the 'dev' zeropsSetup — which skips compilation
+  # and deploys the full source tree with Bun pre-installed. Agent SSHs in and develops
+  # directly: 'bun --hot src/index.ts'. Subdomain gives the agent a URL to inspect output.
   - hostname: appdev
     type: bun@1.2
     zeropsSetup: dev
@@ -16,21 +18,24 @@ services:
     verticalAutoscaling:
       minRam: 0.5
 
-  # Deploy the staging service, where agents can continuously deploy code changes
-  # to test the build pipeline and verify app behavior in the 'prod' setup.
+  # Staging service — agent deploys here via 'zcli push' to validate the production build
+  # pipeline before considering the task complete. Uses 'prod' setup: Zerops bundles
+  # TypeScript into standalone files, no node_modules at runtime.
   - hostname: appstage
     type: bun@1.2
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
-    enableSubdomainAccess: true
+    enableSubdomainAccess: true  # Public HTTPS URL for the agent to verify the deployed app
     verticalAutoscaling:
       minRam: 0.5
-      minFreeRamGB: 0.25
 
-  # The Hello World Bun app requires a database for development. Deploy the database
-  # in Zerops, accessible as 'db' hostname within the 'appdev' and 'appstage' services.
+  # PostgreSQL single-node database for development — shared by both appdev and appstage.
+  # NON_HA is appropriate for dev/staging where high-availability isn't required.
+  # Priority 10 ensures the database starts before the app services, preventing
+  # connection errors during container startup.
   - hostname: db
-    type: postgresql@17
+    type: postgresql@18
     mode: NON_HA
-    # Priority 10 starts data services before app containers, preventing connection errors.
     priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
