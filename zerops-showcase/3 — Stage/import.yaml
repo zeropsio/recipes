@@ -3,8 +3,6 @@
 
 project:
   name: showcase-recipe-stage
-  envVariables:
-    GH_TOKEN: <your-github-personal-access-token>
 
 services:
   # Staging app — Zerops pulls source and zerops.yaml from the 'buildFromGit'

@@ -5,8 +5,6 @@
 
 project:
   name: showcase-recipe-agent
-  envVariables:
-    GH_TOKEN: <your-github-personal-access-token>
 
 services:
   # Development app — Zerops pulls source from the 'buildFromGit' repo

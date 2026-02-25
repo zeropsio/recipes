@@ -3,8 +3,6 @@
 
 project:
   name: showcase-recipe-small-prod
-  envVariables:
-    GH_TOKEN: <your-github-personal-access-token>
 
 services:
   # Production app — Zerops pulls source and zerops.yaml from the 'buildFromGit'
