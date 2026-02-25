@@ -1,15 +1,22 @@
 # Remote (CDE) environment allows developers to build the app within Zerops via SSH,
 # supporting the full development lifecycle without local tool installation.
-# Includes a dev service with the code repository and necessary development tools,
+# It includes a dev service with the code repository and necessary development tools,
 # a staging service, and a low-resource database.
 
 project:
   name: bun-hello-world-remote
 
 services:
-  # Set up the remote development environment using the 'dev' setup. Bun and all
-  # dependencies are pre-installed — SSH in and run 'bun run dev' immediately.
-  # Tip: increase minRam to 4 GB if mounting this workspace from an IDE (e.g. VS Code Remote SSH).
+  # Remote development workspace — Zerops pulls source from the 'buildFromGit' repo and
+  # uses the 'dev' zeropsSetup, which deploys full source code with Bun pre-installed.
+  # SSH in (or mount via SSHFS in your IDE) and develop interactively:
+  #   'bun --hot src/index.ts'  — start with hot reload
+  #   'bun add <package>'       — add dependencies
+  # Subdomain gives you a public URL to preview without configuring local proxies.
+  #
+  # Suggested minRam for comfortable IDE-mounted development:
+  # verticalAutoscaling:
+  #   minRam: 4
   - hostname: appdev
     type: bun@1.2
     zeropsSetup: dev
@@ -17,21 +24,24 @@ services:
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 0.5
-      # minRam: 4  # Uncomment for IDE mounting (VS Code Remote SSH, JetBrains Gateway)
 
-  # Deploy the staging service to validate production builds alongside the dev workspace.
+  # Staging service — run 'zcli push' from your dev container to validate the production
+  # build before merging to your main branch. 'prod' zeropsSetup bundles TypeScript into
+  # standalone artifacts — no node_modules needed at runtime.
   - hostname: appstage
     type: bun@1.2
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
-    enableSubdomainAccess: true
+    enableSubdomainAccess: true  # Public HTTPS URL for staging review
     verticalAutoscaling:
       minRam: 0.5
-      minFreeRamGB: 0.25
 
-  # Database accessible as 'db' hostname from both appdev and appstage services.
+  # PostgreSQL single-node database — accessible as 'db' hostname from both appdev
+  # and appstage. NON_HA is suitable for development where durability isn't critical.
+  # Priority 10 starts the database before app services to prevent connection errors.
   - hostname: db
-    type: postgresql@17
+    type: postgresql@18
     mode: NON_HA
-    # Priority 10 starts data services before app containers, preventing connection errors.
     priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
