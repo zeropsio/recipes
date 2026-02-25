@@ -5,8 +5,6 @@
 
 project:
   name: showcase-recipe-remote
-  envVariables:
-    GH_TOKEN: <your-github-personal-access-token>
 
 services:
   # Development app — Zerops pulls source from the 'buildFromGit' repo,

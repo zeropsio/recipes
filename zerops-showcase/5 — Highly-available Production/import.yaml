@@ -7,8 +7,6 @@ project:
   # Serious core provides dedicated infrastructure for the project's
   # balancer, logging, and metrics — required for production workloads.
   corePackage: SERIOUS
-  envVariables:
-    GH_TOKEN: <your-github-personal-access-token>
 
 services:
   # Production app — Zerops pulls source and zerops.yaml from the 'buildFromGit'
