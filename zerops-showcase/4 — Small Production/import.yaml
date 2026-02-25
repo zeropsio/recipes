@@ -1,0 +1,64 @@
+# Small production environment offers a production-ready setup
+# optimized for moderate throughput.
+
+project:
+  name: showcase-recipe-small-prod
+  envVariables:
+    GH_TOKEN: <your-github-personal-access-token>
+
+services:
+  # Production app — Zerops pulls source and zerops.yaml from the 'buildFromGit'
+  # repo, using the 'prod' setup to build optimized artifacts and deploy.
+  # Subdomain access provides a public HTTPS URL; replace with a custom domain
+  # for production traffic.
+  # minContainers: 2 ensures zero-downtime deploys and load distribution.
+  - hostname: app
+    type: bun@1.2
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/showcase-recipe-app
+    enableSubdomainAccess: true
+    envSecrets:
+      CORE_MODE: serious
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Production worker — processes images from the NATS queue.
+  # Multiple containers distribute processing load across workers.
+  - hostname: worker
+    type: python@3.12
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/showcase-recipe-worker
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL single-node — automatic encrypted backups are on by default.
+  # For higher traffic, consider HA mode for replicated durability.
+  # Priority 10 starts data services before app containers,
+  # preventing connection errors on first deploy.
+  - hostname: db
+    type: postgresql@17
+    mode: NON_HA
+    priority: 10
+
+  # Valkey (Redis-compatible) for event caching and active job tracking.
+  - hostname: redis
+    type: valkey@7.2
+    mode: NON_HA
+    priority: 10
+
+  # NATS message queue — decouples the app from the worker. Upload events
+  # flow through NATS so workers can scale independently.
+  - hostname: queue
+    type: nats@2.12
+    mode: NON_HA
+    priority: 10
+
+  # S3-compatible object storage for original images, thumbnails, and resized variants.
+  - hostname: storage
+    type: object-storage
+    objectStorageSize: 5
+    priority: 10

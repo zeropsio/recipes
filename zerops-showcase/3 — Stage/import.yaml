@@ -1,0 +1,56 @@
+# Stage environment uses the same configuration as production,
+# but runs on a single container with lower scaling settings.
+
+project:
+  name: showcase-recipe-stage
+  envVariables:
+    GH_TOKEN: <your-github-personal-access-token>
+
+services:
+  # Staging app — Zerops pulls source and zerops.yaml from the 'buildFromGit'
+  # repo, using the 'prod' setup to build optimized artifacts and deploy.
+  # Subdomain access provides a public HTTPS URL for testing.
+  - hostname: app
+    type: bun@1.2
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/showcase-recipe-app
+    enableSubdomainAccess: true
+    envSecrets:
+      CORE_MODE: serious
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Staging worker — production build, processes images from the NATS queue.
+  - hostname: worker
+    type: python@3.12
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/showcase-recipe-worker
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL for persistent image metadata and processing state.
+  # Priority 10 starts data services before app containers,
+  # preventing connection errors on first deploy.
+  - hostname: db
+    type: postgresql@17
+    mode: NON_HA
+    priority: 10
+
+  # Valkey (Redis-compatible) for event caching and active job tracking.
+  - hostname: redis
+    type: valkey@7.2
+    mode: NON_HA
+    priority: 10
+
+  # NATS message queue — decouples the app from the worker.
+  - hostname: queue
+    type: nats@2.12
+    mode: NON_HA
+    priority: 10
+
+  # S3-compatible object storage for original images, thumbnails, and resized variants.
+  - hostname: storage
+    type: object-storage
+    objectStorageSize: 2
+    priority: 10

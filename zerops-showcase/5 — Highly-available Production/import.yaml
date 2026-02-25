@@ -1,0 +1,79 @@
+# Highly-available production environment provides a production setup with
+# enhanced scaling, dedicated resources, and HA components for improved
+# durability and performance.
+
+project:
+  name: showcase-recipe-ha-prod
+  # Serious core provides dedicated infrastructure for the project's
+  # balancer, logging, and metrics — required for production workloads.
+  corePackage: SERIOUS
+  envVariables:
+    GH_TOKEN: <your-github-personal-access-token>
+
+services:
+  # Production app — Zerops pulls source and zerops.yaml from the 'buildFromGit'
+  # repo, using the 'prod' setup to build optimized artifacts and deploy.
+  # Subdomain access provides a public HTTPS URL; replace with a custom domain
+  # for production traffic.
+  # minContainers: 2 ensures zero-downtime deploys and load distribution.
+  # Dedicated CPU cores prevent noisy-neighbor performance degradation.
+  - hostname: app
+    type: bun@1.2
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/showcase-recipe-app
+    enableSubdomainAccess: true
+    envSecrets:
+      CORE_MODE: serious
+    minContainers: 2
+    maxContainers: 6
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5
+
+  # Production worker — processes images from the NATS queue.
+  # Multiple containers distribute processing load across workers.
+  # Dedicated CPU cores ensure consistent image processing throughput.
+  - hostname: worker
+    type: python@3.12
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/showcase-recipe-worker
+    minContainers: 2
+    maxContainers: 6
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5
+
+  # PostgreSQL HA — replicates data across multiple nodes, no single point
+  # of failure. Automatic encrypted backups are on by default.
+  # Priority 10 starts data services before app containers,
+  # preventing connection errors on first deploy.
+  - hostname: db
+    type: postgresql@17
+    mode: HA
+    priority: 10
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 2
+      minFreeRamGB: 1
+
+  # Valkey HA — replicated cache for event tracking and job counters,
+  # ensuring cache availability even if a node fails.
+  - hostname: redis
+    type: valkey@7.2
+    mode: HA
+    priority: 10
+
+  # NATS HA — replicated message queue for reliable event delivery
+  # between the app and worker services.
+  - hostname: queue
+    type: nats@2.12
+    mode: HA
+    priority: 10
+
+  # S3-compatible object storage — larger capacity for production workloads.
+  - hostname: storage
+    type: object-storage
+    objectStorageSize: 10
+    priority: 10
