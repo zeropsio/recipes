@@ -59,4 +59,5 @@ services:
   - hostname: storage
     type: object-storage
     objectStorageSize: 5
+    objectStoragePolicy: public-read
     priority: 10
