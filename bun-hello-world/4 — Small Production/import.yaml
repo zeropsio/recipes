@@ -4,21 +4,29 @@ project:
   name: bun-hello-world-small-prod
 
 services:
-  # Production app — minContainers: 2 ensures high availability and horizontal scaling.
+  # Production app — Zerops pulls source from the 'buildFromGit' repo and uses the 'prod'
+  # zeropsSetup to bundle TypeScript into standalone files (~300 KB artifact, no node_modules).
+  # minContainers: 2 ensures at least two containers run at all times — spreading load
+  # and keeping the service available if one container is replaced during a deploy.
+  # Zerops autoscales vertically within the bounds set below.
   - hostname: app
     type: bun@1.2
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
-    enableSubdomainAccess: true
+    enableSubdomainAccess: true  # Zerops subdomain — map your custom domain in the UI
     minContainers: 2
     verticalAutoscaling:
       minRam: 0.25
-      # Reserve ~50% free RAM — V8-based runtimes need headroom for traffic spikes
-      minFreeRamGB: 0.125
+      minFreeRamGB: 0.125  # ~50% reserve — headroom for traffic spikes and Bun's runtime
 
-  # PostgreSQL for app data. Priority 10 starts data services
-  # before app containers, preventing connection errors.
+  # PostgreSQL single-node database. Zerops encrypts and backs up data automatically.
+  # For high-traffic production, consider upgrading to HA mode (see Environment 5)
+  # or configuring your own backup export strategy via the Zerops UI.
+  # Priority 10 starts the database before the app — prevents connection errors on deploy.
   - hostname: db
-    type: postgresql@17
+    type: postgresql@18
     mode: NON_HA
     priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125

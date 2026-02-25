@@ -3,29 +3,33 @@
 
 project:
   name: bun-hello-world-ha-prod
-  # Serious core provides dedicated infrastructure resources for production workloads
+  # SERIOUS core: dedicated infrastructure for the project's balancer, logging, and metrics.
+  # Eliminates shared-tenant overhead — essential for consistent latency at production scale.
   corePackage: SERIOUS
 
 services:
-  # Production app with dedicated CPUs and HA-grade scaling.
-  # minContainers: 2 ensures zero-downtime deploys and request distribution.
+  # Production app with dedicated CPU and HA-grade configuration.
+  # minContainers: 2 guarantees availability during rolling deploys and container replacement.
+  # cpuMode: DEDICATED pins CPU cores to this service — no sharing with other projects,
+  # which gives consistent response times under sustained load.
+  # Zerops autoscales RAM and CPU within the verticalAutoscaling bounds below.
   - hostname: app
     type: bun@1.2
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
-    enableSubdomainAccess: true
+    enableSubdomainAccess: true  # Map your custom domain in the Zerops UI
     minContainers: 2
     verticalAutoscaling:
-      # DEDICATED mode: guaranteed CPU cores — no throttling under sustained load
       cpuMode: DEDICATED
       minRam: 0.5
-      # Reserve 50% free RAM for runtime GC cycles and traffic spikes
-      minFreeRamGB: 0.25
+      minFreeRamGB: 0.25  # 50% reserve — headroom for traffic spikes and runtime pressure
 
-  # PostgreSQL HA mode replicates data across multiple nodes — no single point of failure.
-  # Priority 10 starts data services before app containers, preventing connection errors.
+  # PostgreSQL HA database — replicates data across multiple nodes so no single node
+  # failure causes data loss or downtime. Required for production-grade durability.
+  # Dedicated CPU ensures database operations don't compete with other workloads.
+  # Priority 10 starts the database before app containers.
   - hostname: db
-    type: postgresql@17
+    type: postgresql@18
     mode: HA
     priority: 10
     verticalAutoscaling:
