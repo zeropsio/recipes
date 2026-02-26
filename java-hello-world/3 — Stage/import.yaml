@@ -1,0 +1,35 @@
+# Stage environment uses the same configuration as production,
+# but runs on a single container with lower scaling settings.
+
+project:
+  name: java-hello-world-stage
+
+services:
+  # Staging app — production build pipeline on minimal resources.
+  # Zerops pulls source and zerops.yaml from the 'buildFromGit'
+  # public repo, runs 'mvn clean package -DskipTests' to compile
+  # the Spring Boot fat JAR, then deploys via the 'prod' zeropsSetup.
+  # After each new container starts, Zerops runs the readiness check
+  # at '/' before routing traffic from the project balancer.
+  # Subdomain access provides a public HTTPS URL for pre-release
+  # testing. Replace 'buildFromGit' with 'zcli push' or git
+  # integration once you move the code to your own repository.
+  - hostname: app
+    type: java@21
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/java-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL single-node database. NON_HA is appropriate for
+  # staging — matches production schema without the cost of
+  # full replication. Priority 10 starts the database before
+  # the app container, preventing startup connection failures.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
