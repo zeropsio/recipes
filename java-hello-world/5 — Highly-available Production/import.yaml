@@ -1,0 +1,46 @@
+# Highly-available production environment provides a production setup
+# with enhanced scaling, dedicated resources, and HA components for
+# improved durability and performance.
+
+project:
+  name: java-hello-world-ha-prod
+  # SERIOUS core provides dedicated infrastructure for the project's
+  # balancer, logging, and metrics — isolating them from shared
+  # platform resources for consistent performance under load.
+  corePackage: SERIOUS
+
+services:
+  # Production app on dedicated CPU with at least 2 containers.
+  # DEDICATED cpuMode allocates exclusive CPU cores — no sharing
+  # with other projects on the same physical host. Zerops scales
+  # containers vertically (more RAM/CPU) and horizontally (more
+  # containers) as traffic demands. The readiness check in zerops.yaml
+  # verifies each new container before the project balancer routes
+  # traffic, enabling zero-downtime rolling deploys.
+  # minContainers: 2 ensures the app survives a single container
+  # failure without downtime.
+  - hostname: app
+    type: java@21
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/java-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL HA database — data replicated across multiple nodes.
+  # HA mode eliminates the single point of failure present in
+  # NON_HA: if one node fails, a replica is promoted automatically.
+  # DEDICATED cpuMode ensures database CPU is never shared with
+  # other workloads. Priority 10 guarantees the database cluster
+  # is ready before any app container connects.
+  - hostname: db
+    type: postgresql@18
+    mode: HA
+    priority: 10
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5
