@@ -1,20 +1,31 @@
+# Local environment supports local app development using
+# zCLI VPN for database access, while ensuring valid deployment
+# processes using a staged app in Zerops.
+
 project:
   name: go-hello-world-local
 
 services:
-  # The Hello World Go app requires a database for development.
-  # Deploy the database in Zerops and connect via 'zcli vpn up'
-  # to access it locally as 'db' or 'db.zerops'.
-  - hostname: db
-    type: postgresql@17
-    mode: NON_HA
-  
-  # Additionally, deploy the staging service to continuously deploy
-  # code changes, test the deployment process, and verify
-  # app behavior in the 'prod' setup.
-  # The web app is accessible via the Zerops subdomain.
+  # Staged app — validates the production build pipeline while
+  # the developer works locally. Zerops pulls source and
+  # zerops.yaml from the 'buildFromGit' repo, using the 'prod'
+  # zeropsSetup to compile binaries and deploy. 'buildFromGit'
+  # is one of several pipeline triggers — developers also use
+  # 'zcli push' from their local terminal. Subdomain access
+  # provides a public HTTPS URL for testing.
   - hostname: app
-    type: go@1
+    type: golang@1.22
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/go-hello-world-app
     enableSubdomainAccess: true
+
+  # PostgreSQL for app data. Priority 10 starts data services
+  # before app containers, preventing connection errors on startup.
+  # 'zcli vpn up' makes this database reachable from the
+  # developer's local machine at the 'db' hostname.
+  # NON_HA is a single-node instance — suitable for local dev
+  # where HA durability isn't required.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10

@@ -1,35 +1,43 @@
+# AI agent environment provides a development space for AI agents
+# to build and version the app. Comes with a dev service with
+# source code and development tools, a staging service, and a
+# low-resource database.
+
 project:
   name: go-hello-world-agent
 
 services:
-  # Deploy the staging service, where agents can continuously deploy
-  # code changes to test the deployment process
-  # and verify app behavior in the 'prod' setup.
-  # The web app is publicly accessible via the Zerops subdomain.
-  - hostname: appstage
-    type: go@1
-    zeropsSetup: prod
-    buildFromGit: https://github.com/zerops-recipe-apps/go-hello-world-app
-    enableSubdomainAccess: true
-
-  # Set up the AI agent development environment using the 'dev' setup,
-  # which includes Go pre-installed based on the zerops.yaml from the 'buildFromGit' repository.
+  # Set up the AI agent development environment — Zerops pulls
+  # source from the 'buildFromGit' repo using the 'dev' setup,
+  # which deploys full source code and the Go toolchain.
+  # 'zeropsSetup' selects which setup (prod/dev) from zerops.yaml
+  # in the source repo. SSH in to compile and run the app.
   - hostname: appdev
-    type: go@1
+    type: golang@1.22
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/go-hello-world-app
     enableSubdomainAccess: true
-    # Agents running Go or linters may require more resources.
-    # Adjust limits as needed. Agent services can be stopped when inactive to reduce costs.
     verticalAutoscaling:
       minRam: 0.5
-    #   cpu: 4
-    #   cpuMode: DEDICATED
 
-  # The Hello World Go app requires a database for development.
-  # Deploy the database in Zerops, accessible as 'db' hostname
-  # within the 'appdev' service.
-  # The staged app in 'appstage' also connects to this database.
+  # Staging app — validates the production build pipeline. Zerops
+  # pulls source and zerops.yaml from the 'buildFromGit' repo,
+  # using the 'prod' zeropsSetup to compile binaries and deploy.
+  # Subdomain access provides a public HTTPS URL for testing.
+  - hostname: appstage
+    type: golang@1.22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/go-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL for app data. Priority 10 starts data services
+  # before app containers, preventing connection errors on startup.
+  # Accessible as 'db' hostname from 'appdev' and 'appstage'.
+  # NON_HA is a single-node instance — suitable for dev/staging
+  # where HA durability isn't required.
   - hostname: db
-    type: postgresql@17
+    type: postgresql@16
     mode: NON_HA
+    priority: 10
