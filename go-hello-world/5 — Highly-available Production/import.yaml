@@ -1,30 +1,45 @@
+# Highly-available production environment provides a production
+# setup with enhanced scaling, dedicated resources, and HA
+# components for improved durability and performance.
+
 project:
   name: go-hello-world-ha-prod
-  # Specifies the highly available, higher-performance core service.
+  # SERIOUS core dedicates infrastructure to this project's
+  # balancer, logging, and metrics — isolating it from
+  # shared Zerops infrastructure for production-grade reliability.
   corePackage: SERIOUS
 
 services:
-  # Deploy the production service using the 'prod' setup.
-  # Disable subdomain access after configuring HTTPS for your custom domain.
-  # Allocates higher minimum resources and dedicated CPUs
-  # to manage high traffic volumes.
+  # Production app with dedicated CPU and memory resources.
+  # Zerops pulls source and zerops.yaml from the 'buildFromGit'
+  # repo, using the 'prod' zeropsSetup to compile Go binaries
+  # and deploy. 'minContainers: 2' keeps at least two containers
+  # running at all times for load distribution and zero-downtime
+  # deploys. For custom domains, add a route in the Zerops
+  # dashboard after deployment.
   - hostname: app
-    type: go@1
+    type: golang@1.22
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/go-hello-world-app
     enableSubdomainAccess: true
     minContainers: 2
+    # Zerops auto-scales RAM (and CPU in DEDICATED mode) within
+    # these bounds. DEDICATED reserves physical CPU cores —
+    # eliminates noisy-neighbor jitter in high-traffic workloads.
     verticalAutoscaling:
       cpuMode: DEDICATED
       minRam: 0.5
-  
-  # The app requires a database.
-  # Deploys an HA database for improved resilience
-  # and performance, with increased minimum resource limits.
-  # Automatic daily encrypted backups are enabled by default.
+      minFreeRamGB: 0.25
+
+  # PostgreSQL HA — data replicated across multiple nodes,
+  # no single point of failure. Automatic encrypted backups
+  # are on by default. Priority 10 starts this before the app
+  # containers, preventing connection errors on startup.
   - hostname: db
-    type: postgresql@17
+    type: postgresql@16
     mode: HA
+    priority: 10
     verticalAutoscaling:
       cpuMode: DEDICATED
       minRam: 1
+      minFreeRamGB: 0.5

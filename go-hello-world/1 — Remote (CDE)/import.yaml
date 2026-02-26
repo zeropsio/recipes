@@ -1,37 +1,44 @@
+# Remote (CDE) environment allows developers to build the app
+# within Zerops via SSH, supporting the full development lifecycle
+# without local tool installation.
+
 project:
   name: go-hello-world-remote
 
 services:
-  # Deploy the staging service, where you can continuously deploy
-  # code changes to test the deployment process
-  # and verify app behavior in the 'prod' setup.
-  # The web app is publicly accessible via the Zerops subdomain.
-  - hostname: appstage
-    type: go@1
-    zeropsSetup: prod
-    buildFromGit: https://github.com/zerops-recipe-apps/go-hello-world-app
-    enableSubdomainAccess: true
-
-  # Set up the remote development environment using the 'dev' setup,
-  # which includes Go pre-installed based on the zerops.yaml from the 'buildFromGit' repository.
-  # More about remote development at https://docs.zerops.io/references/remote-development.
+  # Development workspace for remote developers — Zerops pulls
+  # source from the 'buildFromGit' repo using the 'dev' setup,
+  # which deploys full source code and the Go toolchain.
+  # SSH in directly or mount via IDE remote extension (VS Code,
+  # JetBrains Gateway) to edit and run code on the container.
+  # Suggested: raise minRam to 4 GB for a comfortable IDE session.
   - hostname: appdev
-    type: go@1
+    type: golang@1.22
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/go-hello-world-app
     enableSubdomainAccess: true
-    # Building Go applications or running IDEs in the remote container
-    # may require significant resources. Uncomment the section below
-    # to allocate more resources. Development services can be stopped when not in use to save costs.
-    # verticalAutoscaling:
-    #   minRam: 4
-    #   cpu: 4
-    #   cpuMode: DEDICATED
-  
-  # The Hello World Go app requires a database for development.
-  # Deploy the database in Zerops, accessible as 'db' hostname
-  # within the 'appdev' service.
-  # The staged app in 'appstage' also connects to this database.
+    verticalAutoscaling:
+      minRam: 0.5
+      # minRam: 4  # Uncomment for IDE-mounted sessions
+
+  # Staging app — validates the production build pipeline. Zerops
+  # pulls source and zerops.yaml from the 'buildFromGit' repo,
+  # using the 'prod' zeropsSetup to compile binaries and deploy.
+  # Subdomain access provides a public HTTPS URL for testing.
+  - hostname: appstage
+    type: golang@1.22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/go-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL for app data. Priority 10 starts data services
+  # before app containers, preventing connection errors on startup.
+  # Accessible as 'db' hostname from 'appdev' and 'appstage'.
+  # NON_HA is a single-node instance — suitable for dev/staging
+  # where HA durability isn't required.
   - hostname: db
-    type: postgresql@17
+    type: postgresql@16
     mode: NON_HA
+    priority: 10
