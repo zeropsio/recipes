@@ -1,8 +1,7 @@
 # Go Hello World Recipe
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-Basic example of running [Go](https://go.dev) applications on [Zerops](https://zerops.io).
-Simple Go API with single endpoint that reads from and writes to a PostgreSQL database.
+[Go](https://go.dev) recipe for [Zerops](https://zerops.io) — a minimal HTTP server backed by [PostgreSQL](https://www.postgresql.org), showcasing idempotent database migrations, environment-variable-driven configuration, and the complete set of Zerops infrastructure patterns across six ready-to-deploy environment configurations.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 
 ⬇️ **Full recipe page and deploy with one-click**

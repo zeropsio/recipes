@@ -1,16 +1,26 @@
+# Stage environment uses the same configuration as production,
+# but runs on a single container with lower scaling settings.
+
 project:
   name: go-hello-world-stage
 
 services:
-  # Deploy the staging service for the app.
-  # Uses the 'prod' setup to test near-production conditions.
+  # Staging app — validates the production build pipeline before
+  # promoting to production. Zerops pulls source and zerops.yaml
+  # from the 'buildFromGit' repo, using the 'prod' zeropsSetup
+  # to compile binaries and deploy. Subdomain access provides
+  # a public HTTPS URL for QA and stakeholder review.
   - hostname: app
-    type: go@1
+    type: golang@1.22
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/go-hello-world-app
     enableSubdomainAccess: true
-  
-  # The app requires a database.
+
+  # PostgreSQL single-node database for staging. Priority 10
+  # starts it before the app container, preventing connection
+  # errors. NON_HA is sufficient for staging where HA durability
+  # isn't required.
   - hostname: db
-    type: postgresql@17
+    type: postgresql@16
     mode: NON_HA
+    priority: 10
