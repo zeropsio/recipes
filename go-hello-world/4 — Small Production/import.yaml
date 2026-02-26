@@ -1,23 +1,37 @@
+# Small production environment offers a production-ready setup
+# optimized for moderate throughput.
+
 project:
   name: go-hello-world-small-prod
 
 services:
-  # Deploy the production service using the 'prod' setup.
-  # Disable subdomain access after configuring HTTPS for your custom domain.
-  # Allocate higher minimum resources to support
-  # basic traffic levels.
+  # Production app — Zerops pulls source and zerops.yaml from
+  # the 'buildFromGit' repo, using the 'prod' zeropsSetup to
+  # compile Go binaries and deploy. 'minContainers: 2' keeps at
+  # least two containers running at all times, enabling load
+  # distribution and zero-downtime deploys. For custom domains,
+  # add a route in the Zerops dashboard after deployment.
   - hostname: app
-    type: go@1
+    type: golang@1.22
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/go-hello-world-app
     enableSubdomainAccess: true
     minContainers: 2
+    # Zerops auto-scales RAM within these bounds. minFreeRamGB
+    # reserves headroom for traffic spikes — without it, the
+    # container gets exactly minRam and OOM-kills under load.
     verticalAutoscaling:
       minRam: 0.25
-  
-  # The app requires a database.
-  # Uses single-container 'NON_HA' mode for this small production setup.
-  # Automatic daily encrypted backups are enabled by default.
+      minFreeRamGB: 0.125
+
+  # PostgreSQL single-node — automatic encrypted backups are on
+  # by default. For production traffic, consider HA mode or
+  # setting up your own backup strategy. Priority 10 starts it
+  # before the app containers, preventing connection errors.
   - hostname: db
-    type: postgresql@17
+    type: postgresql@16
     mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
