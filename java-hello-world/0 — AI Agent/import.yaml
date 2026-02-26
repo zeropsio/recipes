@@ -1,0 +1,52 @@
+# AI agent environment provides a development space for AI agents
+# to build and version the app. Includes a dev service with the
+# source code and Java toolchain pre-installed, a staging service,
+# and a low-resource PostgreSQL database.
+
+project:
+  name: java-hello-world-agent
+
+services:
+  # Set up the AI agent development environment.
+  # Zerops pulls source and zerops.yaml from the 'buildFromGit'
+  # public repo — one of several pipeline triggers alongside
+  # 'zcli push' and git push integration. The 'dev' zeropsSetup
+  # starts the container idle ('zsc noop --silent') so the agent
+  # can SSH in and drive development. Java 21 and Maven 3.9 are
+  # pre-installed. Subdomain access gives the dev service a
+  # public HTTPS URL for testing endpoints during development.
+  - hostname: appdev
+    type: java@21
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/java-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Staging app validates the production build pipeline.
+  # Zerops pulls source from the same 'buildFromGit' repo,
+  # using the 'prod' zeropsSetup to compile the fat JAR
+  # and run the readiness check before routing traffic.
+  # Subdomain access provides a public HTTPS URL for
+  # validating the production build.
+  - hostname: appstage
+    type: java@21
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/java-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL single-node database shared by 'appdev' and
+  # 'appstage'. Both services reference it as 'db_hostname',
+  # 'db_port', 'db_user', and 'db_password' in their env vars.
+  # NON_HA is suitable for development and staging where
+  # HA durability is not required.
+  # Priority 10 starts the database before the app containers,
+  # preventing connection errors on startup.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25

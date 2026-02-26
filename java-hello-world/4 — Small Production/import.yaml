@@ -1,0 +1,41 @@
+# Small production environment offers a production-ready setup
+# optimized for moderate throughput.
+
+project:
+  name: java-hello-world-small-prod
+
+services:
+  # Production app — always running on at least 2 containers
+  # for availability and distribution across incoming requests.
+  # Zerops pulls source and zerops.yaml from the 'buildFromGit'
+  # public repo as the initial template. For production, replace
+  # 'buildFromGit' with 'zcli push' or connect a git branch so
+  # deploys are triggered by your own release workflow.
+  # The readiness check at '/' in zerops.yaml verifies each new
+  # container before the project balancer routes traffic to it,
+  # enabling zero-downtime rolling updates.
+  # For a custom domain, point your DNS to the project balancer
+  # and configure the domain in the Zerops dashboard.
+  - hostname: app
+    type: java@21
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/java-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL single-node database for production. NON_HA provides
+  # automatic encrypted backups by default. For production traffic,
+  # consider switching to 'mode: HA' for multi-node replication,
+  # or implement a dedicated backup strategy.
+  # Priority 10 ensures the database is ready before any app
+  # container starts, preventing connection errors during scaling.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25

@@ -1,0 +1,37 @@
+# Local environment supports local app development using zCLI VPN
+# for database access, while ensuring valid deployment processes
+# using a staged app in Zerops.
+
+project:
+  name: java-hello-world-local
+
+services:
+  # Staging app to validate that local code builds and runs correctly
+  # on Zerops infrastructure before pushing to production.
+  # Use 'zcli push' from your local terminal (after 'zcli vpn up')
+  # to push local code directly to this service. Zerops pulls
+  # zerops.yaml from the 'buildFromGit' repo as the initial
+  # template, but subsequent deploys use whatever code you push.
+  # Subdomain access provides a public HTTPS URL for sharing
+  # test builds with teammates.
+  - hostname: app
+    type: java@21
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/java-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL single-node database. With 'zcli vpn up', your
+  # local JVM can connect directly to this database using the
+  # db_hostname, db_port, db_user, and db_password values from
+  # the Zerops dashboard — same connection string as production.
+  # NON_HA is single-node, appropriate for local development.
+  # Priority 10 ensures the database is ready before the app
+  # container starts and attempts its connection.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
