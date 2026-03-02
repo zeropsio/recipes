@@ -1,0 +1,50 @@
+# Remote (CDE) environment allows developers to build the app
+# within Zerops via SSH, supporting the full development lifecycle
+# without local tool installation. Includes a dev service with
+# source code and tools, a staging service, and a low-resource
+# database.
+project:
+  name: python-hello-world-remote
+
+services:
+  # Development workspace — SSH in and work directly on the
+  # container. Zerops uses the 'dev' zeropsSetup, which ships
+  # the full source tree and a pre-populated vendor/ directory.
+  # All dependencies (Flask, Gunicorn, psycopg2) are ready;
+  # start the app without any pip install.
+  #
+  # Mount via SSHFS for IDE integration (VS Code Remote, JetBrains
+  # Gateway). Suggested minRam for comfortable development:
+  # verticalAutoscaling:
+  #   minRam: 4
+  - hostname: appdev
+    type: python@3.11
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/python-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Staging service — test your production build before promoting.
+  # Zerops pulls source from 'buildFromGit' and runs the 'prod'
+  # zeropsSetup: vendored pip install, minimal deployFiles, and
+  # Gunicorn start command. Subdomain provides a public HTTPS URL.
+  - hostname: appstage
+    type: python@3.11
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/python-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL single-node database — shared between appdev and
+  # appstage. NON_HA means a single database node, sufficient for
+  # development and staging environments.
+  # Priority 10 ensures the database is ready before app services
+  # attempt to connect, preventing crash loops on fresh imports.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25

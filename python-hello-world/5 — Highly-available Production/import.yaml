@@ -1,0 +1,43 @@
+# Highly-available production environment provides a production
+# setup with enhanced scaling, dedicated resources, and HA
+# components for improved durability and performance.
+project:
+  name: python-hello-world-ha-prod
+  # SERIOUS core allocates dedicated infrastructure for the
+  # project's balancer, logging, and metrics — removing shared
+  # resource contention for production-grade workloads.
+  corePackage: SERIOUS
+
+services:
+  # Production app with dedicated CPU and HA configuration.
+  # cpuMode: DEDICATED reserves CPU cores exclusively for this
+  # service — eliminates noisy-neighbour effects on sustained
+  # workloads. minContainers: 2 maintains availability during
+  # rolling deploys and traffic spikes.
+  - hostname: app
+    type: python@3.11
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/python-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+      # Reserve ~50% of minRam free — Python/Gunicorn workers need
+      # headroom to handle memory accumulation and traffic spikes
+      # without triggering OOM kills.
+      minFreeRamGB: 0.25
+
+  # PostgreSQL HA database — replicates data across multiple nodes,
+  # eliminating a single point of failure. Automatic encrypted
+  # backups are enabled by default. Dedicated CPU ensures
+  # consistent query performance under load.
+  # Priority 10 starts the database before the app service.
+  - hostname: db
+    type: postgresql@16
+    mode: HA
+    priority: 10
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5

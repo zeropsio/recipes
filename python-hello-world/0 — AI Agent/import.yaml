@@ -1,0 +1,47 @@
+# AI agent environment provides a development space for AI agents
+# to build and version the app. Includes a dev service with the
+# code repository and necessary development tools, a staging
+# service, and a low-resource database.
+project:
+  name: python-hello-world-agent
+
+services:
+  # Set up the AI agent development environment — Zerops pulls
+  # source from the 'buildFromGit' repo and uses the 'dev'
+  # zeropsSetup, which installs Flask, Gunicorn, and psycopg2
+  # into ./vendor. SSH in and start iterating immediately.
+  # The subdomain provides a public HTTPS URL for agent testing.
+  - hostname: appdev
+    type: python@3.11
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/python-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Staging service — validates the production build pipeline.
+  # Zerops pulls source and zerops.yaml from the 'buildFromGit'
+  # repo, using the 'prod' zeropsSetup to compile and deploy the
+  # vendored application artifact. Subdomain gives the agent a
+  # URL to verify the production configuration behaves correctly.
+  - hostname: appstage
+    type: python@3.11
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/python-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL single-node database for development and staging.
+  # Accessible as 'db' hostname from 'appdev' and 'appstage'
+  # services via generated variables (db_hostname, db_port,
+  # db_user, db_password). NON_HA is suitable for dev/staging
+  # where HA durability isn't required.
+  # Priority 10 ensures the database starts before app services,
+  # preventing connection errors on first deploy.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
