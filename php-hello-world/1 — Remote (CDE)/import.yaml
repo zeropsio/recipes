@@ -1,0 +1,52 @@
+# Remote (CDE) environment allows developers to build the app within
+# Zerops via SSH, supporting the full development lifecycle without
+# local tool installation. Includes a dev service with the code
+# repository and PHP tools, a staging service, and a low-resource
+# database.
+
+project:
+  name: php-hello-world-remote
+
+services:
+  # Set up the remote development workspace — Zerops pulls source
+  # from the 'buildFromGit' repo and uses the 'dev' zeropsSetup,
+  # which deploys full source code with all Composer dependencies.
+  # Connect via SSH or mount as a remote filesystem with your IDE
+  # (e.g., VS Code Remote SSH, JetBrains Gateway). PHP-FPM and Apache
+  # run on startup; edit PHP files in /var/www and changes take effect
+  # immediately — no restart needed (PHP is interpreted per request).
+  # Use 'zcli push' from the container to deploy to 'appstage'.
+  #
+  # For comfortable SSH development, consider increasing minRam:
+  # verticalAutoscaling:
+  #   minRam: 4
+  - hostname: appdev
+    type: php-apache@8.5
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/php-hello-world-app
+    # Subdomain access gives this service a public HTTPS URL — useful
+    # for sharing previews and testing from your browser while working.
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Staging service — validates the production build before release.
+  # Uses the 'prod' zeropsSetup: installs production-only Composer
+  # dependencies, runs the readiness check at '/', and deploys only
+  # the files needed to run (no source or dev tools).
+  - hostname: appstage
+    type: php-apache@8.5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/php-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL single-node database for both services.
+  # Priority 10 ensures the database starts before the app services —
+  # higher priority = starts first, preventing connection errors on boot.
+  # NON_HA is a single node — suitable for dev/staging workloads.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10

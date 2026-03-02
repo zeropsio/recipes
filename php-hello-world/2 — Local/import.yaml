@@ -1,0 +1,30 @@
+# Local environment supports local app development using zCLI VPN for
+# database access, while ensuring valid deployment processes using a
+# staged app in Zerops.
+
+project:
+  name: php-hello-world-local
+
+services:
+  # Staging service — mirrors the production build pipeline.
+  # Zerops pulls source and zerops.yaml from the 'buildFromGit' repo,
+  # using the 'prod' zeropsSetup to build and deploy. Use 'zcli push'
+  # from your local machine to deploy local changes here.
+  # Subdomain access provides a public HTTPS URL for testing.
+  - hostname: app
+    type: php-apache@8.5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/php-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL single-node database — accessible from your local machine
+  # via 'zcli vpn up'. This lets your locally running PHP app connect to
+  # the cloud database using the same env vars as the Zerops service.
+  # Priority 10 starts the database before the app service.
+  # NON_HA is a single node — appropriate for local development.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10
