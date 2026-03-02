@@ -1,0 +1,30 @@
+# Stage environment uses the same configuration as production, but
+# runs on a single container with lower scaling settings.
+
+project:
+  name: php-hello-world-stage
+
+services:
+  # Staging service — production build pipeline on a single container.
+  # Zerops pulls source and zerops.yaml from the 'buildFromGit' repo
+  # (one of several triggers — developers can also use 'zcli push' or
+  # git integration). The 'prod' zeropsSetup installs production-only
+  # Composer dependencies and runs the readiness check at '/' before
+  # the project balancer routes traffic.
+  - hostname: app
+    type: php-apache@8.5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/php-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL single-node database — same schema as production.
+  # Priority 10 starts the database before the app, preventing
+  # connection errors during container initialization.
+  # NON_HA is appropriate for staging; use HA mode for production.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10
