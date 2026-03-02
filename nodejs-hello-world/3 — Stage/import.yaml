@@ -1,0 +1,29 @@
+# Stage environment uses the same configuration as production,
+# but runs on a single container with lower scaling settings.
+project:
+  name: nodejs-hello-world-stage
+
+services:
+  # Staging app — mirrors production configuration for
+  # pre-release testing. Zerops pulls source and zerops.yaml
+  # from the 'buildFromGit' repo, using the 'prod' zeropsSetup
+  # to compile TypeScript and deploy production artifacts.
+  # Subdomain access provides a public HTTPS URL for QA.
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nodejs-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
+
+  # PostgreSQL single-node database — NON_HA is appropriate
+  # for staging where production-grade durability isn't needed.
+  # Priority 10 starts the database before the app container.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25

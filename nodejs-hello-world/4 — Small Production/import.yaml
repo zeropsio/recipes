@@ -1,0 +1,34 @@
+# Small production environment offers a production-ready
+# setup optimized for moderate throughput.
+project:
+  name: nodejs-hello-world-small-prod
+
+services:
+  # Production app — Zerops pulls source and zerops.yaml
+  # from the 'buildFromGit' repo, using the 'prod' zeropsSetup
+  # to compile TypeScript and deploy optimized artifacts.
+  # minContainers: 2 keeps two containers running at all times
+  # for availability and load distribution without requiring
+  # a full HA database tier.
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nodejs-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      # V8 GC needs headroom — minFreeRamGB reserves ~50% of
+      # minRam to absorb traffic spikes without OOM restarts.
+      minRam: 0.25
+      minFreeRamGB: 0.125
+
+  # PostgreSQL single-node — automatic encrypted backups are
+  # on by default. For higher-traffic production, consider
+  # HA mode (see Environment 5) or an external backup strategy.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
