@@ -1,0 +1,48 @@
+# Remote (CDE) environment allows developers to build
+# the app within Zerops via SSH, supporting the full
+# development lifecycle without local tool installation.
+# Includes a dev service with source code and Deno
+# pre-installed, a staging service, and a low-resource
+# database.
+project:
+  name: deno-hello-world-remote
+
+services:
+  # Set up the remote development environment — Zerops
+  # pulls source from the 'buildFromGit' repo using the
+  # 'dev' zeropsSetup, which ships source code and a
+  # pre-warmed Deno module cache. SSH in (or mount via
+  # SSHFS from your IDE) and start developing.
+  # Increase minRam to 4 if you need more headroom:
+  # verticalAutoscaling:
+  #   minRam: 4
+  - hostname: appdev
+    type: deno@2.0.0
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/deno-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Deploy the staging service — Zerops pulls source
+  # and zerops.yaml from the 'buildFromGit' repo, using
+  # the 'prod' zeropsSetup to compile and deploy
+  # self-contained binaries. Subdomain provides a public
+  # HTTPS URL to test your changes before promoting them.
+  - hostname: appstage
+    type: deno@2.0.0
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/deno-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL single-node database for development.
+  # Accessible as 'db' hostname from 'appdev' and
+  # 'appstage' services. Priority 10 starts data services
+  # before app containers, preventing connection errors.
+  # NON_HA suits dev/staging — not production-grade HA.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10

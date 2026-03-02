@@ -1,0 +1,44 @@
+# AI agent environment provides a development space
+# for AI agents to build and version the app. Includes
+# a dev service with source code and Deno pre-installed,
+# a staging service, and a low-resource database.
+project:
+  name: deno-hello-world-agent
+
+services:
+  # Set up the AI agent development environment — Zerops
+  # pulls source from the 'buildFromGit' repo, using the
+  # 'dev' zeropsSetup which ships the source code and
+  # a pre-warmed Deno module cache. SSH in and start
+  # developing immediately.
+  - hostname: appdev
+    type: deno@2.0.0
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/deno-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Deploy the staging service — Zerops pulls source
+  # and zerops.yaml from the 'buildFromGit' repo, using
+  # the 'prod' zeropsSetup to compile and deploy
+  # self-contained binaries. Subdomain provides a public
+  # HTTPS URL to validate the production build pipeline.
+  - hostname: appstage
+    type: deno@2.0.0
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/deno-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL single-node database for development.
+  # Accessible as 'db' hostname from 'appdev' and
+  # 'appstage' services. Priority 10 starts data services
+  # before app containers, preventing connection errors
+  # on startup. NON_HA is suitable for dev/staging where
+  # high-availability durability is not required.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
