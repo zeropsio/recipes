@@ -1,0 +1,30 @@
+# Stage environment uses the same configuration as production,
+# but runs on a single container with lower scaling settings.
+project:
+  name: python-hello-world-stage
+
+services:
+  # Staging app — validates the production build pipeline before
+  # promoting to production. Zerops pulls source and zerops.yaml
+  # from the 'buildFromGit' repo, using the 'prod' zeropsSetup
+  # to build and deploy the vendored artifact. Subdomain access
+  # provides a public HTTPS URL for pre-release testing.
+  - hostname: app
+    type: python@3.11
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/python-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL single-node database. NON_HA provides a single
+  # database node — appropriate for staging where HA durability
+  # isn't required. Priority 10 starts the database before the
+  # app service, preventing connection errors on deploy.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
