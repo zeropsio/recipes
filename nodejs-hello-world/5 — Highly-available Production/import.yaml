@@ -1,0 +1,42 @@
+# Highly-available production environment provides a
+# production setup with enhanced scaling, dedicated resources,
+# and HA components for improved durability and performance.
+project:
+  name: nodejs-hello-world-ha-prod
+  # SERIOUS core dedicates isolated infrastructure for the
+  # project's balancer, logging, and metrics — eliminates
+  # noisy-neighbor effects from shared infrastructure.
+  corePackage: SERIOUS
+
+services:
+  # Production app with dedicated CPU and HA-grade resources.
+  # minContainers: 2 ensures continuous availability during
+  # deploys and container failures. DEDICATED cpuMode
+  # prevents CPU throttling under sustained traffic load.
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nodejs-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      # Reserve 50% free RAM — V8 GC and traffic spikes need
+      # headroom to avoid OOM kills in production.
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL HA — replicates data across multiple nodes,
+  # eliminating a single point of failure. Automatic failover
+  # keeps the database available during node restarts.
+  # DEDICATED cpuMode prevents database CPU contention under
+  # write-heavy workloads. Priority 10 starts the database
+  # cluster before app containers.
+  - hostname: db
+    type: postgresql@18
+    mode: HA
+    priority: 10
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5

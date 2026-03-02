@@ -1,0 +1,53 @@
+# Remote (CDE) environment allows developers to build the app
+# within Zerops via SSH, supporting the full development
+# lifecycle without local tool installation. Includes a dev
+# service with the code repository and development tools, a
+# staging service to validate builds, and a low-resource
+# database.
+project:
+  name: nodejs-hello-world-remote
+
+services:
+  # Set up the remote development environment — Zerops pulls
+  # source and zerops.yaml from the 'buildFromGit' repo, using
+  # the 'dev' setup which includes Node.js 22, npm, ts-node,
+  # and all dependencies pre-installed.
+  # SSH in from your local terminal or mount via SSHFS with
+  # your IDE (VS Code Remote SSH, JetBrains Gateway, etc.).
+  # Subdomain access gives the workspace a public HTTPS URL.
+  #
+  # Default RAM is 0.5 GB — for intensive tasks (running tests,
+  # building large projects), consider increasing to 4 GB:
+  #   verticalAutoscaling:
+  #     minRam: 4
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/nodejs-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Deploy the staging service — Zerops pulls source from
+  # the 'buildFromGit' repo and uses the 'prod' zeropsSetup
+  # to compile TypeScript and deploy optimized artifacts.
+  # Push from the dev container via 'zcli push' to trigger
+  # a build and test the production pipeline.
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nodejs-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL single-node database shared by 'appdev' and
+  # 'appstage'. Priority 10 ensures the database is ready
+  # before app containers attempt to connect.
+  # NON_HA is appropriate for dev/staging environments.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
