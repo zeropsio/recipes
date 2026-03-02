@@ -1,0 +1,31 @@
+# Local environment supports local app development using
+# zCLI VPN for database access, while ensuring valid
+# deployment processes using a staged app in Zerops.
+project:
+  name: nodejs-hello-world-local
+
+services:
+  # Staging app for validating production deployments.
+  # Run 'zcli push' from your local terminal to trigger
+  # a build using the 'prod' zeropsSetup — compiles
+  # TypeScript and deploys optimized artifacts.
+  # Subdomain provides a public HTTPS URL for testing.
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nodejs-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL single-node database — accessible from your
+  # local machine via the Zerops VPN ('zcli vpn up').
+  # Connect using the 'db_connectionString' env variable
+  # shown in the Zerops dashboard. Priority 10 starts
+  # the database before the app container.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25

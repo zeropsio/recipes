@@ -1,0 +1,47 @@
+# AI agent environment provides a development space for AI
+# agents to build and version the app. Includes a dev service
+# with the code repository and development tools, a staging
+# service to validate builds, and a low-resource database.
+project:
+  name: nodejs-hello-world-agent
+
+services:
+  # Set up the AI agent development environment — Zerops pulls
+  # source and zerops.yaml from the 'buildFromGit' repo, using
+  # the 'dev' setup which installs Node.js 22 and all
+  # dependencies. SSH in and start developing.
+  # Subdomain access gives the dev workspace a public HTTPS URL
+  # so AI agents can verify endpoints during development.
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/nodejs-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      # Low allocation for an idle dev workspace — scale up
+      # via verticalAutoscaling settings when needed.
+      minRam: 0.5
+
+  # Deploy the staging service — Zerops pulls source from
+  # the 'buildFromGit' repo and uses the 'prod' zeropsSetup
+  # to compile TypeScript and deploy optimized artifacts.
+  # Subdomain provides a public HTTPS URL for testing builds.
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nodejs-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL single-node database shared by 'appdev' and
+  # 'appstage'. Priority 10 starts data services before app
+  # containers, preventing connection errors on first boot.
+  # NON_HA is appropriate for dev/staging where HA durability
+  # isn't required.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
