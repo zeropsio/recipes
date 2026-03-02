@@ -1,0 +1,30 @@
+# Stage environment uses the same configuration as
+# production, but runs on a single container with lower
+# scaling settings.
+project:
+  name: deno-hello-world-stage
+
+services:
+  # Staging app — validates the production build pipeline.
+  # Zerops pulls source and zerops.yaml from the
+  # 'buildFromGit' repo, using the 'prod' zeropsSetup
+  # to compile Deno TypeScript to self-contained binaries
+  # and deploy them. Subdomain access provides a public
+  # HTTPS URL for pre-production testing.
+  - hostname: app
+    type: deno@2.0.0
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/deno-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
+
+  # PostgreSQL single-node database for staging. Priority
+  # 10 starts the database before the app container,
+  # preventing connection errors on startup. NON_HA
+  # matches the single-container staging profile.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
