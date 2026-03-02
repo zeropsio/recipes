@@ -1,0 +1,45 @@
+# AI agent environment provides a development space for AI agents
+# to build and version the app. Includes a dev service with the
+# code repository and PHP tools, a staging service, and a
+# low-resource database.
+
+project:
+  name: php-hello-world-agent
+
+services:
+  # Set up the AI agent development workspace — Zerops pulls source
+  # from the 'buildFromGit' repo and uses the 'dev' zeropsSetup, which
+  # deploys full source code and installs all Composer dependencies.
+  # PHP-FPM and Apache run on startup; SSH in to edit files and run
+  # 'zcli push' to stage changes to 'appstage'.
+  - hostname: appdev
+    type: php-apache@8.5
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/php-hello-world-app
+    # enableSubdomainAccess gives this service a public HTTPS URL on a
+    # Zerops subdomain — useful for agents to verify running changes.
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Staging service — validates the production build pipeline.
+  # Zerops pulls source from the same 'buildFromGit' repo and uses
+  # the 'prod' zeropsSetup: installs production Composer dependencies,
+  # runs the readiness check at '/', and serves via PHP-FPM + Apache.
+  - hostname: appstage
+    type: php-apache@8.5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/php-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL single-node database shared by both app services.
+  # Priority 10 starts the database before 'appdev' and 'appstage',
+  # preventing connection errors during container initialization.
+  # NON_HA is a single node — suitable for dev/staging where
+  # HA durability is not required.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10
