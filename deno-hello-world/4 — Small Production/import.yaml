@@ -1,0 +1,33 @@
+# Small production environment offers a production-ready
+# setup optimized for moderate throughput.
+project:
+  name: deno-hello-world-small-prod
+
+services:
+  # Production app — Zerops pulls source and zerops.yaml
+  # from the 'buildFromGit' repo and uses the 'prod'
+  # zeropsSetup to compile Deno TypeScript to
+  # self-contained binaries. minContainers: 2 keeps at
+  # least two containers running for availability and
+  # load distribution. Zerops auto-scales within the
+  # verticalAutoscaling bounds; minFreeRamGB reserves
+  # headroom for request spikes and GC cycles.
+  - hostname: app
+    type: deno@2.0.0
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/deno-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
+
+  # PostgreSQL single-node database. Automatic encrypted
+  # backups are on by default. For higher-traffic
+  # production, consider HA mode or an external backup
+  # strategy. Priority 10 starts the database before
+  # the app containers.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10

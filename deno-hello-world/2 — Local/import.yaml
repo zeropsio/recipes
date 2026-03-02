@@ -1,0 +1,30 @@
+# Local environment supports local app development using
+# zCLI VPN for database access, while ensuring valid
+# deployment processes using a staged app in Zerops.
+project:
+  name: deno-hello-world-local
+
+services:
+  # Deploy the staging app for validating your local
+  # development against a real Zerops build. Zerops pulls
+  # source and zerops.yaml from the 'buildFromGit' repo
+  # and uses the 'prod' zeropsSetup — one of several
+  # pipeline triggers (zcli push and git integration are
+  # others). Subdomain exposes a public HTTPS URL.
+  - hostname: app
+    type: deno@2.0.0
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/deno-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL single-node database. Run 'zcli vpn up'
+  # to connect your local machine to this database
+  # directly via the 'db' hostname. Priority 10 ensures
+  # the database starts before the app container.
+  # NON_HA is sufficient for local development.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10

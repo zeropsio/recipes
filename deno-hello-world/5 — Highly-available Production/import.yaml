@@ -1,0 +1,43 @@
+# Highly-available production environment provides a
+# production setup with enhanced scaling, dedicated
+# resources, and HA components for improved durability
+# and performance.
+project:
+  name: deno-hello-world-ha-prod
+  # SERIOUS core dedicates infrastructure (project balancer,
+  # logging, metrics) to this project rather than sharing
+  # it with other projects on the Zerops cluster.
+  corePackage: SERIOUS
+
+services:
+  # Production app on dedicated CPU with at least two
+  # containers always running. verticalAutoscaling with
+  # cpuMode: DEDICATED allocates exclusive vCPU cores —
+  # no CPU sharing with other containers on the node.
+  # minFreeRamGB reserves headroom for traffic spikes
+  # and runtime GC cycles above the minRam baseline.
+  - hostname: app
+    type: deno@2.0.0
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/deno-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL HA — data is replicated across multiple
+  # nodes, eliminating the single point of failure present
+  # in NON_HA mode. Dedicated CPU ensures query latency
+  # is not affected by other workloads on the node.
+  # Priority 10 starts the database before app containers.
+  # Automatic encrypted backups are on by default.
+  - hostname: db
+    type: postgresql@16
+    mode: HA
+    priority: 10
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5
