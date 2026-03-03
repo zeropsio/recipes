@@ -1,0 +1,38 @@
+# Local environment supports local app development
+# using zCLI VPN for database access, while ensuring
+# valid deployment processes using a staged app in
+# Zerops.
+
+project:
+  name: elixir-hello-world-local
+
+services:
+  # Deploy the staging service for deployment
+  # validation — run 'zcli push' from your local
+  # machine to build and verify the prod pipeline.
+  # Subdomain access lets you test the deployed app
+  # from a public HTTPS URL.
+  #
+  # Zerops pulls source and zerops.yaml from the
+  # 'buildFromGit' repo, using the 'prod' zeropsSetup
+  # to build a self-contained OTP release and deploy.
+  - hostname: app
+    type: elixir@1.16
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/elixir-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # PostgreSQL single-node database. Accessible
+  # locally via 'zcli vpn up' — use the 'db' hostname
+  # and the credentials from the Zerops UI to connect
+  # your local Elixir app directly to this database.
+  # NON_HA is a single container — suitable for local
+  # development. Priority 10 ensures the database
+  # starts before app containers, so the DB is ready
+  # when the app runs its first migration.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
