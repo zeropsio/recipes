@@ -1,0 +1,36 @@
+# Small production environment offers a production-ready setup
+# optimized for moderate throughput.
+project:
+  name: python-hello-world-small-prod
+
+services:
+  # Production app — Zerops pulls source and zerops.yaml from the
+  # 'buildFromGit' repo, using the 'prod' zeropsSetup. Gunicorn
+  # serves Flask with two workers per container.
+  # minContainers: 2 keeps at least two containers running at all
+  # times for availability and load distribution. Zerops
+  # autoscales within these bounds as traffic grows.
+  - hostname: app
+    type: python@3.11
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/python-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.5
+      # Reserve ~50% of minRam free — Python/Gunicorn workers can
+      # accumulate memory; headroom prevents OOM kills on traffic
+      # spikes.
+      minFreeRamGB: 0.25
+
+  # PostgreSQL single-node database. Automatic encrypted backups
+  # are enabled by default. For higher durability, consider HA
+  # mode or a dedicated backup strategy for production traffic.
+  # Priority 10 ensures the database starts before the app.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
