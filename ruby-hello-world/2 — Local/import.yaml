@@ -1,0 +1,30 @@
+# Local environment supports local app development using
+# zCLI VPN for database access, while ensuring valid
+# deployment processes using a staged app in Zerops.
+project:
+  name: ruby-hello-world-local
+
+services:
+  # Staging app — receives pushes from the local machine
+  # via 'zcli push'. Zerops builds and deploys using the
+  # 'prod' zeropsSetup from zerops.yaml in your local
+  # repository. enableSubdomainAccess provides a public
+  # HTTPS URL for testing the deployed build.
+  - hostname: app
+    type: ruby@3.4
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/ruby-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL single-node database. Run 'zcli vpn up'
+  # to connect your local machine to the Zerops network —
+  # the app then reaches the database at 'db' hostname
+  # on its standard port, just like inside Zerops.
+  # Priority 10 starts the database first, preventing
+  # connection errors when the app container boots.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10

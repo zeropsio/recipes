@@ -1,0 +1,43 @@
+# Highly-available production environment provides a
+# production setup with enhanced scaling, dedicated
+# resources, and HA components for improved durability
+# and performance.
+project:
+  name: ruby-hello-world-ha-prod
+  # SERIOUS core dedicates infrastructure for this
+  # project's balancer, logging, and metrics — isolated
+  # from shared Zerops infrastructure, suitable for
+  # production workloads with consistent traffic.
+  corePackage: SERIOUS
+
+services:
+  # Production app with dedicated CPU and HA-grade
+  # resource settings. minContainers: 2 ensures at least
+  # two containers run at all times for redundancy.
+  # Zerops scales up automatically beyond this floor.
+  - hostname: app
+    type: ruby@3.4
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/ruby-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      # DEDICATED cpuMode allocates reserved CPU cores
+      # to this service — no noisy-neighbour contention.
+      # All three fields must be under verticalAutoscaling.
+      cpuMode: DEDICATED
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL HA — data is replicated across multiple
+  # nodes with no single point of failure. Automatic
+  # encrypted backups are on by default. Priority 10
+  # starts the database before app containers.
+  - hostname: db
+    type: postgresql@18
+    mode: HA
+    priority: 10
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5
