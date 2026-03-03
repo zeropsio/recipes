@@ -1,0 +1,32 @@
+# Local environment supports local app development using zCLI VPN
+# for database access, while ensuring valid deployment processes
+# using a staged app in Zerops.
+project:
+  name: python-hello-world-local
+
+services:
+  # Staging service — verifies the production build pipeline while
+  # the developer works locally. Zerops pulls source and zerops.yaml
+  # from 'buildFromGit' and runs the 'prod' zeropsSetup to build
+  # and deploy the vendored application artifact.
+  # Subdomain provides a public HTTPS URL for end-to-end testing
+  # without running the server locally.
+  - hostname: app
+    type: python@3.11
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/python-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL single-node database — the developer connects to it
+  # locally using `zcli vpn up`, then sets DB_HOST=db in their
+  # local .env to match the container hostname. NON_HA is suitable
+  # for local development where HA durability isn't required.
+  # Priority 10 ensures the database starts before the app service.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
