@@ -1,0 +1,48 @@
+# AI agent environment provides a development space
+# for AI agents to build and version the app.
+# Includes a dev service with the source code and
+# necessary development tools, a staging service,
+# and a low-resource database.
+project:
+  name: ruby-hello-world-agent
+
+services:
+  # Set up the AI agent development environment —
+  # Zerops pulls source from the 'buildFromGit' repo
+  # and uses the 'dev' zeropsSetup, which ships Ruby
+  # pre-installed alongside all gems and source code.
+  # SSH in and start developing immediately.
+  - hostname: appdev
+    type: ruby@3.4
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/ruby-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      # 0.5 GB is sufficient for a single-agent workspace
+      # with Puma and a small Ruby app.
+      minRam: 0.5
+
+  # Staging app — validates the production build pipeline.
+  # Zerops pulls source and zerops.yaml from the
+  # 'buildFromGit' repo, using the 'prod' zeropsSetup
+  # to build and deploy the optimized artifact.
+  # enableSubdomainAccess gives a public HTTPS URL
+  # for testing without a custom domain.
+  - hostname: appstage
+    type: ruby@3.4
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/ruby-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL single-node database for development.
+  # Accessible as 'db' hostname from both 'appdev' and
+  # 'appstage' services. Priority 10 starts the database
+  # before app containers, preventing connection errors
+  # on first boot. NON_HA is a single node — suitable for
+  # dev and staging where HA durability is not required.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10

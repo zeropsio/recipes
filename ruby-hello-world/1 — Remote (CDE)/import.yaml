@@ -1,0 +1,47 @@
+# Remote (CDE) environment allows developers to build
+# the app within Zerops via SSH, supporting the full
+# development lifecycle without local tool installation.
+# Includes a dev service with source code and development
+# tools, a staging service, and a low-resource database.
+project:
+  name: ruby-hello-world-remote
+
+services:
+  # Set up the remote development workspace — Zerops pulls
+  # source from the 'buildFromGit' repo and uses the 'dev'
+  # zeropsSetup, which ships Ruby pre-installed alongside
+  # all gems and source code. SSH in (or mount via IDE
+  # SSHFS) and start developing immediately. The database
+  # is migrated and ready before your first connection.
+  #
+  # Resource tip: raise minRam for heavier workloads
+  # (e.g. running tests in parallel). The value below
+  # keeps costs low for light editing sessions.
+  # To raise: verticalAutoscaling: minRam: 4
+  - hostname: appdev
+    type: ruby@3.4
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/ruby-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Staging app — validates the production pipeline.
+  # Push code from the dev SSH session:
+  #   zcli push <appstage-service-id> --setup=prod
+  - hostname: appstage
+    type: ruby@3.4
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/ruby-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL single-node database shared between dev
+  # and staging. Priority 10 ensures the database starts
+  # before app containers — no connection errors on first
+  # deploy. NON_HA is single-node, suitable for dev/stage.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10
