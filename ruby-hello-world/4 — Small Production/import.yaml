@@ -1,0 +1,37 @@
+# Small production environment offers a production-ready
+# setup optimized for moderate throughput.
+project:
+  name: ruby-hello-world-small-prod
+
+services:
+  # Production app — Zerops builds from the
+  # 'buildFromGit' repo using the 'prod' zeropsSetup.
+  # enableSubdomainAccess provides a public HTTPS URL;
+  # map your custom domain in the Zerops dashboard.
+  #
+  # minContainers: 2 keeps two runtime containers
+  # running at all times — requests are distributed
+  # across both, eliminating single-container downtime.
+  # Zerops scales up automatically under load.
+  - hostname: app
+    type: ruby@3.4
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/ruby-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      # minFreeRamGB reserves headroom above minRam —
+      # Zerops scales up before the container hits its
+      # limit, preventing OOM kills under traffic spikes.
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL single-node with automatic encrypted
+  # backups enabled by default. For higher-traffic
+  # workloads, consider HA mode (Environment 5) or
+  # your own backup export strategy.
+  # Priority 10 starts the database before app containers.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10
