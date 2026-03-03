@@ -1,0 +1,36 @@
+# Stage environment uses the same configuration as
+# production, but runs on a single container with
+# lower scaling settings.
+
+project:
+  name: elixir-hello-world-stage
+
+services:
+  # Deploy the staging app — Zerops pulls source and
+  # zerops.yaml from the 'buildFromGit' repo, using
+  # the 'prod' zeropsSetup to build a self-contained
+  # OTP release and deploy it. This is one of several
+  # deploy triggers — teams typically switch to
+  # 'zcli push' or git integration as the project
+  # matures. Subdomain access provides a public HTTPS
+  # URL for pre-production validation.
+  - hostname: app
+    type: elixir@1.16
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/elixir-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.1
+
+  # PostgreSQL single-node database for staging.
+  # Mirrors the production schema via Ecto migrations
+  # (run automatically on each deploy via initCommands).
+  # NON_HA is a single container — acceptable for
+  # staging where HA durability isn't required.
+  # Priority 10 ensures the database starts before the
+  # app container, preventing connection errors on boot.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
