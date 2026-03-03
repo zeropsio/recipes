@@ -1,0 +1,41 @@
+# Small production environment offers a production-ready setup
+# optimized for moderate throughput.
+
+project:
+  name: gleam-hello-world-small-prod
+
+services:
+  # Deploy the production app — Zerops pulls source and zerops.yaml
+  # from the 'buildFromGit' repo and uses the 'prod' zeropsSetup to
+  # compile a self-contained Erlang shipment and deploy it. The 'prod'
+  # setup runs the database migration atomically via initCommands
+  # before traffic reaches the new containers.
+  # Subdomain access gives a public HTTPS URL; add a custom domain
+  # in the Zerops dashboard for production traffic.
+  - hostname: app
+    type: gleam@1.5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/gleam-hello-world-app
+    enableSubdomainAccess: true
+    # minContainers: 2 keeps two containers running at all times for
+    # availability and zero-downtime deploys. Zerops autoscales
+    # RAM within the verticalAutoscaling bounds as load changes.
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.25
+      # Reserve free RAM for OTP scheduler and request spikes.
+      # Production services should always have headroom (30-50% of
+      # minRam) to absorb traffic bursts without OOM kills.
+      minFreeRamGB: 0.125
+
+  # PostgreSQL single-node database. Automatic encrypted backups are
+  # on by default. For production traffic, consider HA mode or a
+  # dedicated backup strategy. Priority 10 ensures the database starts
+  # before app containers.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
