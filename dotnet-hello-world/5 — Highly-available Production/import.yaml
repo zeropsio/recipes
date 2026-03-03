@@ -1,0 +1,43 @@
+# Highly-available production environment provides a production
+# setup with enhanced scaling, dedicated resources, and HA
+# components for improved durability and performance.
+
+project:
+  name: dotnet-hello-world-ha-prod
+  # Serious core: dedicated infrastructure for the project's
+  # balancer, logging, and metrics — isolated from shared
+  # Zerops infrastructure used by Lightweight projects.
+  corePackage: SERIOUS
+
+services:
+  # Production app with dedicated CPU and HA-grade resources.
+  # cpuMode: DEDICATED reserves CPU cores exclusively for this
+  # service — no time-sharing with other containers on the node.
+  # minContainers: 2 ensures at least two replicas are always
+  # running for zero-downtime deploys and failover.
+  # Zerops auto-scales RAM within verticalAutoscaling bounds;
+  # minFreeRamGB: 0.25 keeps a buffer for GC pressure and spikes.
+  - hostname: app
+    type: dotnet@9
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/dotnet-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL HA — data is replicated across multiple nodes,
+  # eliminating a single point of failure. Dedicated CPU ensures
+  # consistent query latency under high throughput. Automatic
+  # encrypted backups are on by default.
+  # Priority 10 starts the database before app containers start.
+  - hostname: db
+    type: postgresql@16
+    mode: HA
+    priority: 10
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5

@@ -1,0 +1,32 @@
+# Stage environment uses the same configuration as production,
+# but runs on a single container with lower scaling settings.
+
+project:
+  name: dotnet-hello-world-stage
+
+services:
+  # Staging app — built and deployed with the same 'prod'
+  # zeropsSetup as production. Zerops pulls source and
+  # zerops.yaml from the 'buildFromGit' repo and publishes
+  # framework-dependent .NET artifacts to the runtime container.
+  # Use 'zcli push' or git integration to trigger pipeline runs.
+  # Subdomain access gives a public HTTPS URL for QA testing.
+  - hostname: app
+    type: dotnet@9
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/dotnet-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL single-node for staging. NON_HA is sufficient
+  # here — staging validates application behavior, not database
+  # HA failover. Priority 10 starts the database first, so the
+  # app container doesn't attempt connections before it's ready.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
