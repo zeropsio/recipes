@@ -1,0 +1,46 @@
+# Remote (CDE) environment allows developers to build the app
+# within Zerops via SSH, supporting the full development lifecycle
+# without local tool installation.
+
+project:
+  name: dotnet-hello-world-remote
+
+services:
+  # Development workspace — Zerops pulls source and zerops.yaml
+  # from the 'buildFromGit' repo, using the 'dev' setup which
+  # deploys the full source tree with the .NET SDK available.
+  # Mount this service in your IDE via SSHFS (e.g., VS Code
+  # Remote SSH) for a fully cloud-hosted development experience.
+  # Increase minRam to 2-4 GB if running multiple dotnet processes.
+  - hostname: appdev
+    type: dotnet@9
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/dotnet-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      # minRam: 4  # Recommended for IDE-mounted development
+      #            # (IntelliSense, build watchers, test runners)
+
+  # Staging service — validates the production pipeline before
+  # shipping. Zerops uses the 'prod' zeropsSetup to compile and
+  # deploy framework-dependent artifacts. Trigger deploys from
+  # the dev container via 'zcli push' after testing locally.
+  - hostname: appstage
+    type: dotnet@9
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/dotnet-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL single-node for development and staging.
+  # NON_HA = single node, suitable for non-production workloads.
+  # Priority 10 ensures the database is ready before app containers
+  # attempt their first connection — prevents startup crash loops.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25

@@ -1,0 +1,34 @@
+# Local environment supports local app development using
+# zCLI VPN for database access, while ensuring valid deployment
+# processes using a staged app in Zerops.
+
+project:
+  name: dotnet-hello-world-local
+
+services:
+  # App service for validating the production build pipeline.
+  # Zerops pulls source and zerops.yaml from the 'buildFromGit'
+  # repo and uses the 'prod' zeropsSetup to compile and deploy
+  # published artifacts — identical to real production behavior.
+  # Developers can also 'zcli push' from their local machine
+  # to iterate on the build pipeline while coding locally.
+  # enableSubdomainAccess provides a public HTTPS URL for testing
+  # the cloud-deployed build alongside your local dev server.
+  - hostname: app
+    type: dotnet@9
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/dotnet-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL single-node database. Run 'zcli vpn up' locally
+  # to connect your local .NET app to this database directly —
+  # use the 'db' hostname and the generated credentials.
+  # NON_HA = single node; priority 10 starts it before the app.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
