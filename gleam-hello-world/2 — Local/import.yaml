@@ -1,0 +1,30 @@
+# Local environment supports local app development using zCLI VPN
+# for database access, while ensuring valid deployment processes
+# using a staged app in Zerops.
+
+project:
+  name: gleam-hello-world-local
+
+services:
+  # Deploy the staging service — Zerops pulls source and zerops.yaml
+  # from the 'buildFromGit' repo and uses the 'prod' zeropsSetup to
+  # compile an Erlang shipment and deploy it. 'buildFromGit' is one
+  # of several pipeline triggers — you can also push code via
+  # 'zcli push' from your local terminal or git integration.
+  # Subdomain access provides a public HTTPS URL for the staged app.
+  - hostname: app
+    type: gleam@1.5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/gleam-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL single-node database. Run 'zcli vpn up' locally to
+  # connect your development machine to this Zerops network and access
+  # it directly using the 'db' hostname and generated credentials.
+  # Priority 10 starts the database before the app service.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10
