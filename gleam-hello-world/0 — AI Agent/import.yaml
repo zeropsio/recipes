@@ -1,0 +1,43 @@
+# AI agent environment provides a development space for AI agents
+# to build and version the app. Includes a dev service with the
+# code repository and necessary development tools, a staging service,
+# and a low-resource database.
+
+project:
+  name: gleam-hello-world-agent
+
+services:
+  # Set up the AI agent development environment — Zerops pulls source
+  # and zerops.yaml from the 'buildFromGit' repo, using the 'dev'
+  # setup which deploys source code and includes the Gleam compiler
+  # (gleam@1.5 with Erlang/OTP 26). SSH in and start developing.
+  # 'zeropsSetup: dev' selects the dev pipeline from zerops.yaml.
+  - hostname: appdev
+    type: gleam@1.5
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/gleam-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Deploy the staging service — Zerops pulls source and zerops.yaml
+  # from the 'buildFromGit' repo and uses the 'prod' zeropsSetup to
+  # compile an Erlang shipment and deploy it. Subdomain access
+  # provides a public HTTPS URL for testing the production build.
+  - hostname: appstage
+    type: gleam@1.5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/gleam-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL single-node database for development and staging.
+  # Accessible as 'db' hostname from 'appdev' and 'appstage'.
+  # Priority 10 ensures the database starts before the app services,
+  # preventing connection errors on first boot. NON_HA is suitable
+  # for dev/staging where single-node durability is acceptable.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10

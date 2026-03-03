@@ -1,0 +1,31 @@
+# Stage environment uses the same configuration as production,
+# but runs on a single container with lower scaling settings.
+
+project:
+  name: gleam-hello-world-stage
+
+services:
+  # Deploy the staging service — Zerops pulls source and zerops.yaml
+  # from the 'buildFromGit' repo and uses the 'prod' zeropsSetup to
+  # compile a self-contained Erlang shipment and deploy it. The 'prod'
+  # setup exports compiled BEAM files via 'gleam export erlang-shipment'
+  # and runs the database migration atomically via initCommands.
+  # Subdomain access provides a public HTTPS URL for the staging app.
+  - hostname: app
+    type: gleam@1.5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/gleam-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.25
+      # Reserve free RAM for OTP process memory and request spikes.
+      minFreeRamGB: 0.125
+
+  # PostgreSQL single-node database for staging. Matches the production
+  # service shape so behavior is consistent across environments.
+  # Priority 10 starts the database before the app service, preventing
+  # connection errors on first boot — higher priority starts first.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10
