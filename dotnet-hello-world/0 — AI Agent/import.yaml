@@ -1,0 +1,44 @@
+# AI agent environment provides a development space for AI agents
+# to build and version the app. Includes a dev service with the
+# code repository and necessary development tools, a staging
+# service, and a low-resource database.
+
+project:
+  name: dotnet-hello-world-agent
+
+services:
+  # Development workspace — Zerops pulls source and zerops.yaml
+  # from the 'buildFromGit' repo, using the 'dev' setup which
+  # deploys the full source tree and runs the .NET SDK. SSH in
+  # and interact directly: restore packages, edit, run the app.
+  # Subdomain access lets the AI agent test the service via HTTPS.
+  - hostname: appdev
+    type: dotnet@9
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/dotnet-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Staging service — validates the production build pipeline.
+  # Zerops pulls source from the 'buildFromGit' repo and uses the
+  # 'prod' zeropsSetup to compile and deploy published artifacts.
+  # Subdomain gives the agent a URL to smoke-test after each push.
+  - hostname: appstage
+    type: dotnet@9
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/dotnet-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL single-node database shared by both appdev and
+  # appstage. NON_HA suits dev/staging — no HA durability needed.
+  # Priority 10 starts the database before the app containers,
+  # preventing connection errors on first boot.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
