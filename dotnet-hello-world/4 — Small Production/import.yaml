@@ -1,0 +1,38 @@
+# Small production environment offers a production-ready setup
+# optimized for moderate throughput.
+
+project:
+  name: dotnet-hello-world-small-prod
+
+services:
+  # Production app — compiled and deployed using the 'prod'
+  # zeropsSetup. Zerops builds framework-dependent .NET artifacts
+  # and runs the readiness check (GET /) before routing traffic.
+  # minContainers: 2 keeps two replicas running at all times for
+  # availability and horizontal load distribution. Zerops scales
+  # RAM automatically within the verticalAutoscaling bounds.
+  # minFreeRamGB: 0.25 reserves headroom for the .NET runtime's
+  # GC cycles and traffic spikes — without it, the container hits
+  # the minRam ceiling and gets OOM-killed under load.
+  - hostname: app
+    type: dotnet@9
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/dotnet-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL single-node for moderate production traffic.
+  # Automatic encrypted backups are on by default. For
+  # higher-durability requirements, consider HA mode or
+  # your own backup strategy.
+  # Priority 10 starts the database before app containers.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
