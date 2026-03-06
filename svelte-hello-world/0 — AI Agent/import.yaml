@@ -1,0 +1,33 @@
+# Svelte Hello World — AI agent environment.
+# Two services: 'appdev' for active development (SSH/SSHFS
+# accessible by the agent), 'appstage' for testing prod builds.
+project:
+  name: svelte-hello-world-agent
+
+services:
+  # Dev service — the agent builds and iterates here via SSH.
+  # Uses the 'dev' setup: deploys full source with Node.js
+  # runtime so the agent can run 'npm run dev' and CLI tools.
+  - hostname: appdev
+    # nodejs@22 provides Node.js at runtime — required for running
+    # the SvelteKit dev server and framework tools via SSH.
+    type: nodejs@22
+    # Selects the 'dev' setup from zerops.yaml in the source repo.
+    zeropsSetup: dev
+    # Zerops pulls source and zerops.yaml from this public repo
+    # to trigger the build/deploy pipeline on first import.
+    buildFromGit: https://github.com/zerops-recipe-apps/svelte-hello-world-app
+    # Public HTTPS URL on a Zerops subdomain — the agent can
+    # verify the running dev server without extra configuration.
+    enableSubdomainAccess: true
+
+  # Staging service — prod builds are deployed here for testing.
+  # 'prod' setup: Node.js builds SvelteKit, Nginx serves output.
+  - hostname: appstage
+    # static type runs Nginx — no Node.js at runtime.
+    type: static
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/svelte-hello-world-app
+    # Public subdomain lets the agent verify the prod build output
+    # immediately after deployment without DNS configuration.
+    enableSubdomainAccess: true
