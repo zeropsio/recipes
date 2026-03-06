@@ -1,0 +1,19 @@
+# Svelte Hello World — Stage environment.
+# Mirrors the production configuration on minimal resources.
+# Use this to verify builds and configuration before promoting
+# to a production environment.
+project:
+  name: svelte-hello-world-stage
+
+services:
+  - hostname: app
+    # static type runs Nginx — serves the compiled SvelteKit output.
+    type: static
+    # Selects the 'prod' setup from zerops.yaml in the source repo.
+    zeropsSetup: prod
+    # Zerops pulls source and zerops.yaml from this public repo
+    # to trigger the build/deploy pipeline on first import.
+    buildFromGit: https://github.com/zerops-recipe-apps/svelte-hello-world-app
+    # Public HTTPS URL on a Zerops subdomain — test the stage build
+    # output without configuring a custom domain.
+    enableSubdomainAccess: true
