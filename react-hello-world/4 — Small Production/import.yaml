@@ -1,0 +1,26 @@
+# React Hello World — Small Production Environment
+#
+# Production-ready setup optimized for moderate throughput. Two Nginx
+# containers run behind the project balancer at all times, providing
+# redundancy and absorbing traffic spikes without cold-start delays.
+project:
+  name: react-hello-world-small-prod
+
+services:
+  - hostname: app
+    type: static
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this public repo,
+    # then triggers the build/deploy pipeline automatically.
+    buildFromGit: https://github.com/zerops-recipe-apps/react-hello-world-app
+    enableSubdomainAccess: true
+    # Always run at least 2 containers — distributes traffic and ensures
+    # the app stays available during zero-downtime deploys while new
+    # containers start alongside old ones before the traffic switch.
+    minContainers: 2
+    verticalAutoscaling:
+      # Production RAM floor — enough headroom for Nginx workers and
+      # simultaneous connections. Zerops auto-scales up under load.
+      minRam: 0.25
+      # Reserve free RAM so burst traffic doesn't cause OOM restarts.
+      minFreeRamGB: 0.125
