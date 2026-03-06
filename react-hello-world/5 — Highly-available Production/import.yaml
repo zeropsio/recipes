@@ -1,0 +1,31 @@
+# React Hello World — Highly-available Production environment.
+# Enterprise-grade setup: dedicated project infrastructure, dedicated
+# CPU, two always-on containers, and HA-grade resource allocation.
+project:
+  name: react-hello-world-ha-prod
+  # 'corePackage: SERIOUS' provisions dedicated infrastructure for
+  # this project's balancer, logging, and metrics — no shared
+  # resources with other Zerops projects. Required for production
+  # workloads that need SLA-grade availability guarantees.
+  corePackage: SERIOUS
+
+services:
+  - hostname: app
+    type: static
+    # 'zeropsSetup' selects which setup from zerops.yaml to use.
+    # 'prod' compiles React/Vite into static assets served by Nginx.
+    zeropsSetup: prod
+    # 'buildFromGit' tells Zerops to pull source code and zerops.yaml
+    # from this public repo to trigger the build/deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/react-hello-world-app
+    enableSubdomainAccess: true
+    # 'minContainers: 2' keeps at least two Nginx containers running
+    # at all times for availability and load distribution.
+    minContainers: 2
+    # Zerops auto-scales RAM (and CPU, since cpuMode is DEDICATED)
+    # within these bounds. DEDICATED reserves physical CPU cores for
+    # this container — no CPU sharing with other workloads.
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+      minFreeRamGB: 0.25

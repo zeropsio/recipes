@@ -1,0 +1,26 @@
+# React Hello World — Small Production environment.
+# Production-ready setup with two always-on Nginx containers
+# for availability and load distribution.
+project:
+  name: react-hello-world-small-prod
+
+services:
+  - hostname: app
+    type: static
+    # 'zeropsSetup' selects which setup from zerops.yaml to use.
+    # 'prod' compiles React/Vite into static assets served by Nginx.
+    zeropsSetup: prod
+    # 'buildFromGit' tells Zerops to pull source code and zerops.yaml
+    # from this public repo to trigger the build/deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/react-hello-world-app
+    enableSubdomainAccess: true
+    # 'minContainers: 2' keeps at least two Nginx containers running
+    # at all times — requests are distributed across both, and the
+    # service stays available during container restarts or deploys.
+    minContainers: 2
+    # Zerops auto-scales RAM within these bounds.
+    # minFreeRamGB reserves headroom so Nginx worker processes and
+    # traffic spikes don't trigger OOM kills.
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125

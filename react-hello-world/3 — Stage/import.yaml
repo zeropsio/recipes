@@ -1,0 +1,27 @@
+# React Hello World — Stage environment.
+# Pre-production environment running the same prod build pipeline
+# as production but on a single container with lower scaling.
+project:
+  name: react-hello-world-stage
+
+services:
+  # Single static service using the production build configuration.
+  # Mirrors production: same Vite build, same Nginx serving, same
+  # VITE_APP_ENV injection — only resource allocation differs.
+  - hostname: app
+    type: static
+    # 'zeropsSetup' selects the 'prod' setup from zerops.yaml —
+    # the same pipeline that runs in production.
+    zeropsSetup: prod
+    # 'buildFromGit' tells Zerops to pull source code and zerops.yaml
+    # from this public repo to trigger the build/deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/react-hello-world-app
+    # Gives the service a public HTTPS URL on a Zerops subdomain.
+    enableSubdomainAccess: true
+    # Zerops auto-scales RAM within these bounds.
+    # minFreeRamGB reserves headroom for Nginx worker processes —
+    # without it, the container gets exactly minRam and OOM-kills
+    # on traffic spikes.
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125

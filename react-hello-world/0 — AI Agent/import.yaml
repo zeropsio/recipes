@@ -1,0 +1,29 @@
+# React Hello World — AI Agent environment.
+# Provides a development workspace (appdev) and a staging service
+# (appstage) for AI agents to build, iterate, and verify the app.
+project:
+  name: react-hello-world-agent
+
+services:
+  # Development service — AI agent writes code here and pushes
+  # via zcli. Uses the 'dev' setup: full source deployed, deps
+  # pre-installed, container stays alive for SSH/tool access.
+  - hostname: appdev
+    type: static
+    # 'zeropsSetup' selects which setup from zerops.yaml to use.
+    # 'dev' deploys the full source tree for interactive development.
+    zeropsSetup: dev
+    # 'buildFromGit' tells Zerops to pull source code and zerops.yaml
+    # from this public repo to trigger the build/deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/react-hello-world-app
+    # Gives the service a public HTTPS URL on a Zerops subdomain —
+    # lets the AI agent verify the running app without extra setup.
+    enableSubdomainAccess: true
+
+  # Staging service — receives prod builds pushed from appdev.
+  # Uses the 'prod' setup: compiles React/Vite, serves via Nginx.
+  - hostname: appstage
+    type: static
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/react-hello-world-app
+    enableSubdomainAccess: true
