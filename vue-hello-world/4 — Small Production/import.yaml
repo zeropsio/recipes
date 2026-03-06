@@ -1,0 +1,27 @@
+# Vue Hello World — Small Production environment.
+# Production-ready setup optimized for moderate throughput.
+# Two containers run at all times for availability and load
+# distribution across Zerops' project balancer.
+
+project:
+  name: vue-hello-world-small-prod
+
+services:
+  - hostname: app
+    type: static
+    # 'prod' setup from zerops.yaml — builds optimized Vue bundle
+    # and deploys compiled HTML/CSS/JS to Nginx containers.
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this public repo,
+    # then triggers the build/deploy pipeline automatically.
+    buildFromGit: https://github.com/zerops-recipe-apps/vue-hello-world-app
+    enableSubdomainAccess: true
+    # Always run at least 2 containers — distributes traffic across
+    # both and keeps the service available if one container restarts.
+    minContainers: 2
+    # Zerops auto-scales RAM within these bounds. minFreeRamGB reserves
+    # headroom for Nginx worker processes and traffic spikes, preventing
+    # OOM kills when the container is near its minRam limit.
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125

@@ -1,0 +1,23 @@
+# Vue Hello World — Local environment.
+# Supports local app development with a staged deployment in Zerops
+# for previewing builds. The developer runs 'npm run dev' locally and
+# uses 'zcli push' to deploy preview builds to this service.
+
+project:
+  name: vue-hello-world-local
+
+services:
+  # app: cloud preview service for locally-developed builds.
+  # Run 'zcli push' from your terminal to trigger a prod build and
+  # deploy the output here — no local Nginx setup needed.
+  - hostname: app
+    type: static
+    # 'prod' setup from zerops.yaml — same build pipeline as production,
+    # so the preview accurately reflects what production will serve.
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this public repo
+    # for the initial deploy. Subsequent deploys use 'zcli push'.
+    buildFromGit: https://github.com/zerops-recipe-apps/vue-hello-world-app
+    # Gives this service a public HTTPS URL on a Zerops subdomain —
+    # share the URL to review the build before promoting to production.
+    enableSubdomainAccess: true
