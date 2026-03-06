@@ -1,0 +1,22 @@
+# React Hello World — Local Environment
+#
+# Supports local app development with a staged deployment in Zerops for
+# previewing builds. The developer runs 'npm run dev' locally and uses
+# 'zcli push' to deploy the app to this cloud service for review.
+project:
+  name: react-hello-world-local
+
+services:
+  # Preview service — Nginx serves the static output produced by the
+  # 'prod' build setup. Push your local changes with 'zcli push' to see
+  # a live preview without managing local Nginx or build tooling.
+  - hostname: app
+    type: static
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this public repo
+    # for the initial deploy. Subsequent deploys use 'zcli push' from
+    # the developer's local terminal or CI pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/react-hello-world-app
+    # Gives this service a public HTTPS URL on a Zerops subdomain —
+    # share the preview link with teammates or QA without extra setup.
+    enableSubdomainAccess: true
