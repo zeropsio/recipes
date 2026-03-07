@@ -1,0 +1,28 @@
+# React Router v7 SSR hello world recipe - stage environment.
+# Uses the same prod configuration as production but runs on a single
+# container with lower scaling settings. Use this to validate changes
+# before promoting to production.
+
+project:
+  name: react-router-ssr-hello-world-stage
+
+services:
+  - hostname: app
+    type: nodejs@22
+    # 'prod' setup: runs the full SSR build pipeline and migrations,
+    # identical config to production for faithful pre-release testing.
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this public repo
+    # and triggers the build pipeline automatically on import.
+    buildFromGit: https://github.com/zerops-recipe-apps/react-router-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL for app data. Priority 10 starts the database before
+  # the app container, preventing connection errors on first deploy.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
