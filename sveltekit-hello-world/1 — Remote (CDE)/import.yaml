@@ -1,0 +1,48 @@
+# Remote (CDE) environment — developer works inside Zerops
+# via SSH or IDE mounting (SSHFS). Includes a dev service
+# (appdev) as the active workspace and a staging service
+# (appstage) to preview compiled static builds.
+project:
+  name: sveltekit-hello-world-remote
+
+services:
+  # appdev: developer connects here via SSH or mounts the
+  # filesystem with an IDE (e.g. VS Code Remote SSH, SSHFS).
+  # nodejs@22 keeps Node.js available at runtime so the
+  # developer can run 'npm run dev' or other npm scripts.
+  - hostname: appdev
+    type: nodejs@22
+    # 'dev' setup from zerops.yaml — Zerops installs deps and
+    # deploys full source so the workspace is ready on login.
+    zeropsSetup: dev
+    # Zerops pulls source code and zerops.yaml from this
+    # public repo to trigger the build/deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/sveltekit-hello-world-app
+    # Public HTTPS URL — lets the developer preview the dev
+    # server running inside the container from a browser.
+    enableSubdomainAccess: true
+    minContainers: 1
+    maxContainers: 1
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # appstage: receives prod builds pushed from appdev.
+  # Developer runs 'zcli push --setup=prod' to build and
+  # deploy the static output for external review.
+  - hostname: appstage
+    type: static
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/sveltekit-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 1
+    maxContainers: 1
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
+    # APP_ENV is a runtime env var. Zerops makes it available
+    # during the build as RUNTIME_APP_ENV so the SvelteKit
+    # build can bake the value into the static output via
+    # PUBLIC_APP_ENV — no code change needed per environment.
+    envVariables:
+      APP_ENV: staging

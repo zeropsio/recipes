@@ -1,0 +1,29 @@
+# Small production environment — optimized for moderate
+# traffic. Two containers run in parallel behind the project
+# balancer for basic availability and load distribution.
+project:
+  name: sveltekit-hello-world-small-prod
+
+services:
+  - hostname: app
+    type: static
+    # 'prod' setup from zerops.yaml — compiles SvelteKit with
+    # Vite, serves the static output via Nginx.
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this
+    # public repo to trigger the build/deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/sveltekit-hello-world-app
+    enableSubdomainAccess: true
+    # Always runs at least 2 containers — distributes traffic
+    # and keeps the service available during deploys. Zerops
+    # zero-downtime deploy starts new containers before
+    # removing old ones from the project balancer.
+    minContainers: 2
+    maxContainers: 10
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
+    # APP_ENV is baked into the static output at build time
+    # via RUNTIME_APP_ENV — no rebuild needed to change it.
+    envVariables:
+      APP_ENV: production
