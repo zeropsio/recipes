@@ -1,34 +1,33 @@
-# React Router v7 SSR hello world recipe - local development environment.
-# Provides a staged app service in Zerops and a cloud PostgreSQL database.
-# Developers run React Router v7 locally and connect to the cloud database
-# via Zerops VPN (zcli vpn up), ensuring valid deployment processes.
-
+# React Router v7 SSR hello world - local environment.
+# Provides a cloud database the local developer connects to
+# via Zerops VPN, and a staging service for verifying prod builds.
 project:
   name: react-router-ssr-hello-world-local
 
 services:
-  # Stage app: receives prod builds pushed from local via zcli.
-  # Validates that local changes deploy correctly before going to
-  # real production.
+  # app: staging service to verify the full prod build pipeline
+  # before deploying. The developer runs the app locally and
+  # uses this service to confirm cloud deployments work correctly.
+  # buildFromGit pulls source + zerops.yaml from the public repo
+  # and runs the 'prod' setup.
   - hostname: app
     type: nodejs@22
     zeropsSetup: prod
-    # Zerops pulls source code and zerops.yaml from this public repo
-    # and triggers the prod build pipeline automatically on import.
     buildFromGit: https://github.com/zerops-recipe-apps/react-router-ssr-hello-world-app
-    # Public HTTPS URL on a Zerops subdomain - verify the staged
-    # deployment without setting up a custom domain.
+    # Subdomain gives the developer a public HTTPS URL to compare
+    # against their local dev server.
     enableSubdomainAccess: true
     verticalAutoscaling:
-      minRam: 0.5
-      minFreeRamGB: 0.25
+      minRam: 0.25
+      # Reserve free RAM for SSR rendering spikes and V8 GC cycles.
+      minFreeRamGB: 0.125
 
-  # PostgreSQL for app data. Priority 10 starts the database before
-  # the app container, preventing connection errors on first deploy.
-  # Local development connects to this same database via VPN.
+  # PostgreSQL for application data. The developer connects to
+  # this database locally via `zcli vpn up`, which routes traffic
+  # over WireGuard to the Zerops private network. Priority 10
+  # starts data services before app containers.
   - hostname: db
-    type: postgresql@16
-    # NON_HA: single-node database - suitable for development where
-    # redundancy is not required.
+    type: postgresql@18
+    # NON_HA: single-node database - suitable for local development.
     mode: NON_HA
     priority: 10
