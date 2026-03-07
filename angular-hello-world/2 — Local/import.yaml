@@ -1,0 +1,31 @@
+# Angular Hello World — Local Environment
+#
+# Supports local Angular development with a Zerops service for
+# previewing builds. The developer runs 'ng serve' locally and uses
+# 'zcli push' to deploy a compiled preview to Zerops.
+
+project:
+  name: angular-hello-world-local
+
+services:
+  # Preview service — developer runs 'zcli push' from their local
+  # machine to build and deploy the Angular app to this static service.
+  # Zerops runs 'ng build' in a temporary build container, then serves
+  # the compiled output from dist/angular-hello-world/browser/ via Nginx.
+  - hostname: app
+    type: static
+
+    # Selects the 'prod' setup from zerops.yaml in the local repo.
+    # 'zcli push' uploads local source code and triggers this pipeline.
+    zeropsSetup: prod
+
+    # Zerops pulls source code and zerops.yaml from this public repo
+    # to trigger an initial build on import. After that, use zcli push.
+    buildFromGit: https://github.com/zerops-recipe-apps/angular-hello-world-app
+
+    # Public HTTPS URL for previewing the deployed build in a browser.
+    enableSubdomainAccess: true
+
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
