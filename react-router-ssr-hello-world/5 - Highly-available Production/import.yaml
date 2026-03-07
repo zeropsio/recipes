@@ -1,0 +1,42 @@
+# React Router v7 SSR hello world recipe - highly-available production.
+# Enterprise-grade setup with dedicated CPU, HA database replication,
+# and the Serious core package for dedicated balancer and metrics
+# infrastructure. Use this when downtime is not acceptable.
+
+project:
+  name: react-router-ssr-hello-world-ha-prod
+  # Serious core: dedicated infrastructure for the project's balancer,
+  # logging, and metrics pipeline - no resource contention with other
+  # projects on shared infrastructure.
+  corePackage: SERIOUS
+
+services:
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this public repo
+    # and triggers the build pipeline automatically on import.
+    buildFromGit: https://github.com/zerops-recipe-apps/react-router-ssr-hello-world-app
+    enableSubdomainAccess: true
+    # At least 2 containers ensure traffic continues during deploys
+    # and absorb traffic spikes without cold-start latency.
+    minContainers: 2
+    # verticalAutoscaling: Zerops auto-scales RAM and CPU within these
+    # bounds. DEDICATED cpuMode gives the container exclusive CPU cores
+    # instead of sharing with other services on the same host.
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL with HA mode replicates data across multiple nodes.
+  # If the primary node fails, a replica is promoted automatically -
+  # no data loss, no manual intervention.
+  - hostname: db
+    type: postgresql@16
+    mode: HA
+    priority: 10
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5

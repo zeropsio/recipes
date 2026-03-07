@@ -1,0 +1,45 @@
+# React Router v7 SSR hello world recipe - remote (CDE) environment.
+# Provides a dev service accessible via SSH or IDE remote mount and a
+# staging service, both sharing one PostgreSQL database. Developers
+# work entirely within Zerops - no local Node.js or database required.
+
+project:
+  name: react-router-ssr-hello-world-remote
+
+services:
+  # Dev service: SSH in or mount with VS Code Remote / SSHFS to edit
+  # files directly. The 'dev' setup deploys full source and keeps the
+  # container idle (zsc noop) so you start the dev server yourself.
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    # Zerops pulls source code and zerops.yaml from this public repo
+    # and triggers the dev build pipeline automatically on import.
+    buildFromGit: https://github.com/zerops-recipe-apps/react-router-ssr-hello-world-app
+    # Public HTTPS URL on a Zerops subdomain - reach your dev server
+    # without setting up tunnels or local port forwarding.
+    enableSubdomainAccess: true
+    # For development work, you may want to increase RAM:
+    # minRam: 4
+    # minFreeRamGB: 2
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Staging service: receives prod builds pushed from appdev.
+  # Uses the 'prod' setup with the full SSR pipeline and migration.
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/react-router-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL for app data. Priority 10 starts the database before
+  # app containers, preventing connection errors on first deploy.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10

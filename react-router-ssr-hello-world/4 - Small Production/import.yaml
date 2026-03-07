@@ -1,0 +1,35 @@
+# React Router v7 SSR hello world recipe - small production environment.
+# Production-ready setup optimized for moderate throughput. Runs two
+# app containers for availability and reserves RAM headroom for V8 GC
+# cycles and SSR rendering spikes.
+
+project:
+  name: react-router-ssr-hello-world-small-prod
+
+services:
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this public repo
+    # and triggers the build pipeline automatically on import.
+    buildFromGit: https://github.com/zerops-recipe-apps/react-router-ssr-hello-world-app
+    enableSubdomainAccess: true
+    # Always runs at least 2 containers so traffic keeps flowing
+    # while one container is replaced during a zero-downtime deploy.
+    minContainers: 2
+    # verticalAutoscaling: Zerops auto-scales RAM within these bounds.
+    # minFreeRamGB reserves headroom for V8 GC and SSR rendering
+    # spikes so the container doesn't OOM-kill under load.
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
+
+  # PostgreSQL for app data. Priority 10 starts the database before
+  # app containers, preventing connection errors on first deploy.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
