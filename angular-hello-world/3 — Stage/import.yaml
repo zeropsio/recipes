@@ -1,0 +1,28 @@
+# Angular Hello World — Stage Environment
+#
+# Pre-production environment using the same 'prod' build configuration
+# as production. Runs on a single container with lower scaling settings,
+# suitable for integration testing and stakeholder review before promoting
+# to production.
+
+project:
+  name: angular-hello-world-stage
+
+services:
+  - hostname: app
+    type: static
+
+    # Selects the 'prod' setup: compiles Angular with ng build and
+    # serves output from dist/angular-hello-world/browser/ via Nginx.
+    # Same pipeline as production — stage catches config issues early.
+    zeropsSetup: prod
+
+    # Zerops pulls source code and zerops.yaml from this public repo
+    # to trigger the build/deploy pipeline automatically on import.
+    buildFromGit: https://github.com/zerops-recipe-apps/angular-hello-world-app
+
+    enableSubdomainAccess: true
+
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
