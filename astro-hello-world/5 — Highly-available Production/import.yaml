@@ -1,0 +1,38 @@
+# astro-hello-world — Highly-available Production environment
+#
+# Enterprise-grade setup with dedicated infrastructure, enhanced
+# scaling, and HA components. Use this for high-traffic sites where
+# availability and consistent latency are non-negotiable.
+project:
+  name: astro-hello-world-ha-prod
+  # SERIOUS core allocates dedicated infrastructure for the project's
+  # balancer, logging, and metrics — isolated from shared resources.
+  # Use for production workloads where noisy-neighbor effects matter.
+  corePackage: SERIOUS
+
+services:
+  - hostname: app
+    type: static
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this public repo
+    # and runs the build/deploy pipeline automatically on import.
+    buildFromGit: https://github.com/zerops-recipe-apps/astro-hello-world-app
+    enableSubdomainAccess: true
+    # Always run at least 2 containers for availability and load
+    # distribution. The project balancer routes traffic across them.
+    minContainers: 2
+    maxContainers: 20
+    # Zerops autoscales RAM and CPU within these bounds.
+    # DEDICATED cpuMode pins vCPUs to this service exclusively —
+    # eliminates CPU throttling from shared-host contention.
+    # minFreeRamGB reserves headroom for traffic spikes so Nginx
+    # worker processes never hit the OOM limit under load.
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+      minFreeRamGB: 0.25
+    envVariables:
+      # APP_ENV is exposed as RUNTIME_APP_ENV in the build shell,
+      # allowing the framework to bake the environment name into the
+      # compiled output at build time.
+      APP_ENV: production

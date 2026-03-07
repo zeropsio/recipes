@@ -1,0 +1,31 @@
+# astro-hello-world — Local environment
+#
+# Supports local development with Zerops as a cloud preview target.
+# The developer runs 'npm run dev' locally; 'zcli push' deploys to
+# the 'app' service for shareable preview builds.
+project:
+  name: astro-hello-world-local
+
+services:
+  # Preview service — Nginx serves the compiled Astro output.
+  # Run 'zcli push' from your local machine to trigger a build and
+  # deploy; the subdomain URL provides a shareable preview link.
+  # Uses the 'prod' setup from zerops.yaml for a production-like
+  # static build — identical to what will run in production.
+  - hostname: app
+    type: static
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this public repo
+    # to seed the service on first import. After that, use 'zcli push'
+    # from your local terminal or CI pipeline to deploy changes.
+    buildFromGit: https://github.com/zerops-recipe-apps/astro-hello-world-app
+    # Gives the service a public HTTPS URL on a Zerops subdomain for
+    # sharing preview builds with teammates.
+    enableSubdomainAccess: true
+    minContainers: 1
+    maxContainers: 1
+    envVariables:
+      # APP_ENV is exposed as RUNTIME_APP_ENV in the build shell,
+      # allowing the framework to bake the environment name into the
+      # compiled output at build time.
+      APP_ENV: local
