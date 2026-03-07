@@ -1,7 +1,7 @@
 # React Router v7 SSR Hello World Recipe
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-A server-side rendered [React Router v7](https://reactrouter.com) application running on [Zerops](https://zerops.io), connected to a [PostgreSQL](https://zerops.io/postgresql) database. The app demonstrates idempotent migrations and a live database health check at the root path.
+A minimal server-side rendered application built with [React Router v7](https://reactrouter.com) on [Zerops](https://zerops.io), connecting to a PostgreSQL database. Includes ready-made environment configurations for every stage of the development lifecycle - from AI agent workspaces through local development to highly-available production.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 
 ⬇️ **Full recipe page and deploy with one-click**
