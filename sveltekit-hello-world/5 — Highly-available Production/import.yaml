@@ -1,0 +1,37 @@
+# Highly-available production environment — dedicated
+# infrastructure, dedicated CPU, and multiple containers
+# for enhanced durability and performance under load.
+project:
+  name: sveltekit-hello-world-ha-prod
+  # SERIOUS core: dedicated infrastructure for the project's
+  # balancer, logging, and metrics — not shared with other
+  # Zerops projects on the same physical node.
+  corePackage: SERIOUS
+
+services:
+  - hostname: app
+    type: static
+    # 'prod' setup from zerops.yaml — compiles SvelteKit with
+    # Vite, serves the static output via Nginx.
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this
+    # public repo to trigger the build/deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/sveltekit-hello-world-app
+    enableSubdomainAccess: true
+    # Always runs at least 2 containers — traffic is
+    # distributed by the project balancer; zero-downtime
+    # deploys rotate containers without dropping requests.
+    minContainers: 2
+    maxContainers: 20
+    # Zerops auto-scales RAM within these bounds every 10s.
+    # DEDICATED CPU prevents noisy-neighbour interference —
+    # vCPU cores are reserved exclusively for this service.
+    # minFreeRamGB reserves headroom for Nginx worker spikes.
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+      minFreeRamGB: 0.25
+    # APP_ENV is baked into the static output at build time
+    # via RUNTIME_APP_ENV — no rebuild needed to change it.
+    envVariables:
+      APP_ENV: production
