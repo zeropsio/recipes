@@ -1,0 +1,34 @@
+# React Router v7 Hello World — Local Environment
+#
+# A local development setup: the developer runs the React
+# Router Vite dev server on their own machine and uses
+# 'zcli push' to build and preview on Zerops.
+
+project:
+  name: react-router-hello-world-local
+
+services:
+  # Preview service: receives code pushed via 'zcli push',
+  # runs the 'prod' build, and serves the compiled static
+  # assets via Nginx. Lets the developer preview builds at
+  # a public HTTPS URL without running a full production setup.
+  - hostname: app
+    type: static
+    # Zerops pulls the source code and zerops.yaml from this
+    # public repo for the initial deploy. Subsequent deploys
+    # use 'zcli push' from the developer's local machine.
+    buildFromGit: https://github.com/zerops-recipe-apps/react-router-hello-world-app
+    # Selects the 'prod' setup — Node.js builds the React Router
+    # SPA into static assets; Nginx serves them at runtime.
+    zeropsSetup: prod
+    # Public subdomain for browser-based preview of each push.
+    enableSubdomainAccess: true
+    envVariables:
+      # Runtime env var exposed as RUNTIME_APP_ENV in the build
+      # shell (Zerops auto-prefixes runtime vars with RUNTIME_).
+      # The zerops.yaml buildCommands inject it as VITE_APP_ENV,
+      # baking the environment name into the compiled JS bundle.
+      APP_ENV: stage
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125

@@ -1,0 +1,48 @@
+# React Router v7 Hello World — Remote (CDE) Environment
+#
+# A remote development environment that lets developers work
+# inside Zerops via SSH or an IDE with remote filesystem
+# support (e.g., VS Code Remote, Cursor). No local React
+# Router or Node.js installation needed.
+
+project:
+  name: react-router-hello-world-remote
+
+services:
+  # Dev workspace mounted via SSH or SSHFS by the developer's
+  # IDE. Node.js runtime enables running 'npm run dev' and
+  # Vite commands directly inside the container.
+  # Uses the 'dev' setup from zerops.yaml: source and
+  # node_modules deployed; developer starts the dev server.
+  - hostname: appdev
+    # nodejs@22 (not static) — the developer needs the Node.js
+    # runtime to run Vite's dev server and CLI tools via SSH.
+    type: nodejs@22
+    # Zerops pulls the source code and zerops.yaml from this
+    # public repo to trigger the build/deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/react-router-hello-world-app
+    # Selects the 'dev' setup — deploys source to a Node.js
+    # container so the developer has a ready workspace on login.
+    zeropsSetup: dev
+    # Public HTTPS URL — developer can preview the running
+    # Vite dev server (started manually via SSH) in a browser.
+    enableSubdomainAccess: true
+    minContainers: 1
+    maxContainers: 1
+
+  # Staging service: builds the React Router v7 SPA into
+  # static assets served by Nginx. Developer pushes to appstage
+  # to validate production builds during development.
+  - hostname: appstage
+    type: static
+    buildFromGit: https://github.com/zerops-recipe-apps/react-router-hello-world-app
+    # Selects the 'prod' setup — compiles static assets with
+    # Node.js and serves via Nginx. Node.js absent at runtime.
+    zeropsSetup: prod
+    enableSubdomainAccess: true
+    envVariables:
+      # Runtime env var exposed as RUNTIME_APP_ENV in the build
+      # shell (Zerops auto-prefixes runtime vars with RUNTIME_).
+      # The zerops.yaml buildCommands inject it as VITE_APP_ENV,
+      # baking the environment name into the compiled JS bundle.
+      APP_ENV: stage
