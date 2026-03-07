@@ -1,35 +1,36 @@
-# React Router v7 SSR hello world recipe - small production environment.
-# Production-ready setup optimized for moderate throughput. Runs two
-# app containers for availability and reserves RAM headroom for V8 GC
-# cycles and SSR rendering spikes.
-
+# React Router v7 SSR hello world - small production environment.
+# Balanced production setup with auto-scaling and a minimum
+# of two containers for basic availability.
 project:
   name: react-router-ssr-hello-world-small-prod
 
 services:
+  # app: production setup with horizontal scale-floor.
+  # buildFromGit pulls source + zerops.yaml from the public repo
+  # and runs the 'prod' setup.
   - hostname: app
     type: nodejs@22
     zeropsSetup: prod
-    # Zerops pulls source code and zerops.yaml from this public repo
-    # and triggers the build pipeline automatically on import.
     buildFromGit: https://github.com/zerops-recipe-apps/react-router-ssr-hello-world-app
     enableSubdomainAccess: true
-    # Always runs at least 2 containers so traffic keeps flowing
-    # while one container is replaced during a zero-downtime deploy.
+    # minContainers: 2 ensures the project balancer always has at
+    # least two containers to route to - one container going down
+    # for any reason does not cause downtime.
     minContainers: 2
-    # verticalAutoscaling: Zerops auto-scales RAM within these bounds.
-    # minFreeRamGB reserves headroom for V8 GC and SSR rendering
-    # spikes so the container doesn't OOM-kill under load.
+    # Zerops vertically autoscales RAM (and CPU when DEDICATED)
+    # within these bounds. minRam is the guaranteed floor;
+    # minFreeRamGB is headroom reserved above the current usage
+    # so the container does not OOM on SSR traffic spikes.
     verticalAutoscaling:
       minRam: 0.25
       minFreeRamGB: 0.125
 
-  # PostgreSQL for app data. Priority 10 starts the database before
-  # app containers, preventing connection errors on first deploy.
+  # PostgreSQL for application data. Priority 10 starts data
+  # services before app containers, preventing connection errors
+  # on first boot.
   - hostname: db
-    type: postgresql@16
+    type: postgresql@18
+    # NON_HA: single-node database suitable for moderate traffic.
+    # Upgrade to HA mode for workloads requiring data redundancy.
     mode: NON_HA
     priority: 10
-    verticalAutoscaling:
-      minRam: 0.5
-      minFreeRamGB: 0.25
