@@ -1,0 +1,51 @@
+# Qwik City Hello World — Remote (CDE) environment.
+# Provides a cloud development environment: developers SSH in or
+# mount the appdev container via an IDE (e.g. VS Code Remote SSH)
+# to edit source files without installing Node.js locally.
+# appstage serves compiled builds for preview at a public HTTPS URL.
+
+project:
+  name: qwik-city-hello-world-remote
+
+services:
+
+  # Development workspace — mount via IDE or SSH, then run
+  # 'npm run dev' to start the Qwik dev server on port 5173.
+  # type: nodejs@22 so Node.js is available at runtime.
+  - hostname: appdev
+    type: nodejs@22
+
+    # 'dev' setup: installs deps and deploys the full source tree
+    # so the workspace is ready immediately on first SSH connection.
+    zeropsSetup: dev
+
+    # Zerops pulls source code and zerops.yaml from this public repo
+    # to trigger the initial build and deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/qwik-city-hello-world-app
+
+    # Public HTTPS URL for accessing the dev server through
+    # the Zerops project balancer (requires port forwarding or tunnel).
+    enableSubdomainAccess: true
+
+    verticalAutoscaling:
+      minRam: 1
+      # Reserve free RAM for the Qwik dev server and file watchers.
+      minFreeRamGB: 0.5
+
+  # Staging service — run 'zcli push appstage --setup prod' from
+  # inside the appdev container to preview a production build here.
+  - hostname: appstage
+    type: static
+
+    # 'prod' setup: Qwik build pipeline → Nginx serving compiled assets.
+    zeropsSetup: prod
+
+    buildFromGit: https://github.com/zerops-recipe-apps/qwik-city-hello-world-app
+
+    # Public HTTPS URL for sharing the staged build with teammates
+    # or verifying the prod output before promoting to production.
+    enableSubdomainAccess: true
+
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
