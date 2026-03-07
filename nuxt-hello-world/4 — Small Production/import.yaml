@@ -1,0 +1,25 @@
+# Nuxt Hello World — Small Production environment.
+# Production-ready setup with two containers for
+# availability and load distribution under moderate
+# traffic.
+project:
+  name: nuxt-hello-world-small-prod
+
+services:
+  - hostname: app
+    type: static
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this
+    # public repo to trigger the build/deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/nuxt-hello-world-app
+    enableSubdomainAccess: true
+    # Always run at least 2 containers — eliminates single
+    # points of failure and distributes traffic across
+    # multiple Nginx instances.
+    minContainers: 2
+    # Zerops auto-scales RAM within these bounds.
+    # minFreeRamGB reserves headroom for Nginx workers
+    # and traffic spikes without triggering a scale-up.
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125

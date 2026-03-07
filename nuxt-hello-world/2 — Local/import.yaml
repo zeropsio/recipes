@@ -1,0 +1,24 @@
+# Nuxt Hello World — Local environment.
+# Developer runs 'npx nuxi dev' locally and pushes
+# production builds to Zerops for cloud preview via
+# 'zcli push'.
+project:
+  name: nuxt-hello-world-local
+
+services:
+  # Preview service — Nginx serving the compiled Nuxt
+  # output pushed from a local machine. buildFromGit
+  # provides the initial bootstrap build; subsequent
+  # deployments use 'zcli push --setup prod' from
+  # your terminal or CI pipeline.
+  - hostname: app
+    type: static
+    # 'prod' setup: runs 'nuxi generate', deploys
+    # .output/public/ contents to Nginx.
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this
+    # public repo to trigger the build/deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/nuxt-hello-world-app
+    # Public HTTPS subdomain — share the URL to preview
+    # your local builds in a production-like environment.
+    enableSubdomainAccess: true
