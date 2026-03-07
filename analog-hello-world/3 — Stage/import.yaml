@@ -1,0 +1,17 @@
+# Analog Hello World — Stage environment.
+# Pre-production testing with the same build pipeline as production.
+# Single container, lower scaling — keeps costs down for validation.
+project:
+  name: analog-hello-world-stage
+
+services:
+  - hostname: app
+    type: static
+    # 'prod' setup: Vite compiles Analog to static assets; Nginx serves them.
+    # VITE_APP_ENV is injected at build time — there is no runtime process
+    # in static deployments to read env vars.
+    zeropsSetup: prod
+    # buildFromGit triggers a build/deploy pipeline: Zerops pulls source
+    # code and zerops.yaml from this public repo automatically.
+    buildFromGit: https://github.com/zerops-recipe-apps/analog-hello-world-app
+    enableSubdomainAccess: true
