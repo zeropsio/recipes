@@ -1,39 +1,38 @@
-# React Router v7 SSR hello world recipe - highly-available production.
-# Enterprise-grade setup with dedicated CPU, HA database replication,
-# and the Serious core package for dedicated balancer and metrics
-# infrastructure. Use this when downtime is not acceptable.
-
+# React Router v7 SSR hello world - highly-available production.
+# Enterprise-grade setup: dedicated CPU cores, HA database with
+# replication, and a Serious core for dedicated infrastructure.
 project:
   name: react-router-ssr-hello-world-ha-prod
-  # Serious core: dedicated infrastructure for the project's balancer,
-  # logging, and metrics pipeline - no resource contention with other
-  # projects on shared infrastructure.
+  # SERIOUS core dedicates infrastructure to this project's
+  # balancer, logging, and metrics pipeline - no noisy neighbours.
   corePackage: SERIOUS
 
 services:
+  # app: production setup with dedicated resources and a two-
+  # container scale-floor for continuous availability.
   - hostname: app
     type: nodejs@22
     zeropsSetup: prod
-    # Zerops pulls source code and zerops.yaml from this public repo
-    # and triggers the build pipeline automatically on import.
     buildFromGit: https://github.com/zerops-recipe-apps/react-router-ssr-hello-world-app
     enableSubdomainAccess: true
-    # At least 2 containers ensure traffic continues during deploys
-    # and absorb traffic spikes without cold-start latency.
+    # Two containers ensure the project balancer always has a
+    # healthy target if one container restarts during a deploy.
     minContainers: 2
-    # verticalAutoscaling: Zerops auto-scales RAM and CPU within these
-    # bounds. DEDICATED cpuMode gives the container exclusive CPU cores
-    # instead of sharing with other services on the same host.
+    # Zerops autoscales RAM and CPU within these bounds.
+    # cpuMode DEDICATED reserves CPU cores exclusively for this
+    # service - eliminates throttling under sustained SSR load.
     verticalAutoscaling:
       cpuMode: DEDICATED
       minRam: 0.5
+      # Reserve 50% headroom: SSR page renders and V8 GC cycles
+      # can spike memory significantly above idle usage.
       minFreeRamGB: 0.25
 
   # PostgreSQL with HA mode replicates data across multiple nodes.
-  # If the primary node fails, a replica is promoted automatically -
-  # no data loss, no manual intervention.
+  # If the primary node fails, a replica is promoted automatically
+  # - no manual intervention and no data loss.
   - hostname: db
-    type: postgresql@16
+    type: postgresql@18
     mode: HA
     priority: 10
     verticalAutoscaling:
