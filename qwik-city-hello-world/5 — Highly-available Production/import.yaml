@@ -1,0 +1,40 @@
+# Qwik City Hello World — Highly-available Production environment.
+# Enterprise-grade setup with dedicated CPU, HA project core, and
+# multiple Nginx containers for improved durability and performance.
+
+project:
+  name: qwik-city-hello-world-ha-prod
+
+  # SERIOUS core: dedicated infrastructure for the project balancer,
+  # logging, and metrics — isolated from shared Zerops resources.
+  # Use when your SLA requires consistent low-latency routing.
+  corePackage: SERIOUS
+
+services:
+
+  - hostname: app
+    type: static
+
+    # 'prod' setup: Node.js build container compiles Qwik source,
+    # application artifact is stored internally, then deployed to
+    # all runtime containers with zero-downtime traffic switching.
+    # Old containers keep serving hashed assets while new ones start.
+    zeropsSetup: prod
+
+    # Zerops pulls source code and zerops.yaml from this public repo
+    # to trigger the build and deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/qwik-city-hello-world-app
+
+    enableSubdomainAccess: true
+
+    # Always run at least 2 containers — Zerops scales up further
+    # automatically as traffic grows within the autoscaling bounds.
+    minContainers: 2
+
+    verticalAutoscaling:
+      # DEDICATED CPU: Nginx workers get guaranteed CPU time, not
+      # burstable shared cores. Eliminates latency spikes under load.
+      cpuMode: DEDICATED
+      minRam: 0.5
+      # Reserve free RAM for Nginx workers and high-traffic bursts.
+      minFreeRamGB: 0.25

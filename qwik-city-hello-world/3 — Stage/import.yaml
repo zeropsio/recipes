@@ -1,0 +1,31 @@
+# Qwik City Hello World — Stage environment.
+# Pre-production testing with the same build pipeline as production.
+# A single Nginx container serves the compiled static site — identical
+# to prod config but with lower scaling settings.
+
+project:
+  name: qwik-city-hello-world-stage
+
+services:
+
+  - hostname: app
+    type: static
+
+    # 'prod' setup: Zerops pulls source, runs 'npm ci' and the
+    # Qwik build pipeline in a temporary build container, then
+    # deploys compiled HTML/CSS/JS to this Nginx runtime container.
+    # Build base: nodejs@22 — Run base: static (Nginx).
+    zeropsSetup: prod
+
+    # Zerops pulls source code and zerops.yaml from this public repo
+    # to trigger the build and deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/qwik-city-hello-world-app
+
+    # Public HTTPS URL for QA and stakeholder review before
+    # promoting the build to production.
+    enableSubdomainAccess: true
+
+    verticalAutoscaling:
+      minRam: 0.25
+      # Reserve free RAM for Nginx worker processes and traffic spikes.
+      minFreeRamGB: 0.125
