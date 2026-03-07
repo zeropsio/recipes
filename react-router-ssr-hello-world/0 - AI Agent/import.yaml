@@ -1,0 +1,43 @@
+# React Router v7 SSR hello world recipe - AI agent environment.
+# Provides a dev service (mounted via SSHFS for AI agents) and a
+# staging service sharing one PostgreSQL database. AI agents can
+# build and deploy the app entirely within Zerops without local
+# tool installation.
+
+project:
+  name: react-router-ssr-hello-world-agent
+
+services:
+  # Dev service: AI agents build here, mount via SSHFS, push to
+  # staging. Uses the 'dev' zerops.yaml setup - deploys full source,
+  # starts with 'zsc noop --silent' so the agent drives the server.
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    # Zerops pulls source code and zerops.yaml from this public repo
+    # and triggers the dev build pipeline automatically on import.
+    buildFromGit: https://github.com/zerops-recipe-apps/react-router-ssr-hello-world-app
+    # Public HTTPS URL on a Zerops subdomain - lets the agent verify
+    # the running dev server without configuring DNS or TLS.
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Staging service: receives prod builds pushed from appdev.
+  # Uses the 'prod' setup with the full SSR pipeline and migration.
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/react-router-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL for app data. Priority 10 starts the database before
+  # app containers, preventing connection errors on first deploy.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
