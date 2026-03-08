@@ -1,0 +1,50 @@
+# Nuxt SSR Hello World - Remote (CDE) environment
+# Provides a cloud development environment accessible via SSH,
+# with a staging service for production build validation and
+# a low-resource database for development data.
+
+project:
+  name: nuxt-ssr-hello-world-remote
+
+services:
+  # appdev: Remote development container accessible via SSH.
+  # buildFromGit: Zerops pulls source code and zerops.yaml
+  # from this public repo and deploys the dev setup.
+  # The dev setup runs zsc noop --silent - container stays
+  # idle, ready for SSH connection and interactive dev work.
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/nuxt-ssr-hello-world-app
+    # enableSubdomainAccess: gives a public HTTPS URL so the
+    # dev server started via SSH is reachable from a browser.
+    enableSubdomainAccess: true
+    # Uncomment and increase minRam for resource-intensive
+    # development workloads (IDE, hot reload, type checking):
+    # verticalAutoscaling:
+    #   minRam: 4
+    #   minFreeRamGB: 2
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # appstage: Staging service for validating prod builds.
+  # zeropsSetup: prod selects the production build pipeline
+  # from zerops.yaml - compiles the Nitro bundle and starts
+  # the server.
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nuxt-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL for app data. Priority 10 ensures the database
+  # starts before app containers - prevents connection errors
+  # on first boot when the database is not yet accepting queries.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10

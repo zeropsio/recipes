@@ -1,0 +1,45 @@
+# SvelteKit SSR Hello World - Highly-available Production Environment
+#
+# Enterprise-grade production setup with dedicated resources and HA
+# components. The project core handles balancing, logging, and
+# metrics on dedicated infrastructure. Both the app and database
+# run with DEDICATED CPU and reserved RAM for consistent latency.
+
+project:
+  name: sveltekit-ssr-hello-world-ha-prod
+  # corePackage: SERIOUS allocates dedicated infrastructure for the
+  # project's balancer, logging pipeline, and metrics collection.
+  # The default Lightweight core is shared; SERIOUS is isolated.
+  corePackage: SERIOUS
+
+services:
+  # app: prod setup with 2 minimum containers and dedicated CPU.
+  # DEDICATED cpuMode gives each container exclusive CPU cores
+  # instead of sharing them with other tenants - consistent latency
+  # under load without noisy-neighbor interference.
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    # Zerops pulls source and zerops.yaml from this public repo.
+    buildFromGit: https://github.com/zerops-recipe-apps/sveltekit-ssr-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    # All of cpuMode, minRam, minFreeRamGB nest under
+    # verticalAutoscaling - never at the service top level.
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+      # Reserve ~50% free RAM for SSR rendering spikes and V8 GC.
+      minFreeRamGB: 0.25
+
+  # PostgreSQL HA: data replicated across multiple nodes.
+  # mode: HA survives a single-node failure without data loss
+  # or service interruption - required for production durability.
+  - hostname: db
+    type: postgresql@16
+    mode: HA
+    priority: 10
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5

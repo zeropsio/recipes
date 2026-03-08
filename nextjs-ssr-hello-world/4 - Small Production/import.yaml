@@ -1,0 +1,38 @@
+# Next.js SSR Hello World — Small Production environment.
+# Production-ready setup optimized for moderate traffic. Two containers
+# handle deploys and node failures without downtime. Vertical autoscaling
+# handles traffic spikes within the configured RAM bounds.
+
+project:
+  name: nextjs-ssr-hello-world-small-prod
+
+services:
+  - hostname: app
+    type: nodejs@22
+    # zeropsSetup: selects the prod setup from zerops.yaml.
+    zeropsSetup: prod
+    # buildFromGit: Zerops pulls source code and zerops.yaml from this
+    # public repo and runs the selected setup pipeline automatically.
+    buildFromGit: https://github.com/zerops-recipe-apps/nextjs-ssr-hello-world-app
+    enableSubdomainAccess: true
+    # minContainers: always run at least 2 containers so a rolling deploy
+    # or single node failure does not cause downtime.
+    minContainers: 2
+    # verticalAutoscaling: Zerops scales RAM automatically between minRam
+    # and the platform maximum. minFreeRamGB reserves headroom for V8 GC
+    # cycles and SSR rendering spikes - without it, the container OOM-kills
+    # at the minRam ceiling.
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
+
+  # PostgreSQL for application data. Priority 10 starts the database
+  # before app containers, preventing connection errors on first boot.
+  - hostname: db
+    type: postgresql@16
+    # mode: NON_HA — single-node database with automatic backups.
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25

@@ -1,0 +1,37 @@
+# SvelteKit SSR Hello World - Small Production Environment
+#
+# Production-ready setup optimized for moderate traffic. Runs at
+# least two app containers for availability and handles traffic
+# spikes via vertical autoscaling within the configured bounds.
+
+project:
+  name: sveltekit-ssr-hello-world-small-prod
+
+services:
+  # app: prod setup with minContainers: 2 for availability.
+  # Zerops keeps at least 2 containers running at all times -
+  # if one fails, the other continues to serve traffic while
+  # a replacement starts.
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    # Zerops pulls source and zerops.yaml from this public repo.
+    buildFromGit: https://github.com/zerops-recipe-apps/sveltekit-ssr-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    # verticalAutoscaling: Zerops scales RAM automatically within
+    # these bounds. minFreeRamGB reserves headroom for V8 GC and
+    # SSR rendering spikes without triggering an OOM restart.
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
+
+  # PostgreSQL - starts before app containers (priority 10).
+  # mode: NON_HA is a single-node database with no replication.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25

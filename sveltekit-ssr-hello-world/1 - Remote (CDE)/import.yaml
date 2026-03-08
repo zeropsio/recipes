@@ -1,0 +1,40 @@
+# SvelteKit SSR Hello World - Remote (CDE) Environment
+#
+# Two-service development setup for developers working remotely via
+# SSH or IDE with SSHFS mounting: appdev runs the dev setup for
+# interactive development; appstage runs the prod setup to validate
+# the production build. Both share a single PostgreSQL database.
+
+project:
+  name: sveltekit-ssr-hello-world-remote
+
+services:
+  # appdev: dev setup for remote development via SSH.
+  # os: ubuntu (set in zerops.yaml) provides git, curl, and a
+  # richer toolset for interactive work compared to Alpine.
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    # Zerops pulls source and zerops.yaml from this public repo.
+    buildFromGit: https://github.com/zerops-recipe-apps/sveltekit-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      # 0.5 GB minimum - increase to 4 GB (commented below) if
+      # IDE language server or heavy tooling causes OOM restarts.
+      minRam: 0.5
+      # minRam: 4
+
+  # appstage: prod setup - validate production builds from the
+  # remote environment before promoting to a real staging server.
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/sveltekit-ssr-hello-world-app
+    enableSubdomainAccess: true
+
+  # PostgreSQL - starts before app containers (priority 10).
+  # mode: NON_HA is a single-node database - suitable for development.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
