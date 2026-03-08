@@ -1,0 +1,33 @@
+# SvelteKit SSR Hello World - Stage Environment
+#
+# Pre-production environment that mirrors production configuration.
+# Uses the prod setup from zerops.yaml on a single container with
+# lower scaling bounds - sufficient for integration testing without
+# the cost of a fully scaled production deployment.
+
+project:
+  name: sveltekit-ssr-hello-world-stage
+
+services:
+  # app: prod setup - same build pipeline and config as production.
+  # Single container keeps resource usage low for staging workloads.
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    # Zerops pulls source and zerops.yaml from this public repo.
+    buildFromGit: https://github.com/zerops-recipe-apps/sveltekit-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.25
+      # Reserve free RAM for V8 GC and SSR rendering spikes.
+      minFreeRamGB: 0.125
+
+  # PostgreSQL - starts before the app container (priority 10).
+  # mode: NON_HA is a single-node database - appropriate for staging.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25

@@ -1,0 +1,52 @@
+# Next.js SSR Hello World — Remote (CDE) environment.
+# Provides a dev service (appdev) and staging service (appstage) backed
+# by PostgreSQL. Developers SSH into appdev (or mount it via SSHFS in
+# their IDE) and run the Next.js dev server with full hot reload.
+# The database is migrated automatically on first deploy.
+
+project:
+  name: nextjs-ssr-hello-world-remote
+
+services:
+  # Development service: developer SSHes in or mounts via IDE (VS Code
+  # Remote SSH, JetBrains Gateway). Uses the 'dev' zerops.yaml setup -
+  # full source deploy, npm install, zsc noop start so the developer
+  # drives the dev server manually.
+  - hostname: appdev
+    type: nodejs@22
+    # zeropsSetup: selects which named setup to run from zerops.yaml.
+    zeropsSetup: dev
+    # buildFromGit: Zerops pulls source code and zerops.yaml from this
+    # public repo and runs the selected setup pipeline automatically.
+    buildFromGit: https://github.com/zerops-recipe-apps/nextjs-ssr-hello-world-app
+    # enableSubdomainAccess: public HTTPS URL for testing the running service.
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      # 0.5 GB minimum for interactive dev. Uncomment below for IDE usage
+      # with language servers and large projects (recommended: 4 GB):
+      # minRam: 4
+      # minFreeRamGB: 2
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Staging service: validates the production build pipeline. Push the prod
+  # setup here after verifying work on appdev.
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nextjs-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL for application data. Priority 10 starts the database
+  # before app containers, preventing connection errors on first boot.
+  - hostname: db
+    type: postgresql@16
+    # mode: NON_HA — single-node database, suitable for development use.
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
