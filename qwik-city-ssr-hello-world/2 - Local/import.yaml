@@ -1,0 +1,35 @@
+# Qwik City SSR Hello World — Local environment.
+# Provides a cloud PostgreSQL database accessed via the Zerops VPN
+# (zcli vpn up) and a staging service for deployment validation,
+# while the developer runs Qwik City locally.
+#
+# Deploy: zcli project project-import import.yaml
+project:
+  name: qwik-city-ssr-hello-world-local
+
+services:
+  # App service with prod setup: validates the full production build
+  # and migration path. Developers push via zcli push for staging checks
+  # while running npm run dev locally against the cloud database.
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    # buildFromGit: Zerops pulls source code and zerops.yaml from this
+    # public repository and triggers the first build automatically.
+    buildFromGit: https://github.com/zerops-recipe-apps/qwik-city-ssr-hello-world-app
+    # enableSubdomainAccess: public HTTPS URL for previewing the staged
+    # production build without local infrastructure.
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL accessible locally via zcli VPN. Run `zcli vpn up` to
+  # connect — then use DB_HOST=db.zerops (internal hostname) in your
+  # local .env to point the local dev server at this database.
+  - hostname: db
+    type: postgresql@16
+    # NON_HA: single-node database — sufficient for local development.
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.5

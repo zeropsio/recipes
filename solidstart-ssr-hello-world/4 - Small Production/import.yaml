@@ -1,0 +1,33 @@
+# SolidStart SSR Hello World — Small Production environment.
+# Production-ready setup with two containers for availability
+# and vertical autoscaling for memory headroom on SSR rendering.
+project:
+  name: solidstart-ssr-hello-world-small-prod
+
+services:
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/solidstart-ssr-hello-world-app
+    enableSubdomainAccess: true
+    # minContainers: 2 ensures the app is always running on at
+    # least two containers — requests are load-balanced across
+    # them. Zero-downtime deploys work by default: new containers
+    # start alongside old ones before old ones are removed from
+    # the project balancer.
+    minContainers: 2
+    # verticalAutoscaling: Zerops scales RAM up automatically
+    # within these bounds. minFreeRamGB reserves headroom for
+    # V8 GC cycles and SSR rendering spikes — without it the
+    # container hits the limit and triggers an OOM restart.
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
+
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25

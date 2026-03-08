@@ -1,0 +1,42 @@
+# Qwik City SSR Hello World — AI Agent environment.
+# Provides a dev service (SSH-accessible, mounted by AI agents) and a
+# staging service (runs prod build for integration testing), both sharing
+# a single low-resource PostgreSQL database.
+#
+# Deploy: zcli project project-import import.yaml
+project:
+  name: qwik-city-ssr-hello-world-agent
+
+services:
+  # Dev service: AI agents write and push code here. zeropsSetup: dev
+  # deploys full source with zsc noop start — agent drives the workflow.
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    # buildFromGit: Zerops pulls source code and zerops.yaml from this
+    # public repository and triggers the first build automatically.
+    buildFromGit: https://github.com/zerops-recipe-apps/qwik-city-ssr-hello-world-app
+    # enableSubdomainAccess: assigns a public HTTPS URL on a Zerops
+    # subdomain so agents can verify the running app externally.
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Stage service: runs the prod setup so agents can verify the full
+  # production build path (SSR compile + migration) before finishing.
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/qwik-city-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL for app data. Priority 10 starts data services before
+  # app containers, preventing connection errors on first boot.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.5

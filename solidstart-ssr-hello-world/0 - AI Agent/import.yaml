@@ -1,0 +1,45 @@
+# SolidStart SSR Hello World — AI Agent environment.
+# Provides two app services (dev workspace + staging) and a
+# low-resource PostgreSQL instance for AI agents to build,
+# iterate, and validate changes before shipping.
+project:
+  name: solidstart-ssr-hello-world-agent
+
+services:
+  # Dev workspace — AI agents SSH in, edit files, and push
+  # builds from here. Uses the 'dev' zerops.yaml setup:
+  # full source code deployed, zsc noop keeps the container
+  # idle so the agent controls when to start the dev server.
+  - hostname: appdev
+    type: nodejs@22
+    # 'dev' setup deploys full source + runs npm install.
+    # No prod build — agent drives the dev server manually.
+    zeropsSetup: dev
+    # buildFromGit: Zerops pulls source code and zerops.yaml
+    # from this public repository on every import.
+    buildFromGit: https://github.com/zerops-recipe-apps/solidstart-ssr-hello-world-app
+    # Subdomain gives the agent a public URL to verify
+    # the dev server is responding correctly.
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Staging — validates the prod build (SSR + Nitro bundle)
+  # before any production deploy. Uses the 'prod' setup.
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/solidstart-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL shared by both app services. Priority 10 starts
+  # the database before app containers — prevents connection
+  # errors during initCommands (migration) on first deploy.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
