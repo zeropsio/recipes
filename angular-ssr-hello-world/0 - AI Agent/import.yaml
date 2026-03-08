@@ -1,0 +1,42 @@
+# Angular SSR Hello World — AI Agent environment.
+# Provides a dev service for AI agents to write and iterate on
+# the app, a staging service to validate production builds, and
+# a PostgreSQL database. Both app services get public subdomains
+# so agents can verify the running result via HTTP.
+project:
+  name: angular-ssr-hello-world-agent
+
+services:
+  # Dev service: AI agent writes code here, deploys the dev setup
+  # (full source tree + zsc noop), and runs 'ng serve' or tests
+  # via SSH. The dev setup keeps the container idle so the agent
+  # controls execution.
+  - hostname: appdev
+    type: nodejs@22
+    # 'dev' selects the dev setup from zerops.yaml — deploys full
+    # source tree for SSH-based development.
+    zeropsSetup: dev
+    # Zerops pulls source code and zerops.yaml from this public
+    # repo and triggers the build pipeline automatically.
+    buildFromGit: https://github.com/zerops-recipe-apps/angular-ssr-hello-world-app
+    # Gives the service a public HTTPS URL on a Zerops subdomain
+    # so the AI agent can verify the running application via HTTP.
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Stage service: runs the prod setup so the AI agent can validate
+  # that the production build and migration work end-to-end before
+  # committing the recipe.
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/angular-ssr-hello-world-app
+    enableSubdomainAccess: true
+
+  # PostgreSQL for application data. Priority 10 starts the database
+  # before app containers, preventing connection errors on first boot.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10

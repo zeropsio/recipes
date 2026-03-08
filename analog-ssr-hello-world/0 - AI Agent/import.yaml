@@ -1,0 +1,47 @@
+# Analog SSR Hello World — AI Agent environment.
+# Two services: appdev (dev setup, SSH workspace) and appstage
+# (prod setup, staging preview). AI agents build in appdev and
+# verify deployments via the appstage subdomain.
+project:
+  name: analog-ssr-hello-world-agent
+
+services:
+  # appdev: development container where AI agents write and iterate
+  # on application code. Uses the 'dev' zerops.yaml setup, which
+  # deploys full source and keeps the container idle (zsc noop)
+  # so the agent can SSH in and run 'npm run dev' directly.
+  - hostname: appdev
+    type: nodejs@22
+    # zeropsSetup selects which setup block from zerops.yaml to use.
+    zeropsSetup: dev
+    # buildFromGit: Zerops pulls the source code and zerops.yaml
+    # from this public repository and runs the pipeline immediately.
+    buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-hello-world-app
+    # enableSubdomainAccess gives a public HTTPS URL on a Zerops
+    # subdomain — useful for previewing the dev server externally.
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # appstage: production-mode container for staging previews.
+  # AI agents push prod builds here to verify before finalising
+  # the recipe configuration.
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL for app data. Priority 10 starts data services
+  # before app containers, preventing connection errors on
+  # first boot when the database is not yet ready.
+  - hostname: db
+    type: postgresql@18
+    # NON_HA: single-node database — appropriate for development
+    # and staging where redundancy is not required.
+    mode: NON_HA
+    priority: 10
