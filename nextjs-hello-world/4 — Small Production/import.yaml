@@ -1,0 +1,33 @@
+# Next.js Hello World — Small Production Environment
+#
+# Production-ready setup optimized for moderate throughput.
+# Two containers run at all times for availability and
+# load distribution across requests.
+
+project:
+  name: nextjs-hello-world-small-prod
+
+services:
+  # Production service — Nginx serves the static export
+  # across two containers, with Zerops autoscaling RAM
+  # within the configured bounds as traffic changes.
+  - hostname: app
+    type: static
+    # 'prod' setup: runs 'npm ci && npm run build', bakes
+    # NEXT_PUBLIC_APP_ENV=production into the static output,
+    # and deploys the 'out/' directory to Nginx.
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this
+    # public repo and triggers the build/deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/nextjs-hello-world-app
+    enableSubdomainAccess: true
+    # Always run at least 2 containers — ensures availability
+    # during deploys (zero-downtime switchover) and spreads
+    # traffic across multiple Nginx instances.
+    minContainers: 2
+    # Zerops autoscales RAM within these bounds every 10s.
+    # minFreeRamGB reserves headroom for Nginx worker
+    # processes and traffic spikes above the baseline.
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
