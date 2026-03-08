@@ -1,0 +1,39 @@
+# SolidStart SSR Hello World — Highly-available Production environment.
+# Enterprise-grade setup: dedicated CPU, HA PostgreSQL, serious core
+# package, and two containers minimum for maximum durability.
+project:
+  name: solidstart-ssr-hello-world-ha-prod
+  # corePackage: SERIOUS allocates dedicated infrastructure for the
+  # project's balancer, logging pipeline, and metrics — shared
+  # infrastructure (Lightweight) can become a bottleneck under
+  # sustained production load.
+  corePackage: SERIOUS
+
+services:
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/solidstart-ssr-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      # cpuMode: DEDICATED pins CPU cores to this service —
+      # no throttling from noisy neighbours, consistent SSR
+      # latency under load.
+      cpuMode: DEDICATED
+      minRam: 0.5
+      # 50% free RAM reserve: V8 GC + server-side rendering of
+      # Solid components requires burst headroom beyond the baseline.
+      minFreeRamGB: 0.25
+
+  # HA PostgreSQL replicates data across multiple nodes — no
+  # single point of failure. Combined with DEDICATED CPU for
+  # consistent query latency under concurrent SSR load.
+  - hostname: db
+    type: postgresql@16
+    mode: HA
+    priority: 10
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5
