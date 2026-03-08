@@ -1,0 +1,53 @@
+# Qwik City Hello World — AI Agent environment.
+# Provides a development service (appdev) for AI agents to build and
+# iterate on the app via SSH, and a staging service (appstage) for
+# the agent to verify compiled builds through a public HTTPS URL.
+
+project:
+  name: qwik-city-static-hello-world-agent
+
+services:
+
+  # Development workspace — the AI agent SSHes in, edits source files,
+  # and runs 'npm run dev' or pushes builds from inside the container.
+  # type: nodejs@22 so Node.js is available at runtime for dev commands.
+  - hostname: appdev
+    type: nodejs@22
+
+    # 'dev' setup from zerops.yaml: installs deps and deploys the full
+    # source tree so the agent has a ready workspace on first boot.
+    zeropsSetup: dev
+
+    # Zerops pulls source code and zerops.yaml from this public repo
+    # to trigger the initial build and deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/qwik-city-static-hello-world-app
+
+    # Gives appdev a public HTTPS URL so the agent can verify
+    # the dev server is reachable after starting it via SSH.
+    enableSubdomainAccess: true
+
+    verticalAutoscaling:
+      minRam: 1
+      # Reserve free RAM for Node.js dev server and hot-reload overhead.
+      minFreeRamGB: 0.5
+
+  # Staging service — the agent pushes a prod build here to verify
+  # the compiled static site before the recipe is considered complete.
+  # type: static = Nginx serving; no Node.js at runtime.
+  - hostname: appstage
+    type: static
+
+    # 'prod' setup: runs the Qwik build pipeline and deploys
+    # compiled HTML/CSS/JS to Nginx containers.
+    zeropsSetup: prod
+
+    buildFromGit: https://github.com/zerops-recipe-apps/qwik-city-static-hello-world-app
+
+    # Public HTTPS URL for the agent to curl and confirm the
+    # greeting, environment name, and build timestamp appear.
+    enableSubdomainAccess: true
+
+    verticalAutoscaling:
+      minRam: 0.25
+      # Reserve free RAM for Nginx worker processes and traffic spikes.
+      minFreeRamGB: 0.125

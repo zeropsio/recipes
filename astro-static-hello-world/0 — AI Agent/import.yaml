@@ -1,0 +1,43 @@
+# astro-static-hello-world — AI Agent environment
+#
+# Provides a development workspace for AI agents to build and version
+# the app. Includes a Node.js dev service the agent edits via SSH and
+# a static staging service to validate compiled builds.
+project:
+  name: astro-static-hello-world-agent
+
+services:
+  # Development service — Node.js runtime so the AI agent has npm,
+  # the Astro CLI, and a full development environment via SSH.
+  # Uses the 'dev' setup from zerops.yaml: installs dependencies and
+  # deploys full source; the agent runs 'npm run dev' to start a
+  # live-reload server, or edits files and pushes to appstage.
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    # Zerops pulls source code and zerops.yaml from this public repo
+    # and runs the build/deploy pipeline automatically on import.
+    buildFromGit: https://github.com/zerops-recipe-apps/astro-static-hello-world-app
+    # Gives the service a public HTTPS URL on a Zerops subdomain —
+    # the agent can reach the dev server if it binds to 0.0.0.0.
+    enableSubdomainAccess: true
+    minContainers: 1
+    maxContainers: 1
+    envVariables:
+      # APP_ENV is exposed as RUNTIME_APP_ENV in the build shell,
+      # allowing the framework to bake the environment name into the
+      # compiled output at build time.
+      APP_ENV: agent
+
+  # Staging service — Nginx serves the compiled Astro output.
+  # The agent pushes from appdev to test a production-like build
+  # before the recipe is used in a real environment.
+  - hostname: appstage
+    type: static
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/astro-static-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 1
+    maxContainers: 1
+    envVariables:
+      APP_ENV: staging

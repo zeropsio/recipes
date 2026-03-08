@@ -1,0 +1,30 @@
+# Analog Hello World — Remote (CDE) environment.
+# Provides a cloud development environment: SSH in (or mount via SSHFS)
+# and develop directly on Zerops without installing anything locally.
+project:
+  name: analog-static-hello-world-remote
+
+services:
+  # Dev service — developer SSHes in and runs 'npm start' to start
+  # Vite's dev server. Uses nodejs@22 (not static) so Node.js is
+  # available at runtime for the development workflow.
+  - hostname: appdev
+    type: nodejs@22
+    # 'dev' setup deploys full source + node_modules — workspace ready
+    # the moment you SSH in. No 'npm install' needed before coding.
+    zeropsSetup: dev
+    # buildFromGit triggers a build/deploy pipeline: Zerops pulls source
+    # code and zerops.yaml from this public repo automatically.
+    buildFromGit: https://github.com/zerops-recipe-apps/analog-static-hello-world-app
+    # Gives the service a public HTTPS URL on a Zerops subdomain —
+    # use this to preview the dev server from a browser or IDE.
+    enableSubdomainAccess: true
+
+  # Staging service — preview production builds before shipping.
+  # Build-time VITE_APP_ENV is baked into the static bundle by Vite —
+  # there is no runtime process to read env vars in static deployments.
+  - hostname: appstage
+    type: static
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/analog-static-hello-world-app
+    enableSubdomainAccess: true

@@ -1,0 +1,40 @@
+# SolidStart Hello World — AI Agent Environment
+# Provides a development service and a staging service so AI
+# agents can build, iterate, and preview without local tooling.
+
+project:
+  name: solidstart-static-hello-world-agent
+
+services:
+  # Development workspace — the AI agent works here via SSH.
+  # type: nodejs@22 gives the agent Node.js at runtime to run
+  # 'npm run dev' (vinxi dev server) and other build tools.
+  - hostname: appdev
+    type: nodejs@22
+    # 'dev' setup from zerops.yaml: deploys full source tree with
+    # node_modules pre-installed; agent starts dev server via SSH.
+    zeropsSetup: dev
+    # Zerops pulls source code and zerops.yaml from this public
+    # repo and triggers the build/deploy pipeline on first import.
+    buildFromGit: https://github.com/zerops-recipe-apps/solidstart-static-hello-world-app
+    # Gives the service a public HTTPS URL on a Zerops subdomain
+    # so the agent can preview the app during development.
+    enableSubdomainAccess: true
+    envVariables:
+      # APP_ENV is available at build time as RUNTIME_APP_ENV.
+      # zerops.yaml reads: VITE_APP_ENV=${RUNTIME_APP_ENV:-production}
+      # — this bakes the environment name into the static bundle.
+      APP_ENV: development
+
+  # Staging service — the AI agent pushes prod builds here for preview.
+  # type: static runs Nginx; the prod setup compiles SolidStart into
+  # .output/public/ and Nginx serves the resulting HTML/CSS/JS.
+  - hostname: appstage
+    type: static
+    # 'prod' setup: npm ci → vinxi build → deploy .output/public/~
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/solidstart-static-hello-world-app
+    # Subdomain access so the agent can verify production builds.
+    enableSubdomainAccess: true
+    envVariables:
+      APP_ENV: staging

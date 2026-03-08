@@ -1,0 +1,32 @@
+# astro-static-hello-world — Small Production environment
+#
+# Production-ready setup optimized for moderate throughput.
+# Two containers run at all times — requests are distributed by
+# the project balancer, and deploys are zero-downtime: new
+# containers start before old ones are removed from rotation.
+project:
+  name: astro-static-hello-world-small-prod
+
+services:
+  - hostname: app
+    type: static
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this public repo
+    # and runs the build/deploy pipeline automatically on import.
+    buildFromGit: https://github.com/zerops-recipe-apps/astro-static-hello-world-app
+    enableSubdomainAccess: true
+    # Always run at least 2 containers for availability and load
+    # distribution. The project balancer routes traffic across them.
+    minContainers: 2
+    maxContainers: 10
+    # Zerops autoscales RAM within these bounds. minFreeRamGB
+    # reserves headroom for Nginx worker processes and traffic
+    # spikes — without it, sustained load can cause OOM restarts.
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
+    envVariables:
+      # APP_ENV is exposed as RUNTIME_APP_ENV in the build shell,
+      # allowing the framework to bake the environment name into the
+      # compiled output at build time.
+      APP_ENV: production

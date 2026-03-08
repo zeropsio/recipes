@@ -1,0 +1,39 @@
+# Vue Hello World — AI Agent environment.
+# Provides a development space for AI agents to build and version the
+# app, plus a staging service for testing compiled builds.
+#
+# Two services:
+#   appdev   — nodejs@22 runtime with source code; the agent edits
+#              files and runs 'npm run dev' via SSH.
+#   appstage — static (Nginx) service that serves compiled builds for
+#              visual validation after each push.
+
+project:
+  name: vue-static-hello-world-agent
+
+services:
+  # appdev: development workspace for the AI agent.
+  # The agent SSHs in, edits source, and pushes builds here.
+  - hostname: appdev
+    # nodejs@22 runtime — the agent needs Node.js available via SSH
+    # to run 'npm run dev' or other Vite CLI commands. Static runtime
+    # (Nginx-only) would not provide this.
+    type: nodejs@22
+    # 'dev' setup from zerops.yaml — deploys full source with deps
+    # installed so the agent can start the Vite dev server immediately.
+    zeropsSetup: dev
+    # Zerops pulls source code and zerops.yaml from this public repo,
+    # then triggers the build/deploy pipeline automatically.
+    buildFromGit: https://github.com/zerops-recipe-apps/vue-static-hello-world-app
+    # Gives this service a public HTTPS URL on a Zerops subdomain —
+    # the agent can open the URL to verify the running app.
+    enableSubdomainAccess: true
+
+  # appstage: staging service that compiles and serves a production
+  # build, so the agent can validate the real Nginx-served output.
+  - hostname: appstage
+    type: static
+    # 'prod' setup — builds optimized Vue bundle and deploys to Nginx.
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/vue-static-hello-world-app
+    enableSubdomainAccess: true

@@ -1,0 +1,30 @@
+# Next.js Hello World — Local Environment
+#
+# Supports local development with a cloud preview for
+# sharing and testing. The developer runs 'npm run dev'
+# locally and uses 'zcli push' to deploy a production
+# build to Zerops for previewing.
+
+project:
+  name: nextjs-static-hello-world-local
+
+services:
+  # Preview service — receives production builds pushed
+  # from the developer's local machine via 'zcli push'.
+  # Zerops builds the static export and serves it through
+  # Nginx so the developer can preview and share URLs.
+  - hostname: app
+    type: static
+    # 'prod' setup: runs 'npm ci && npm run build', deploys
+    # the 'out/' directory contents to Nginx.
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this
+    # public repo on first deploy. Subsequent deploys use
+    # 'zcli push' from the local machine.
+    buildFromGit: https://github.com/zerops-recipe-apps/nextjs-static-hello-world-app
+    # Public HTTPS URL on a Zerops subdomain — the preview
+    # URL the developer shares with teammates.
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
