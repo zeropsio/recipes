@@ -1,31 +1,30 @@
-# Nuxt SSR Hello World - AI Agent environment
-# Provides a development space for AI agents to build and
-# version the app, with a staging service to validate prod
-# builds and a low-resource database for data persistence.
-
+# Nuxt SSR hello world — AI agent environment.
+# Two app services: appdev (dev setup, for active development)
+# and appstage (prod setup, for validating changes before commit).
+# Both have subdomain access so the agent can verify deployments.
 project:
   name: nuxt-ssr-hello-world-agent
 
 services:
-  # appdev: The agent's live workspace - source code is pushed
-  # here with the dev setup (zsc noop --silent start command),
-  # keeping the container idle for SSH and zCLI access.
-  # buildFromGit: tells Zerops to pull source code and
-  # zerops.yaml from this public repo on first deploy.
+  # Dev service: the agent writes code, pushes via zcli, and
+  # SSHes in to run the framework dev server interactively.
   - hostname: appdev
     type: nodejs@22
+    # zeropsSetup selects the 'dev' block from zerops.yaml —
+    # deploys full source, starts with zsc noop so the agent
+    # drives the process manually.
     zeropsSetup: dev
+    # buildFromGit: Zerops pulls source code and zerops.yaml
+    # from this public repository on the first deploy.
     buildFromGit: https://github.com/zerops-recipe-apps/nuxt-ssr-hello-world-app
-    # enableSubdomainAccess: provides a public HTTPS URL on a
-    # Zerops subdomain for external testing without custom DNS.
+    # Gives a public HTTPS URL on a Zerops subdomain so the
+    # agent can verify the running app without VPN.
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 0.5
-      minFreeRamGB: 0.25
 
-  # appstage: Staging service for validating prod builds.
-  # zeropsSetup: prod selects the prod setup from zerops.yaml,
-  # which builds the Nitro bundle and runs the full server.
+  # Stage service: prod build of the same code — the agent
+  # validates the production SSR bundle before committing.
   - hostname: appstage
     type: nodejs@22
     zeropsSetup: prod
@@ -33,14 +32,10 @@ services:
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 0.5
-      minFreeRamGB: 0.25
 
   # PostgreSQL for app data. Priority 10 starts data services
-  # before app containers, preventing connection errors on
-  # first startup before the database is ready.
+  # before app containers, preventing connection errors on boot.
   - hostname: db
     type: postgresql@16
-    # NON_HA: single-node database - suitable for development
-    # and staging where data replication is not required.
     mode: NON_HA
     priority: 10
