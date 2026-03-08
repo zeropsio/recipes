@@ -1,0 +1,30 @@
+# SolidStart SSR Hello World — Local development environment.
+# Provides a staged app service and a cloud PostgreSQL instance.
+# The developer runs the SolidStart dev server locally and
+# connects to the cloud database via zcli VPN (zcli vpn up).
+project:
+  name: solidstart-ssr-hello-world-local
+
+services:
+  # Staged app service — validates the prod Nitro bundle in
+  # Zerops while the developer iterates locally. Uses the 'prod'
+  # zeropsSetup so local and staged builds stay in sync.
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/solidstart-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Cloud PostgreSQL — accessible locally via zcli VPN.
+  # Run: zcli vpn up; then connect using the db_* credentials
+  # exposed as environment variables in the app service.
+  # Priority 10: starts before the app service.
+  - hostname: db
+    type: postgresql@16
+    # NON_HA: single-node database, suitable for local dev
+    # where high availability is not required.
+    mode: NON_HA
+    priority: 10

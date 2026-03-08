@@ -1,0 +1,42 @@
+# SolidStart SSR Hello World — Remote (CDE) environment.
+# Provides two app services (dev workspace + staging) and a
+# low-resource PostgreSQL instance for developers connecting
+# via SSH or IDE with remote filesystem mounting (SSHFS).
+project:
+  name: solidstart-ssr-hello-world-remote
+
+services:
+  # Dev workspace — developers SSH in or mount via SSHFS to
+  # edit files directly on the container. Uses the 'dev' setup:
+  # full source code deployed, container stays idle (zsc noop)
+  # so the developer starts the dev server manually.
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/solidstart-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      # 0.5 GB minimum — increase to 4 GB (comment below) if
+      # running heavy IDE processes alongside the dev server.
+      minRam: 0.5
+      # minRam: 4
+      minFreeRamGB: 0.25
+
+  # Staging — validates the prod Nitro bundle before promoting
+  # to production. Same config as the prod environment.
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/solidstart-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL shared by both app services. Priority 10 ensures
+  # the database is ready before app containers start — preventing
+  # connection errors during the migration initCommand.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10

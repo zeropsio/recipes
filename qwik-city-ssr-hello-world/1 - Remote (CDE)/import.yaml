@@ -1,0 +1,45 @@
+# Qwik City SSR Hello World — Remote (CDE) environment.
+# Provides a dev service for SSH-based development (mount via SSHFS or
+# IDE remote extensions) and a staging service for build validation,
+# both sharing a single PostgreSQL database.
+#
+# Deploy: zcli project project-import import.yaml
+project:
+  name: qwik-city-ssr-hello-world-remote
+
+services:
+  # Dev service: developers SSH in and work directly on the container.
+  # Compatible with VS Code Remote SSH, JetBrains Gateway, and similar
+  # IDE remote development extensions.
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    # buildFromGit: Zerops pulls source code and zerops.yaml from this
+    # public repository and triggers the first build automatically.
+    buildFromGit: https://github.com/zerops-recipe-apps/qwik-city-ssr-hello-world-app
+    # enableSubdomainAccess: public HTTPS URL on a Zerops subdomain for
+    # previewing the running dev server from any browser.
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      # 0.5 GB is sufficient for the idle dev container. Increase to 4 GB
+      # (minRam: 4) if running npm run build or intensive tooling via SSH.
+      minRam: 0.5
+
+  # Stage service: validates the production build path before pushing
+  # to a real production environment.
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/qwik-city-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL for app data. Priority 10 starts data services before
+  # app containers, preventing connection errors on first boot.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.5
