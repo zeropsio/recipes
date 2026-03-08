@@ -3,7 +3,7 @@
 # The developer runs SvelteKit locally and pushes builds
 # to Zerops via 'zcli push' to test the static output.
 project:
-  name: svelte-static-hello-world-local
+  name: svelte-hello-world-local
 
 services:
   # Preview service — receives builds pushed with 'zcli push'.
@@ -16,7 +16,7 @@ services:
     zeropsSetup: prod
     # Zerops pulls source and zerops.yaml from this public repo
     # to trigger the build/deploy pipeline on first import.
-    buildFromGit: https://github.com/zerops-recipe-apps/svelte-static-hello-world-app
+    buildFromGit: https://github.com/zerops-recipe-apps/svelte-hello-world-app
     # Public HTTPS URL on a Zerops subdomain — preview the static
     # build output without configuring a custom domain.
     enableSubdomainAccess: true
