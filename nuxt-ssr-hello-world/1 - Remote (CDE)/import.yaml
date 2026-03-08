@@ -1,37 +1,28 @@
-# Nuxt SSR Hello World - Remote (CDE) environment
-# Provides a cloud development environment accessible via SSH,
-# with a staging service for production build validation and
-# a low-resource database for development data.
-
+# Nuxt SSR hello world — remote (CDE) environment.
+# Identical topology to the AI agent environment — two app
+# services plus a database — but intended for human developers
+# working via SSH or an IDE with remote filesystem mounting.
 project:
   name: nuxt-ssr-hello-world-remote
 
 services:
-  # appdev: Remote development container accessible via SSH.
-  # buildFromGit: Zerops pulls source code and zerops.yaml
-  # from this public repo and deploys the dev setup.
-  # The dev setup runs zsc noop --silent - container stays
-  # idle, ready for SSH connection and interactive dev work.
+  # Dev service: developer mounts /var/www via SSHFS from their
+  # IDE (e.g. VS Code Remote SSH), edits files in place, and
+  # runs npm run dev over SSH.
   - hostname: appdev
     type: nodejs@22
     zeropsSetup: dev
+    # buildFromGit: Zerops pulls source and zerops.yaml from
+    # this public repository to bootstrap the initial deploy.
     buildFromGit: https://github.com/zerops-recipe-apps/nuxt-ssr-hello-world-app
-    # enableSubdomainAccess: gives a public HTTPS URL so the
-    # dev server started via SSH is reachable from a browser.
     enableSubdomainAccess: true
-    # Uncomment and increase minRam for resource-intensive
-    # development workloads (IDE, hot reload, type checking):
-    # verticalAutoscaling:
-    #   minRam: 4
-    #   minFreeRamGB: 2
     verticalAutoscaling:
+      # 0.5 GB keeps costs low for development. Increase to
+      # 4 GB (minRam: 4) if running build tools in the container.
       minRam: 0.5
-      minFreeRamGB: 0.25
 
-  # appstage: Staging service for validating prod builds.
-  # zeropsSetup: prod selects the production build pipeline
-  # from zerops.yaml - compiles the Nitro bundle and starts
-  # the server.
+  # Stage service: validates the prod Nitro bundle before pushing
+  # to the main branch — same prod config as production.
   - hostname: appstage
     type: nodejs@22
     zeropsSetup: prod
@@ -39,11 +30,9 @@ services:
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 0.5
-      minFreeRamGB: 0.25
 
-  # PostgreSQL for app data. Priority 10 ensures the database
-  # starts before app containers - prevents connection errors
-  # on first boot when the database is not yet accepting queries.
+  # PostgreSQL for app data. Priority 10 ensures the database is
+  # ready before app containers attempt to connect.
   - hostname: db
     type: postgresql@16
     mode: NON_HA

@@ -1,8 +1,8 @@
 # Nuxt SSR Hello World Recipe
 
-<!--#ZEROPS_EXTRACT_START:intro#-->
-A server-side rendered [Nuxt](https://nuxt.com) application running on [Zerops](https://zerops.io) with a [PostgreSQL](https://www.postgresql.org) database. Demonstrates idempotent migrations, Nitro server-side rendering, and the full Zerops SSR deployment pipeline across six ready-made environment configurations.
-<!--#ZEROPS_EXTRACT_END:intro#-->
+<!-- #ZEROPS_EXTRACT_START:intro# -->
+A server-rendered [Nuxt](https://nuxt.com) application connected to a [PostgreSQL](https://www.postgresql.org) database, deployed on [Zerops](https://zerops.io). Includes idempotent database migrations and ready-made environment configurations for the full development lifecycle.
+<!-- #ZEROPS_EXTRACT_END:intro# -->
 
 ⬇️ **Full recipe page and deploy with one-click**
 
