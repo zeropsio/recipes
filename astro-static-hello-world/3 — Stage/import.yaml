@@ -1,0 +1,30 @@
+# astro-static-hello-world — Stage environment
+#
+# Pre-production environment using the same 'prod' setup as
+# production. Runs on a single container with lower scaling
+# settings — ideal for QA, stakeholder review, and integration
+# testing before promoting to production.
+project:
+  name: astro-static-hello-world-stage
+
+services:
+  - hostname: app
+    type: static
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this public repo
+    # and runs the build/deploy pipeline automatically on import.
+    buildFromGit: https://github.com/zerops-recipe-apps/astro-static-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 1
+    maxContainers: 1
+    # Zerops autoscales RAM within these bounds. Static services are
+    # lightweight — Nginx uses minimal RAM, so a small reservation
+    # is sufficient for a single-container stage environment.
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
+    envVariables:
+      # APP_ENV is exposed as RUNTIME_APP_ENV in the build shell,
+      # allowing the framework to bake the environment name into the
+      # compiled output at build time.
+      APP_ENV: staging

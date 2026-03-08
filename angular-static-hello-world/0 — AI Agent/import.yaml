@@ -1,0 +1,53 @@
+# Angular Hello World — AI Agent Environment
+#
+# Provides a development space for AI agents to build and version
+# an Angular application on Zerops. Two services: a dev workspace
+# (appdev) the agent works in via SSH, and a staging service
+# (appstage) for previewing compiled builds.
+
+project:
+  name: angular-static-hello-world-agent
+
+services:
+  # Development workspace — the AI agent writes code here via SSH
+  # and runs 'npm start' (ng serve) to iterate on changes.
+  # type: nodejs@22 (not static) so Node.js is available at runtime
+  # for running Angular CLI commands.
+  - hostname: appdev
+    type: nodejs@22
+
+    # Selects the 'dev' setup from zerops.yaml in the source repo.
+    # The dev setup installs dependencies and deploys the full
+    # source tree — agent gets a ready workspace without extra steps.
+    zeropsSetup: dev
+
+    # Zerops pulls source code and zerops.yaml from this public repo
+    # to trigger the build/deploy pipeline automatically on import.
+    buildFromGit: https://github.com/zerops-recipe-apps/angular-static-hello-world-app
+
+    # Gives appdev a public HTTPS URL on a Zerops subdomain so the
+    # agent can run 'ng serve --host 0.0.0.0' and preview via browser.
+    enableSubdomainAccess: true
+
+    verticalAutoscaling:
+      minRam: 1
+      minFreeRamGB: 0.5
+
+  # Staging service — agent pushes prod builds here to verify the
+  # compiled Angular output looks correct before declaring the task done.
+  - hostname: appstage
+    type: static
+
+    # Selects the 'prod' setup: compiles Angular with ng build and
+    # serves the output from dist/angular-static-hello-world/browser/ via Nginx.
+    zeropsSetup: prod
+
+    buildFromGit: https://github.com/zerops-recipe-apps/angular-static-hello-world-app
+
+    # Public HTTPS URL so the agent can curl the subdomain and verify
+    # the page loads with correct environment values.
+    enableSubdomainAccess: true
+
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125

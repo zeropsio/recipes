@@ -1,0 +1,30 @@
+# Nuxt Hello World — Highly-available Production environment.
+# Dedicated infrastructure, enhanced scaling, and HA-grade
+# resources for production workloads requiring high
+# durability and performance.
+project:
+  name: nuxt-static-hello-world-ha-prod
+  # SERIOUS core allocates dedicated infrastructure for the
+  # project balancer, logging, and metrics — prevents
+  # noisy-neighbor contention on shared infrastructure.
+  corePackage: SERIOUS
+
+services:
+  - hostname: app
+    type: static
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this
+    # public repo to trigger the build/deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/nuxt-static-hello-world-app
+    enableSubdomainAccess: true
+    # Always run at least 2 containers — eliminates single
+    # points of failure and keeps traffic flowing during
+    # zero-downtime deploys.
+    minContainers: 2
+    # Zerops auto-scales RAM and CPU within these bounds.
+    # DEDICATED mode reserves physical CPU cores for this
+    # service — no sharing with other containers on the host.
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+      minFreeRamGB: 0.25

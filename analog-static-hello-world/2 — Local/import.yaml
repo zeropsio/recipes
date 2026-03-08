@@ -1,0 +1,21 @@
+# Analog Hello World — Local environment.
+# Develop locally with your own tools; use 'zcli push' to preview
+# production builds on Zerops without deploying to production.
+project:
+  name: analog-static-hello-world-local
+
+services:
+  # Single app service — receives production builds pushed from your
+  # local machine via 'zcli push'. Run 'npm start' locally for dev.
+  - hostname: app
+    type: static
+    # 'prod' setup: Vite compiles Analog to static assets in
+    # dist/analog/public/, which Nginx serves from the runtime container.
+    zeropsSetup: prod
+    # buildFromGit triggers a build/deploy pipeline: Zerops pulls source
+    # code and zerops.yaml from this public repo automatically.
+    # Replace with your own repo URL after forking.
+    buildFromGit: https://github.com/zerops-recipe-apps/analog-static-hello-world-app
+    # Gives the service a public HTTPS URL on a Zerops subdomain —
+    # open this URL to preview your pushed build.
+    enableSubdomainAccess: true

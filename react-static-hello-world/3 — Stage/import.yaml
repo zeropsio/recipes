@@ -1,0 +1,25 @@
+# React Hello World — Stage Environment
+#
+# Uses the same configuration as production, but runs on a single container
+# with lower scaling settings — suitable for pre-production testing and QA.
+project:
+  name: react-static-hello-world-stage
+
+services:
+  - hostname: app
+    type: static
+    # Uses the production build setup — same Nginx config, same env vars,
+    # same build pipeline as prod. What passes here deploys safely to prod.
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this public repo,
+    # then triggers the build/deploy pipeline automatically.
+    buildFromGit: https://github.com/zerops-recipe-apps/react-static-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      # Minimal RAM floor for a staging service — Nginx is lightweight.
+      # Zerops auto-scales up if traffic increases; scale down is gradual.
+      minRam: 0.25
+      # Reserve free RAM for Nginx worker processes and traffic bursts.
+      # Without this buffer, peak load can exhaust minRam and OOM-kill
+      # the container.
+      minFreeRamGB: 0.125

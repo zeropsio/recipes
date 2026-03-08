@@ -1,0 +1,31 @@
+# Svelte Hello World — Remote (CDE) environment.
+# Two services: 'appdev' for development via SSH or IDE mounting,
+# 'appstage' for testing production builds before promotion.
+project:
+  name: svelte-static-hello-world-remote
+
+services:
+  # Dev service — mount via SSHFS or connect with VS Code Remote.
+  # Uses the 'dev' setup: deploys full source with Node.js runtime
+  # so the developer can run 'npm run dev' and framework tools.
+  - hostname: appdev
+    # nodejs@22 provides Node.js at runtime — required for running
+    # the SvelteKit dev server and npm scripts via SSH or IDE.
+    type: nodejs@22
+    # Selects the 'dev' setup from zerops.yaml in the source repo.
+    zeropsSetup: dev
+    # Zerops pulls source and zerops.yaml from this public repo
+    # to trigger the build/deploy pipeline on first import.
+    buildFromGit: https://github.com/zerops-recipe-apps/svelte-static-hello-world-app
+    # Public HTTPS URL on a Zerops subdomain — access the dev
+    # server output without additional networking configuration.
+    enableSubdomainAccess: true
+
+  # Staging service — deploy prod builds here to verify output
+  # before pushing to production. Mirrors production configuration.
+  - hostname: appstage
+    # static type runs Nginx — no Node.js at runtime.
+    type: static
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/svelte-static-hello-world-app
+    enableSubdomainAccess: true

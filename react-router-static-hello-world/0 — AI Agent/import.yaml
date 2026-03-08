@@ -1,0 +1,49 @@
+# React Router v7 Hello World — AI Agent Environment
+#
+# An AI agent environment with a Node.js dev workspace
+# (appdev) and a static staging preview (appstage) for
+# building and testing the app inside Zerops.
+
+project:
+  name: react-router-static-hello-world-agent
+
+services:
+  # Dev workspace for the AI agent. Node.js runtime gives
+  # the agent SSH access to run 'npm run dev', edit files,
+  # and iterate — without local tool installation.
+  # Uses the 'dev' setup from zerops.yaml: full source and
+  # node_modules are deployed; agent starts its own server.
+  - hostname: appdev
+    # nodejs@22 (not static) — the agent needs the Node.js
+    # runtime at runtime to execute npm/Vite commands via SSH.
+    type: nodejs@22
+    # Zerops pulls the source code and zerops.yaml from this
+    # public repo to trigger the build/deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/react-router-static-hello-world-app
+    # Selects the 'dev' setup from zerops.yaml — deploys full
+    # source to a Node.js container for SSH-based development.
+    zeropsSetup: dev
+    # Public HTTPS URL on a Zerops subdomain — gives the agent
+    # a URL for previewing the running dev server.
+    enableSubdomainAccess: true
+    minContainers: 1
+    maxContainers: 1
+
+  # Staging service: builds the React Router v7 SPA into
+  # static assets and serves via Nginx. The agent can validate
+  # the production build before handing off to users.
+  - hostname: appstage
+    type: static
+    buildFromGit: https://github.com/zerops-recipe-apps/react-router-static-hello-world-app
+    # Selects the 'prod' setup — compiles static assets with
+    # Node.js and deploys to Nginx. Node.js is absent at runtime.
+    zeropsSetup: prod
+    # Public subdomain so the agent can verify the built app
+    # renders correctly at a real HTTPS URL.
+    enableSubdomainAccess: true
+    envVariables:
+      # Runtime env var exposed as RUNTIME_APP_ENV in the build
+      # shell (Zerops auto-prefixes runtime vars with RUNTIME_).
+      # The zerops.yaml buildCommands inject it as VITE_APP_ENV,
+      # baking the environment name into the compiled JS bundle.
+      APP_ENV: stage

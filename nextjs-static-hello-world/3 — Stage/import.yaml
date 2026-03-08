@@ -1,0 +1,30 @@
+# Next.js Hello World — Stage Environment
+#
+# Pre-production environment that mirrors the production
+# configuration on a single container with lower scaling
+# settings. Used to validate builds before promoting to
+# production.
+
+project:
+  name: nextjs-static-hello-world-stage
+
+services:
+  # Staging service — same 'prod' build pipeline and Nginx
+  # runtime as production, but on a single container.
+  # Catches build issues and environment-specific bugs
+  # before they reach production traffic.
+  - hostname: app
+    type: static
+    # 'prod' setup: runs 'npm ci && npm run build', bakes
+    # NEXT_PUBLIC_APP_ENV=production into the static output,
+    # and deploys the 'out/' directory to Nginx.
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this
+    # public repo and triggers the build/deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/nextjs-static-hello-world-app
+    # Public HTTPS URL on a Zerops subdomain for reviewing
+    # the staged build before production promotion.
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
