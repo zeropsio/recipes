@@ -1,0 +1,52 @@
+# AI agent environment — provides a development space for
+# AI agents to build and version the app. Includes a dev
+# service (appdev) for active development via SSH and a
+# staging service (appstage) to preview static builds.
+project:
+  name: sveltekit-static-hello-world-agent
+
+services:
+  # appdev: the agent works here via SSH — installs deps,
+  # edits files, runs dev server. Uses nodejs@22 so Node.js
+  # tools are available at runtime (not static/Nginx).
+  - hostname: appdev
+    # nodejs@22 runtime — agent needs npm/node via SSH.
+    # The dev zeropsSetup keeps Node.js at runtime via
+    # 'zsc noop --silent'; agent starts their own dev server.
+    type: nodejs@22
+    # 'dev' setup from zerops.yaml — deploys full source code
+    # so the agent has all files ready in the container.
+    zeropsSetup: dev
+    # Zerops pulls source code and zerops.yaml from this
+    # public repo to trigger the build/deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/sveltekit-static-hello-world-app
+    # Public HTTPS URL on a Zerops subdomain — lets the
+    # agent verify the dev server from outside the container.
+    enableSubdomainAccess: true
+    minContainers: 1
+    maxContainers: 1
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # appstage: receives prod builds pushed from appdev.
+  # Agent pushes with '--setup=prod' to preview the static
+  # output as it would appear in production.
+  - hostname: appstage
+    type: static
+    # 'prod' setup — compiles SvelteKit with Vite, deploys
+    # static output to Nginx.
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/sveltekit-static-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 1
+    maxContainers: 1
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
+    # APP_ENV is a runtime env var. Zerops makes it available
+    # during the build as RUNTIME_APP_ENV so the SvelteKit
+    # build can bake the value into the static output via
+    # PUBLIC_APP_ENV — no code change needed per environment.
+    envVariables:
+      APP_ENV: staging

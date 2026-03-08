@@ -1,0 +1,25 @@
+# Analog Hello World — Small Production environment.
+# Production-ready setup optimized for moderate throughput.
+# Two containers provide availability and distribute load.
+project:
+  name: analog-static-hello-world-small-prod
+
+services:
+  - hostname: app
+    type: static
+    # 'prod' setup: Vite compiles Analog to static HTML/CSS/JS;
+    # Nginx serves the output. Build-time env vars are baked into
+    # the bundle — no runtime process reads them after deploy.
+    zeropsSetup: prod
+    # buildFromGit triggers a build/deploy pipeline: Zerops pulls source
+    # code and zerops.yaml from this public repo automatically.
+    buildFromGit: https://github.com/zerops-recipe-apps/analog-static-hello-world-app
+    enableSubdomainAccess: true
+    # Always run at least 2 containers for availability and load distribution.
+    minContainers: 2
+    # Zerops auto-scales RAM within these bounds.
+    # minFreeRamGB reserves headroom for Nginx workers and traffic spikes —
+    # without it the container gets exactly minRam and may OOM under load.
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125

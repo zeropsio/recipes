@@ -1,0 +1,38 @@
+# React Router v7 Hello World — Small Production Environment
+#
+# A production-ready setup optimised for moderate throughput.
+# Two Nginx containers distribute traffic and ensure the app
+# remains available during zero-downtime deploys.
+
+project:
+  name: reactrouterv7-static-hello-world-small-prod
+
+services:
+  - hostname: app
+    type: static
+    # Zerops pulls the source code and zerops.yaml from this
+    # public repo to trigger the build/deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/reactrouterv7-static-hello-world-app
+    # Selects the 'prod' setup — Node.js compiles the React
+    # Router v7 SPA into static assets; Nginx serves them.
+    # The build container is deleted after deploy; Node.js is
+    # NOT present in the Nginx runtime containers.
+    zeropsSetup: prod
+    enableSubdomainAccess: true
+    # Always run at least 2 containers so traffic is distributed
+    # and the app stays available while new containers start
+    # during zero-downtime deploys.
+    minContainers: 2
+    envVariables:
+      # Runtime env var exposed as RUNTIME_APP_ENV in the build
+      # shell (Zerops auto-prefixes runtime vars with RUNTIME_).
+      # The zerops.yaml buildCommands inject it as VITE_APP_ENV,
+      # baking the environment name into the compiled JS bundle.
+      APP_ENV: production
+    # Zerops auto-scales RAM within these bounds. minFreeRamGB
+    # reserves headroom for Nginx worker processes and traffic
+    # spikes — without it the container gets exactly minRam and
+    # risks OOM kills under load.
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125

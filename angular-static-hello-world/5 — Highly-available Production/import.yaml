@@ -1,0 +1,39 @@
+# Angular Hello World — Highly-available Production Environment
+#
+# Enterprise-grade production setup with enhanced scaling, dedicated
+# CPU resources, and a Serious core for improved durability and
+# performance under sustained traffic.
+
+project:
+  name: angular-static-hello-world-ha-prod
+
+  # Serious core provides dedicated infrastructure for the project's
+  # balancer, logging, and metrics — isolated from other projects
+  # on the Zerops platform.
+  corePackage: SERIOUS
+
+services:
+  - hostname: app
+    type: static
+
+    # Selects the 'prod' setup: compiles Angular with ng build and
+    # serves output from dist/angular-static-hello-world/browser/ via Nginx.
+    zeropsSetup: prod
+
+    # Zerops pulls source code and zerops.yaml from this public repo
+    # to trigger the build/deploy pipeline automatically on import.
+    buildFromGit: https://github.com/zerops-recipe-apps/angular-static-hello-world-app
+
+    enableSubdomainAccess: true
+
+    # Always run at least 2 containers for traffic distribution
+    # and zero-downtime rolling deployments.
+    minContainers: 2
+
+    # DEDICATED CPU mode reserves physical CPU cores for this service
+    # rather than sharing with other containers on the host.
+    # Zerops auto-scales RAM within the specified bounds.
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+      minFreeRamGB: 0.25
