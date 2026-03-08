@@ -2,7 +2,7 @@
 # SERIOUS core provides dedicated infrastructure for the project's
 # balancer, logging, and metrics — isolated from shared resources.
 project:
-  name: svelte-static-hello-world-ha-prod
+  name: svelte-hello-world-ha-prod
   # Dedicated infrastructure for balancer, logging, and metrics.
   # Eliminates shared-resource contention at the platform level.
   corePackage: SERIOUS
@@ -15,7 +15,7 @@ services:
     zeropsSetup: prod
     # Zerops pulls source and zerops.yaml from this public repo
     # to trigger the build/deploy pipeline on first import.
-    buildFromGit: https://github.com/zerops-recipe-apps/svelte-static-hello-world-app
+    buildFromGit: https://github.com/zerops-recipe-apps/svelte-hello-world-app
     enableSubdomainAccess: true
     # Always run at least 2 containers — distributes traffic and
     # keeps the service available during rolling deployments.

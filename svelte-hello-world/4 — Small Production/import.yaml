@@ -2,7 +2,7 @@
 # Two containers run in parallel for availability and load
 # distribution. Zerops routes traffic between them automatically.
 project:
-  name: svelte-static-hello-world-small-prod
+  name: svelte-hello-world-small-prod
 
 services:
   - hostname: app
@@ -12,7 +12,7 @@ services:
     zeropsSetup: prod
     # Zerops pulls source and zerops.yaml from this public repo
     # to trigger the build/deploy pipeline on first import.
-    buildFromGit: https://github.com/zerops-recipe-apps/svelte-static-hello-world-app
+    buildFromGit: https://github.com/zerops-recipe-apps/svelte-hello-world-app
     enableSubdomainAccess: true
     # Always run at least 2 containers — distributes traffic and
     # keeps the service available if one container is replaced.
