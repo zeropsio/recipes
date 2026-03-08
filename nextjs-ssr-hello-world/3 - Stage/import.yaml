@@ -1,34 +1,32 @@
-# Next.js SSR Hello World — Stage environment.
-# Pre-production environment that mirrors the production configuration:
-# same zerops.yaml prod setup, same service topology, same env vars.
-# Lower scaling settings keep costs down while still validating the
-# full production pipeline before promoting changes to production.
-
+# Next.js SSR Hello World - Stage Environment
+#
+# Pre-production environment using the same production configuration
+# as Small Production but on a single container. Use this to validate
+# the full build pipeline and migration before promoting to production.
 project:
   name: nextjs-ssr-hello-world-stage
 
 services:
-  # Stage app: runs the prod setup from zerops.yaml on a single container.
-  # Identical pipeline to production - catches build and migration issues
-  # before they reach users.
   - hostname: app
     type: nodejs@22
-    # zeropsSetup: selects which named setup to run from zerops.yaml.
     zeropsSetup: prod
-    # buildFromGit: Zerops pulls source code and zerops.yaml from this
-    # public repo and runs the selected setup pipeline automatically.
+    # buildFromGit pulls source code and zerops.yaml from this public
+    # repository and triggers the first build automatically.
     buildFromGit: https://github.com/zerops-recipe-apps/nextjs-ssr-hello-world-app
-    # enableSubdomainAccess: public HTTPS URL for stakeholder review.
+    # enableSubdomainAccess gives a public HTTPS URL on a Zerops
+    # subdomain for sharing stage previews.
     enableSubdomainAccess: true
     verticalAutoscaling:
-      minRam: 0.5
-      minFreeRamGB: 0.25
+      # Reserve free RAM for V8 GC and SSR rendering spikes.
+      minRam: 0.25
+      minFreeRamGB: 0.125
 
-  # PostgreSQL for application data. Priority 10 starts the database
-  # before app containers, preventing connection errors on first boot.
+  # PostgreSQL for application data. Priority 10 ensures the database
+  # is ready before the app container runs migrations in initCommands.
   - hostname: db
-    type: postgresql@16
-    # mode: NON_HA — single-node is sufficient for pre-production testing.
+    type: postgresql@18
+    # NON_HA = single-node database - same as production config but
+    # without replication, matching stage's lower-cost profile.
     mode: NON_HA
     priority: 10
     verticalAutoscaling:
