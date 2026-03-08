@@ -1,36 +1,31 @@
-# Nuxt SSR Hello World - Local environment
-# Provides cloud infrastructure for local development.
-# The app runs on the developer's machine; Zerops hosts
-# the database and a staging service for prod validations.
-
+# Nuxt SSR hello world — local development environment.
+# Single app service (prod setup) + database. The developer
+# runs Nuxt locally and connects to the Zerops database via
+# zcli VPN: `zcli vpn up`.
 project:
   name: nuxt-ssr-hello-world-local
 
 services:
-  # app: Staging service for validating prod builds.
-  # zeropsSetup: prod selects the production pipeline from
-  # zerops.yaml - compiles the Nuxt Nitro bundle and runs
-  # the full SSR server.
-  # buildFromGit: Zerops pulls source code from this public
-  # repo and runs the build pipeline automatically.
+  # App service with prod setup — validates the Nitro SSR
+  # bundle against the cloud database before pushing to main.
   - hostname: app
     type: nodejs@22
+    # zeropsSetup: prod — uses the production build pipeline.
+    # Local development runs separately on the developer's
+    # machine; this service acts as a staging validator.
     zeropsSetup: prod
+    # buildFromGit: Zerops pulls source code and zerops.yaml
+    # from this public repository to seed the initial deploy.
     buildFromGit: https://github.com/zerops-recipe-apps/nuxt-ssr-hello-world-app
-    # enableSubdomainAccess: gives a public HTTPS URL to test
-    # the staged prod build without custom DNS configuration.
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 0.5
-      minFreeRamGB: 0.25
 
-  # PostgreSQL for app data. Priority 10 starts the database
-  # before app containers - prevents startup connection errors.
-  # Connect from your local machine using zcli vpn up, then
-  # use DB_HOST=db and credentials from project env variables.
+  # PostgreSQL for app data. Priority 10 ensures the database
+  # starts before the app container attempts to connect.
   - hostname: db
     type: postgresql@16
-    # NON_HA: single-node database - suitable for local
-    # development where high availability is not required.
+    # NON_HA: single-node database — adequate for local dev
+    # where losing a few minutes of data is acceptable.
     mode: NON_HA
     priority: 10
