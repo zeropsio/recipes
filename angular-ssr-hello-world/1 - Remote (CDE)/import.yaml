@@ -1,0 +1,39 @@
+# Angular SSR Hello World — Remote (CDE) environment.
+# Provides a dev service for developers to work via SSH or IDE
+# remote mounting (VS Code Remote, JetBrains Gateway), a staging
+# service to validate production builds, and a PostgreSQL database.
+project:
+  name: angular-ssr-hello-world-remote
+
+services:
+  # Dev service: developer mounts /var/www via SSHFS or IDE plugin,
+  # edits files locally, and runs 'ng serve' inside the container.
+  # Increase minRam to 4 GB (commented out) if the Angular compiler
+  # or Language Server feels slow during active development.
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    # Zerops pulls source code and zerops.yaml from this public
+    # repo and triggers the build pipeline automatically.
+    buildFromGit: https://github.com/zerops-recipe-apps/angular-ssr-hello-world-app
+    # Public HTTPS subdomain lets the developer preview the app
+    # from a browser without VPN or port forwarding.
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      # minRam: 4  # Uncomment for a smoother Angular dev experience
+
+  # Stage service: prod build target for verifying SSR output and
+  # migrations before the developer pushes to a real environment.
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/angular-ssr-hello-world-app
+    enableSubdomainAccess: true
+
+  # PostgreSQL for application data. Priority 10 ensures the database
+  # is ready before either app service tries to connect.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
