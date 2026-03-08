@@ -1,0 +1,36 @@
+# Nuxt SSR Hello World - Local environment
+# Provides cloud infrastructure for local development.
+# The app runs on the developer's machine; Zerops hosts
+# the database and a staging service for prod validations.
+
+project:
+  name: nuxt-ssr-hello-world-local
+
+services:
+  # app: Staging service for validating prod builds.
+  # zeropsSetup: prod selects the production pipeline from
+  # zerops.yaml - compiles the Nuxt Nitro bundle and runs
+  # the full SSR server.
+  # buildFromGit: Zerops pulls source code from this public
+  # repo and runs the build pipeline automatically.
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nuxt-ssr-hello-world-app
+    # enableSubdomainAccess: gives a public HTTPS URL to test
+    # the staged prod build without custom DNS configuration.
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL for app data. Priority 10 starts the database
+  # before app containers - prevents startup connection errors.
+  # Connect from your local machine using zcli vpn up, then
+  # use DB_HOST=db and credentials from project env variables.
+  - hostname: db
+    type: postgresql@16
+    # NON_HA: single-node database - suitable for local
+    # development where high availability is not required.
+    mode: NON_HA
+    priority: 10

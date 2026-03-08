@@ -1,0 +1,46 @@
+# Next.js SSR Hello World — Highly-available Production environment.
+# Enterprise-grade setup with dedicated CPU, HA database replication,
+# and a Serious core package for the project balancer, logging, and
+# metrics infrastructure. Designed for sustained high-traffic workloads
+# where durability and consistent latency are required.
+
+project:
+  name: nextjs-ssr-hello-world-ha-prod
+  # corePackage: SERIOUS provisions dedicated infrastructure for the
+  # project's internal balancer, logging pipeline, and metrics storage.
+  # The default Lightweight core shares these resources across projects.
+  corePackage: SERIOUS
+
+services:
+  - hostname: app
+    type: nodejs@22
+    # zeropsSetup: selects the prod setup from zerops.yaml.
+    zeropsSetup: prod
+    # buildFromGit: Zerops pulls source code and zerops.yaml from this
+    # public repo and runs the selected setup pipeline automatically.
+    buildFromGit: https://github.com/zerops-recipe-apps/nextjs-ssr-hello-world-app
+    enableSubdomainAccess: true
+    # minContainers: maintain at least 2 containers at all times for
+    # zero-downtime rolling deploys and fault tolerance.
+    minContainers: 2
+    # verticalAutoscaling: Zerops auto-scales RAM and CPU within these
+    # bounds. cpuMode: DEDICATED pins vCPUs exclusively to this service -
+    # no CPU sharing with other tenants. minFreeRamGB reserves headroom
+    # for V8 GC cycles and SSR rendering spikes.
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL for application data. Priority 10 starts the database
+  # before app containers, preventing connection errors on first boot.
+  - hostname: db
+    type: postgresql@16
+    # mode: HA — replicates data across multiple nodes. Survives
+    # individual node failures without data loss or manual failover.
+    mode: HA
+    priority: 10
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5
