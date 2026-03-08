@@ -1,36 +1,36 @@
-# Next.js SSR Hello World — Small Production environment.
-# Production-ready setup optimized for moderate traffic. Two containers
-# handle deploys and node failures without downtime. Vertical autoscaling
-# handles traffic spikes within the configured RAM bounds.
-
+# Next.js SSR Hello World - Small Production Environment
+#
+# Production-ready setup optimized for moderate traffic. Runs two
+# containers by default for availability, with Zerops autoscaling
+# additional containers under load.
 project:
   name: nextjs-ssr-hello-world-small-prod
 
 services:
   - hostname: app
     type: nodejs@22
-    # zeropsSetup: selects the prod setup from zerops.yaml.
     zeropsSetup: prod
-    # buildFromGit: Zerops pulls source code and zerops.yaml from this
-    # public repo and runs the selected setup pipeline automatically.
+    # buildFromGit pulls source code and zerops.yaml from this public
+    # repository and triggers the first build automatically.
     buildFromGit: https://github.com/zerops-recipe-apps/nextjs-ssr-hello-world-app
     enableSubdomainAccess: true
-    # minContainers: always run at least 2 containers so a rolling deploy
-    # or single node failure does not cause downtime.
+    # minContainers: 2 ensures at least two containers run at all
+    # times - one can restart or redeploy while the other serves
+    # traffic, giving zero-downtime updates.
     minContainers: 2
-    # verticalAutoscaling: Zerops scales RAM automatically between minRam
-    # and the platform maximum. minFreeRamGB reserves headroom for V8 GC
-    # cycles and SSR rendering spikes - without it, the container OOM-kills
-    # at the minRam ceiling.
     verticalAutoscaling:
+      # Reserve free RAM for V8 GC cycles and SSR rendering spikes.
+      # Without minFreeRamGB the container gets exactly minRam and
+      # OOM-kills under spike load.
       minRam: 0.25
       minFreeRamGB: 0.125
 
   # PostgreSQL for application data. Priority 10 starts the database
-  # before app containers, preventing connection errors on first boot.
+  # before app containers so migrations run against a ready database.
   - hostname: db
-    type: postgresql@16
-    # mode: NON_HA — single-node database with automatic backups.
+    type: postgresql@18
+    # NON_HA = single-node database - suitable for production workloads
+    # where a short outage during database restart is acceptable.
     mode: NON_HA
     priority: 10
     verticalAutoscaling:
