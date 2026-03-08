@@ -1,0 +1,50 @@
+# Astro SSR Hello World - Remote (CDE) Environment
+#
+# A minimal Astro SSR application with a server-rendered health check
+# page that connects to a PostgreSQL database, runs idempotent
+# migrations, and queries live data - demonstrating the full Zerops
+# SSR integration pattern.
+#
+# Two app services: appdev for remote development via SSH or IDE
+# mounting (SSHFS/Remote Tunnels), appstage for validating prod builds.
+
+project:
+  name: astro-ssr-hello-world-remote
+
+services:
+  # Dev service: developers connect via SSH or mount the filesystem
+  # with an IDE (VS Code Remote, JetBrains Gateway, SSHFS). The dev
+  # setup deploys full source and starts zsc noop - developer runs
+  # `npm run dev` manually for hot-reload.
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    # buildFromGit pulls source code and zerops.yaml from this public
+    # repo and triggers the first build automatically on import.
+    buildFromGit: https://github.com/zerops-recipe-apps/astro-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      # 1-4 GB RAM is comfortable for IDE + dev server + node_modules.
+      # Uncomment and raise minRam if your IDE integration needs more:
+      # minRam: 4
+      # minFreeRamGB: 2
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Staging service: push the prod setup here to verify the optimized
+  # build, readiness check, and migration all work before merging.
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/astro-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL for app data. Priority 10 ensures the database is ready
+  # before app containers attempt their first connection.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10

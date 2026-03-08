@@ -1,0 +1,38 @@
+# Astro SSR Hello World - Local Environment
+#
+# A minimal Astro SSR application with a server-rendered health check
+# page that connects to a PostgreSQL database, runs idempotent
+# migrations, and queries live data - demonstrating the full Zerops
+# SSR integration pattern.
+#
+# Developer runs Astro locally; zCLI VPN connects their machine to
+# the Zerops private network for database access. The app service
+# (prod setup) validates that the same zerops.yaml builds correctly
+# on Zerops infrastructure.
+
+project:
+  name: astro-ssr-hello-world-local
+
+services:
+  # App service: runs the prod setup on Zerops. Used to verify that
+  # the build pipeline and deployment work correctly before pushing
+  # to a shared staging environment.
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    # buildFromGit pulls source code and zerops.yaml from this public
+    # repo and triggers the first build automatically on import.
+    buildFromGit: https://github.com/zerops-recipe-apps/astro-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL for app data. With `zcli vpn up`, your local Astro dev
+  # server can reach this service by hostname (db) as if it were on
+  # your local network. Priority 10 starts it before app containers.
+  - hostname: db
+    type: postgresql@16
+    # NON_HA = single-node database, suitable for local development.
+    mode: NON_HA
+    priority: 10
