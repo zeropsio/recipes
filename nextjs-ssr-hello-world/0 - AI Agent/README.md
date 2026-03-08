@@ -1,8 +1,7 @@
 # Next.js SSR Hello World - AI Agent Environment
 
-This is an AI agent environment for [Next.js SSR Hello World (info + deploy)](https://app.zerops.io/recipes/nextjs-ssr-hello-world?environment=ai-agent) recipe on [Zerops](https://zerops.io).
+This is [an AI agent environment](https://app.zerops.io/recipes/nextjs-ssr-hello-world?environment=ai-agent) for [Next.js SSR Hello World (info + deploy)](https://app.zerops.io/recipes/nextjs-ssr-hello-world?environment=ai-agent) recipe on [Zerops](https://zerops.io).
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-**AI agent** environment provides a development space for AI agents to build and version the app.
-It includes a dev service with the code repository and necessary development tools, a staging service, and a low-resource database.
+**AI agent** environment provides a development space for AI agents to build and version the app. It includes a dev service with the code repository and necessary development tools, a staging service, and a low-resource database.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
