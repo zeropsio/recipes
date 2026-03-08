@@ -1,0 +1,34 @@
+# Analog SSR Hello World — Small Production environment.
+# Production-ready setup for moderate traffic. Two containers
+# run in parallel behind the project balancer for availability
+# during deploys and minor container failures.
+project:
+  name: analog-ssr-hello-world-small-prod
+
+services:
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-hello-world-app
+    enableSubdomainAccess: true
+    # Always run at least 2 containers so one stays healthy
+    # while the other restarts or receives a new deploy.
+    minContainers: 2
+    # verticalAutoscaling: Zerops scales RAM automatically within
+    # these bounds. minFreeRamGB reserves headroom for SSR
+    # rendering spikes — without it, V8 GC pressure can trigger
+    # OOM restarts at the minRam ceiling.
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
+
+  # PostgreSQL for app data. Priority 10 starts data services
+  # before app containers, preventing connection errors on
+  # first boot when the database is not yet ready.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25

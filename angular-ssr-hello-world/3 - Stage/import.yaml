@@ -1,0 +1,25 @@
+# Angular SSR Hello World — Stage environment.
+# Pre-production environment using the same prod configuration as
+# production but running on a single container with lower resource
+# floors. Use this to validate SSR output and migrations before
+# promoting to production.
+project:
+  name: angular-ssr-hello-world-stage
+
+services:
+  - hostname: app
+    type: nodejs@22
+    # 'prod' setup — identical pipeline to production so stage
+    # faithfully reproduces build artifacts and migration behavior.
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this public
+    # repo and triggers the build pipeline automatically.
+    buildFromGit: https://github.com/zerops-recipe-apps/angular-ssr-hello-world-app
+    enableSubdomainAccess: true
+
+  # PostgreSQL for application data. Priority 10 starts the database
+  # before the app service, preventing connection errors on boot.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10

@@ -1,0 +1,35 @@
+# Angular SSR Hello World — Small Production environment.
+# Production-ready setup optimized for moderate throughput.
+# Two containers ensure availability during rolling deploys;
+# Zerops scales RAM vertically within the configured bounds.
+project:
+  name: angular-ssr-hello-world-small-prod
+
+services:
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this public
+    # repo and triggers the build pipeline automatically.
+    buildFromGit: https://github.com/zerops-recipe-apps/angular-ssr-hello-world-app
+    enableSubdomainAccess: true
+    # Always run at least 2 containers so one can serve traffic
+    # while the other is replaced during a rolling deploy.
+    minContainers: 2
+    # verticalAutoscaling: Zerops scales RAM up automatically when
+    # load increases, and back down when it eases.
+    # minFreeRamGB reserves headroom for V8 GC cycles and Angular
+    # SSR rendering spikes — without it, OOM kills can occur.
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
+
+  # PostgreSQL for application data. Priority 10 starts the database
+  # before app containers, preventing connection errors on first boot.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25

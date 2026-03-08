@@ -1,0 +1,28 @@
+# Analog SSR Hello World — Local environment.
+# Single app service (prod setup) plus a database. The developer
+# runs Analog locally and connects to the Zerops database via
+# 'zcli vpn up', which routes database traffic through the
+# Zerops private network without exposing the database publicly.
+project:
+  name: analog-ssr-hello-world-local
+
+services:
+  # app: production-mode staging container. Validates that the
+  # prod build pipeline works correctly while the developer
+  # iterates locally against the shared database.
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL for app data. Priority 10 starts data services
+  # before app containers, preventing connection errors on
+  # first boot when the database is not yet ready.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10
