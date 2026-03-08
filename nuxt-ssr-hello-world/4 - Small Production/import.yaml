@@ -1,0 +1,39 @@
+# Nuxt SSR Hello World - Small Production environment
+# Production-ready setup for moderate traffic with automatic
+# horizontal scaling and database persistence.
+
+project:
+  name: nuxt-ssr-hello-world-small-prod
+
+services:
+  # app: Production SSR service running the Nitro bundle.
+  # zeropsSetup: prod selects the production build pipeline
+  # from zerops.yaml.
+  # buildFromGit: Zerops pulls source code and zerops.yaml
+  # from this public repo.
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nuxt-ssr-hello-world-app
+    enableSubdomainAccess: true
+    # minContainers: 2 ensures at least two containers are
+    # always running - provides availability during rolling
+    # deploys and handles traffic spikes without cold starts.
+    minContainers: 2
+    # verticalAutoscaling: Zerops automatically scales RAM
+    # within these bounds. minFreeRamGB reserves headroom
+    # for V8 GC cycles and SSR rendering spikes - without it,
+    # usage hitting minRam causes OOM kills and restarts.
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
+
+  # PostgreSQL for app data. Priority 10 starts the database
+  # before app containers, preventing connection errors.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25

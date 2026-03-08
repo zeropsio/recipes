@@ -1,0 +1,32 @@
+# Nuxt SSR Hello World - Stage environment
+# Uses the same configuration as production to catch
+# integration issues before deploying to production.
+# Single container with lower scaling settings.
+
+project:
+  name: nuxt-ssr-hello-world-stage
+
+services:
+  # app: Stage service running the production Nitro bundle.
+  # zeropsSetup: prod builds and deploys the same artifact
+  # that will run in production - no special staging config.
+  # buildFromGit: Zerops pulls the source code from this
+  # public repo and runs the full build pipeline.
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nuxt-ssr-hello-world-app
+    # enableSubdomainAccess: gives a public HTTPS URL for
+    # testing and QA without configuring custom DNS.
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL for app data. Priority 10 starts the database
+  # before app containers, preventing connection errors on
+  # first startup.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10

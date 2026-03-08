@@ -1,0 +1,41 @@
+# SvelteKit SSR Hello World - AI Agent Environment
+#
+# Two-service development setup for AI agents: appdev runs the
+# dev setup for active development and testing; appstage runs the
+# prod setup to validate that the production build works before
+# promoting changes. Both share a single PostgreSQL database.
+
+project:
+  name: sveltekit-ssr-hello-world-agent
+
+services:
+  # appdev: dev setup - deploys full source code so the AI agent
+  # can SSH in, inspect files, and run the SvelteKit dev server.
+  # zeropsSetup selects which setup block in zerops.yaml to use.
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    # buildFromGit: Zerops pulls the source code and zerops.yaml
+    # from this public repo and runs the build pipeline immediately.
+    buildFromGit: https://github.com/zerops-recipe-apps/sveltekit-ssr-hello-world-app
+    # enableSubdomainAccess: gives this service a public HTTPS URL
+    # on a zerops.app subdomain - useful for testing from a browser.
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # appstage: prod setup - builds the optimized SSR artifact.
+  # The AI agent pushes source from appdev to validate prod builds.
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/sveltekit-ssr-hello-world-app
+    enableSubdomainAccess: true
+
+  # PostgreSQL for app data and migration demo. Priority 10 starts
+  # the database before app containers start - prevents connection
+  # errors during the first boot when the app tries to connect.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10

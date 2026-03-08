@@ -1,0 +1,46 @@
+# Nuxt SSR Hello World - AI Agent environment
+# Provides a development space for AI agents to build and
+# version the app, with a staging service to validate prod
+# builds and a low-resource database for data persistence.
+
+project:
+  name: nuxt-ssr-hello-world-agent
+
+services:
+  # appdev: The agent's live workspace - source code is pushed
+  # here with the dev setup (zsc noop --silent start command),
+  # keeping the container idle for SSH and zCLI access.
+  # buildFromGit: tells Zerops to pull source code and
+  # zerops.yaml from this public repo on first deploy.
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/nuxt-ssr-hello-world-app
+    # enableSubdomainAccess: provides a public HTTPS URL on a
+    # Zerops subdomain for external testing without custom DNS.
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # appstage: Staging service for validating prod builds.
+  # zeropsSetup: prod selects the prod setup from zerops.yaml,
+  # which builds the Nitro bundle and runs the full server.
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nuxt-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL for app data. Priority 10 starts data services
+  # before app containers, preventing connection errors on
+  # first startup before the database is ready.
+  - hostname: db
+    type: postgresql@16
+    # NON_HA: single-node database - suitable for development
+    # and staging where data replication is not required.
+    mode: NON_HA
+    priority: 10

@@ -1,0 +1,48 @@
+# Next.js SSR Hello World — AI Agent environment.
+# Provides a dev service (appdev) and staging service (appstage) backed
+# by PostgreSQL. AI agents mount appdev via SSHFS, build and version
+# the app there, then push the prod setup to appstage to validate the
+# production pipeline before promoting to a real environment.
+
+project:
+  name: nextjs-ssr-hello-world-agent
+
+services:
+  # Development service: AI agent writes code here via SSHFS mount.
+  # Uses the 'dev' setup from zerops.yaml - deploys full source,
+  # runs npm install, keeps container alive with zsc noop.
+  - hostname: appdev
+    type: nodejs@22
+    # zeropsSetup: selects which named setup to run from zerops.yaml.
+    zeropsSetup: dev
+    # buildFromGit: Zerops pulls source code and zerops.yaml from this
+    # public repo and immediately runs the selected setup pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/nextjs-ssr-hello-world-app
+    # enableSubdomainAccess: assigns a public HTTPS URL on zerops.app
+    # so the agent can verify the running service externally.
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Staging service: validates the prod build pipeline and production
+  # config. Receives pushes from the agent after dev work is verified.
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nextjs-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL for application data. Priority 10 starts the database
+  # before app containers, preventing connection errors on first boot.
+  - hostname: db
+    type: postgresql@16
+    # mode: NON_HA — single-node database, suitable for development use.
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
