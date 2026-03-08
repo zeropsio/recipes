@@ -2,7 +2,7 @@
 # Two services: 'appdev' for active development (SSH/SSHFS
 # accessible by the agent), 'appstage' for testing prod builds.
 project:
-  name: svelte-static-hello-world-agent
+  name: svelte-hello-world-agent
 
 services:
   # Dev service — the agent builds and iterates here via SSH.
@@ -16,7 +16,7 @@ services:
     zeropsSetup: dev
     # Zerops pulls source and zerops.yaml from this public repo
     # to trigger the build/deploy pipeline on first import.
-    buildFromGit: https://github.com/zerops-recipe-apps/svelte-static-hello-world-app
+    buildFromGit: https://github.com/zerops-recipe-apps/svelte-hello-world-app
     # Public HTTPS URL on a Zerops subdomain — the agent can
     # verify the running dev server without extra configuration.
     enableSubdomainAccess: true
@@ -27,7 +27,7 @@ services:
     # static type runs Nginx — no Node.js at runtime.
     type: static
     zeropsSetup: prod
-    buildFromGit: https://github.com/zerops-recipe-apps/svelte-static-hello-world-app
+    buildFromGit: https://github.com/zerops-recipe-apps/svelte-hello-world-app
     # Public subdomain lets the agent verify the prod build output
     # immediately after deployment without DNS configuration.
     enableSubdomainAccess: true
