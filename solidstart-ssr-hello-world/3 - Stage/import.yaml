@@ -1,0 +1,27 @@
+# SolidStart SSR Hello World — Stage environment.
+# Pre-production environment using the same prod configuration
+# as the production setups but on a single container with lower
+# scaling settings — validates the full Nitro SSR build and
+# migration pipeline before promoting to production.
+project:
+  name: solidstart-ssr-hello-world-stage
+
+services:
+  - hostname: app
+    type: nodejs@22
+    # 'prod' setup: builds the Nitro node-server bundle (.output/),
+    # runs the migration via initCommands, starts the SSR server.
+    # Same pipeline as production — no staging-specific shortcuts.
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/solidstart-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Single-node database — production parity in topology but
+  # without the HA overhead. Sufficient for pre-production testing.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10

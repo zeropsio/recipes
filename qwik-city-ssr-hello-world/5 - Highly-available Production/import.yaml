@@ -1,0 +1,42 @@
+# Qwik City SSR Hello World — Highly-available Production environment.
+# Enterprise-grade setup: dedicated CPU cores, HA database replication,
+# and Serious core package for the project's balancer and observability.
+#
+# Deploy: zcli project project-import import.yaml
+project:
+  name: qwik-city-ssr-hello-world-ha-prod
+  # corePackage: SERIOUS provisions dedicated infrastructure for this
+  # project's balancer, logging, and metrics — not shared with other
+  # projects. Recommended for production workloads requiring consistent
+  # performance under load.
+  corePackage: SERIOUS
+
+services:
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    # buildFromGit: Zerops pulls source code and zerops.yaml from this
+    # public repository and triggers the first build automatically.
+    buildFromGit: https://github.com/zerops-recipe-apps/qwik-city-ssr-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    # verticalAutoscaling: cpuMode DEDICATED pins CPU cores exclusively
+    # to this service — no sharing with other containers on the host.
+    # minFreeRamGB reserves headroom for V8 GC and SSR rendering peaks.
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL for app data. Priority 10 starts data services before
+  # app containers, preventing connection errors on first boot.
+  - hostname: db
+    type: postgresql@16
+    # HA: data replicated across multiple nodes — survives single-node
+    # failure without data loss or manual intervention.
+    mode: HA
+    priority: 10
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5

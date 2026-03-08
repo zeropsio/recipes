@@ -1,0 +1,29 @@
+# Qwik City SSR Hello World — Stage environment.
+# Pre-production environment with the same prod configuration as
+# production, running on a single container with minimal resources.
+# Use this to validate builds and migrations before promoting to prod.
+#
+# Deploy: zcli project project-import import.yaml
+project:
+  name: qwik-city-ssr-hello-world-stage
+
+services:
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    # buildFromGit: Zerops pulls source code and zerops.yaml from this
+    # public repository and triggers the first build automatically.
+    buildFromGit: https://github.com/zerops-recipe-apps/qwik-city-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL for app data. Priority 10 starts data services before
+  # app containers, preventing connection errors on first boot.
+  - hostname: db
+    type: postgresql@16
+    # NON_HA: single-node database — sufficient for staging.
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.5
