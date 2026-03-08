@@ -1,7 +1,7 @@
 # Next.js SSR Hello World Recipe
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-A [Next.js](https://nextjs.org) SSR Hello World recipe for [Zerops](https://zerops.io), showcasing server-rendered pages with a [PostgreSQL](https://www.postgresql.org/) database connection, automated idempotent migrations, and standalone output mode — packaged in environment configurations ready for every stage of development.
+A minimal Next.js 15 server-side rendering recipe connecting to a PostgreSQL database, running on [Zerops](https://zerops.io). Demonstrates the full SSR lifecycle: standalone build, idempotent migration via `zsc execOnce`, and a live health check that queries the database on every request.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 
 ⬇️ **Full recipe page and deploy with one-click**

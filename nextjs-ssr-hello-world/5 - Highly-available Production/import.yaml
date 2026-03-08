@@ -1,46 +1,47 @@
-# Next.js SSR Hello World — Highly-available Production environment.
-# Enterprise-grade setup with dedicated CPU, HA database replication,
-# and a Serious core package for the project balancer, logging, and
-# metrics infrastructure. Designed for sustained high-traffic workloads
-# where durability and consistent latency are required.
-
+# Next.js SSR Hello World - Highly-available Production Environment
+#
+# Enterprise-grade setup with dedicated CPU, replicated database,
+# and Zerops Serious core for dedicated project infrastructure.
+# Use this for high-traffic applications where latency and durability
+# are critical.
 project:
   name: nextjs-ssr-hello-world-ha-prod
-  # corePackage: SERIOUS provisions dedicated infrastructure for the
-  # project's internal balancer, logging pipeline, and metrics storage.
-  # The default Lightweight core shares these resources across projects.
+  # SERIOUS core dedicates the project balancer, logging, and metrics
+  # infrastructure to this project instead of sharing it. Required
+  # for consistent low-latency routing under heavy load.
   corePackage: SERIOUS
 
 services:
   - hostname: app
     type: nodejs@22
-    # zeropsSetup: selects the prod setup from zerops.yaml.
     zeropsSetup: prod
-    # buildFromGit: Zerops pulls source code and zerops.yaml from this
-    # public repo and runs the selected setup pipeline automatically.
+    # buildFromGit pulls source code and zerops.yaml from this public
+    # repository and triggers the first build automatically.
     buildFromGit: https://github.com/zerops-recipe-apps/nextjs-ssr-hello-world-app
     enableSubdomainAccess: true
-    # minContainers: maintain at least 2 containers at all times for
-    # zero-downtime rolling deploys and fault tolerance.
+    # minContainers: 2 guarantees at least two containers for
+    # availability during rolling deploys and instance restarts.
     minContainers: 2
-    # verticalAutoscaling: Zerops auto-scales RAM and CPU within these
-    # bounds. cpuMode: DEDICATED pins vCPUs exclusively to this service -
-    # no CPU sharing with other tenants. minFreeRamGB reserves headroom
-    # for V8 GC cycles and SSR rendering spikes.
     verticalAutoscaling:
+      # DEDICATED reserves CPU cores exclusively for this service -
+      # no CPU sharing with other services on the same host node.
       cpuMode: DEDICATED
+      # SSR frameworks hold per-request state in memory. Higher
+      # minRam reduces GC pressure and keeps latency predictable.
       minRam: 0.5
       minFreeRamGB: 0.25
 
-  # PostgreSQL for application data. Priority 10 starts the database
-  # before app containers, preventing connection errors on first boot.
+  # PostgreSQL with HA replication. Priority 10 ensures primary and
+  # replica nodes are ready before app containers start.
   - hostname: db
-    type: postgresql@16
-    # mode: HA — replicates data across multiple nodes. Survives
-    # individual node failures without data loss or manual failover.
+    type: postgresql@18
+    # HA mode replicates data across multiple nodes - no single point
+    # of failure. Automatic failover if the primary node goes down.
     mode: HA
     priority: 10
     verticalAutoscaling:
       cpuMode: DEDICATED
+      # Larger minRam for the database handles query buffers and
+      # connection pool overhead from multiple app containers.
       minRam: 1
       minFreeRamGB: 0.5
