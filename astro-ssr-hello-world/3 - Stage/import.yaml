@@ -1,0 +1,38 @@
+# Astro SSR Hello World - Stage Environment
+#
+# A minimal Astro SSR application with a server-rendered health check
+# page that connects to a PostgreSQL database, runs idempotent
+# migrations, and queries live data - demonstrating the full Zerops
+# SSR integration pattern.
+#
+# Pre-production environment: same prod setup and config as production
+# but on a single container with lower scaling limits.
+
+project:
+  name: astro-ssr-hello-world-stage
+
+services:
+  - hostname: app
+    type: nodejs@22
+    # prod setup: same build pipeline and start command as production,
+    # so bugs caught here won't appear after promotion.
+    zeropsSetup: prod
+    # buildFromGit pulls source code and zerops.yaml from this public
+    # repo and triggers the first build automatically on import.
+    buildFromGit: https://github.com/zerops-recipe-apps/astro-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      # Reserve free RAM for V8 GC cycles and SSR rendering spikes.
+      minRam: 0.25
+      minFreeRamGB: 0.125
+
+  # PostgreSQL for app data. Priority 10 ensures the database is
+  # running and accepting connections before the app starts.
+  - hostname: db
+    type: postgresql@16
+    # NON_HA = single-node database, appropriate for staging.
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
