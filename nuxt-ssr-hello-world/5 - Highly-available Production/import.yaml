@@ -1,42 +1,39 @@
-# Nuxt SSR Hello World - Highly-available Production environment
-# Enterprise-grade setup with dedicated resources, HA database
-# replication, and enhanced scaling for maximum durability.
-
+# Nuxt SSR hello world — highly-available production environment.
+# Dedicated infrastructure, replicated database, and multiple
+# app containers for enterprise-grade durability and throughput.
 project:
   name: nuxt-ssr-hello-world-ha-prod
   # corePackage: SERIOUS provisions dedicated infrastructure for
-  # the project's balancer, logging, and metrics services.
-  # Use for production workloads that need consistent performance
-  # isolated from noisy-neighbor effects.
+  # the project's balancer, logging, and metrics pipeline —
+  # isolating this project from shared platform overhead.
   corePackage: SERIOUS
 
 services:
-  # app: Production SSR service running the Nuxt Nitro bundle.
-  # zeropsSetup: prod builds the self-contained Nitro output
-  # and runs it without node_modules.
-  # buildFromGit: Zerops pulls source code and zerops.yaml
-  # from this public repo.
   - hostname: app
     type: nodejs@22
     zeropsSetup: prod
+    # buildFromGit: Zerops pulls source code and zerops.yaml
+    # from this public repository on the first deploy.
     buildFromGit: https://github.com/zerops-recipe-apps/nuxt-ssr-hello-world-app
     enableSubdomainAccess: true
+    # minContainers: 2 ensures continuous availability during
+    # rolling deploys — traffic is never interrupted.
     minContainers: 2
-    # verticalAutoscaling: cpuMode: DEDICATED reserves CPU
-    # cores exclusively for this service - no sharing with
-    # other tenants. Essential for latency-sensitive SSR.
     verticalAutoscaling:
+      # cpuMode: DEDICATED allocates exclusive vCPU threads —
+      # no CPU throttling under sustained SSR request load.
       cpuMode: DEDICATED
       minRam: 0.5
+      # minFreeRamGB reserves headroom for Nitro SSR rendering,
+      # Vue hydration payloads, and V8 GC under peak load.
       minFreeRamGB: 0.25
 
-  # PostgreSQL with HA mode replicates data across multiple
-  # nodes - survives single-node failures without data loss.
-  # Priority 10 starts the database before app containers.
+  # PostgreSQL for app data. Priority 10 ensures the database
+  # is ready before any app container attempts to connect.
   - hostname: db
     type: postgresql@16
-    # HA: multi-node replication for data durability and
-    # availability - automatic failover on node failure.
+    # HA mode replicates data across multiple nodes — no single
+    # point of failure, automatic failover on node loss.
     mode: HA
     priority: 10
     verticalAutoscaling:
