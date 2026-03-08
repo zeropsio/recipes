@@ -1,0 +1,42 @@
+# SolidStart Hello World — Remote (CDE) Environment
+# Provides a development service and a staging service for
+# developers working via SSH or a remote IDE (e.g. VS Code
+# Remote, JetBrains Gateway) without local tool installation.
+
+project:
+  name: solidstart-static-hello-world-remote
+
+services:
+  # Development workspace — developer mounts or SSHs into this
+  # service and edits files directly. type: nodejs@22 gives the
+  # developer Node.js at runtime to run 'npm run dev' (vinxi
+  # dev server) and other framework CLI tools via the terminal.
+  - hostname: appdev
+    type: nodejs@22
+    # 'dev' setup: deploys full source tree with node_modules
+    # pre-installed — developer can start work immediately.
+    zeropsSetup: dev
+    # Zerops pulls source code and zerops.yaml from this public
+    # repo and triggers the build/deploy pipeline on first import.
+    buildFromGit: https://github.com/zerops-recipe-apps/solidstart-static-hello-world-app
+    # Gives the service a public HTTPS URL on a Zerops subdomain
+    # so the developer can preview the running dev server.
+    enableSubdomainAccess: true
+    envVariables:
+      # APP_ENV is available at build time as RUNTIME_APP_ENV.
+      # zerops.yaml reads: VITE_APP_ENV=${RUNTIME_APP_ENV:-production}
+      # — this bakes the environment name into the static bundle.
+      APP_ENV: development
+
+  # Staging service — developer pushes prod builds here to verify
+  # the static output before merging. type: static runs Nginx;
+  # the prod setup compiles SolidStart and deploys .output/public/.
+  - hostname: appstage
+    type: static
+    # 'prod' setup: npm ci → vinxi build → deploy .output/public/~
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/solidstart-static-hello-world-app
+    # Subdomain access for previewing production builds.
+    enableSubdomainAccess: true
+    envVariables:
+      APP_ENV: staging

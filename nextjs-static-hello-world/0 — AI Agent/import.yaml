@@ -1,0 +1,47 @@
+# Next.js Hello World — AI Agent Environment
+#
+# Provides a development space for AI agents to build
+# and version the app. Two services are deployed:
+# 'appdev' (Node.js workspace the agent codes in via SSH)
+# and 'appstage' (Nginx-served staging for testing builds).
+
+project:
+  name: nextjs-static-hello-world-agent
+
+services:
+  # Development workspace — Node.js runtime so the agent
+  # (or developer) has npm, npx, and all framework tooling
+  # available via SSH. Uses the 'dev' setup from zerops.yaml,
+  # which installs dependencies and keeps the container alive
+  # with 'zsc noop --silent'.
+  - hostname: appdev
+    # nodejs@22 (not static) — the dev setup needs Node.js
+    # at runtime to run 'npm run dev' via SSH.
+    type: nodejs@22
+    # 'dev' setup: deploys full source + node_modules,
+    # starts with 'zsc noop --silent' so the agent drives
+    # the dev server manually.
+    zeropsSetup: dev
+    # Zerops pulls source code and zerops.yaml from this
+    # public repo and triggers the build/deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/nextjs-static-hello-world-app
+    # Public HTTPS URL on a Zerops subdomain — lets the
+    # agent verify the running dev server externally.
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 1
+      minFreeRamGB: 0.5
+
+  # Staging service — Nginx serves the static export
+  # produced by the 'prod' build pipeline. The agent pushes
+  # here to verify the production build before delivery.
+  - hostname: appstage
+    type: static
+    # 'prod' setup: runs 'npm ci && npm run build', deploys
+    # the 'out/' directory to Nginx runtime containers.
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nextjs-static-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125

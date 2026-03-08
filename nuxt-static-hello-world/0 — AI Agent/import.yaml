@@ -1,0 +1,35 @@
+# Nuxt Hello World — AI Agent environment.
+# Provides two services: a dev workspace for the AI agent
+# to build and iterate via SSH, and a staging service for
+# testing compiled Nuxt builds.
+project:
+  name: nuxt-static-hello-world-agent
+
+services:
+  # Dev service — the agent's primary workspace.
+  # Uses nodejs@22 so Node.js is available at runtime
+  # for 'npx nuxi dev', package installs, or any other
+  # Node.js tooling the agent needs via SSH.
+  - hostname: appdev
+    type: nodejs@22
+    # 'dev' setup: deploys full source tree and keeps the
+    # container alive with zsc noop — agent starts the dev
+    # server manually via SSH ('npx nuxi dev --host 0.0.0.0').
+    zeropsSetup: dev
+    # Zerops pulls source code and zerops.yaml from this
+    # public repo to trigger the build/deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/nuxt-static-hello-world-app
+    # Public HTTPS subdomain — gives the agent direct URL
+    # access to the service for external testing.
+    enableSubdomainAccess: true
+
+  # Staging service — Nginx serving the compiled Nuxt
+  # static output. Agent pushes builds here from appdev
+  # via 'zcli push --setup prod' to verify production output.
+  - hostname: appstage
+    type: static
+    # 'prod' setup: runs 'nuxi generate', deploys
+    # .output/public/ contents to Nginx.
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nuxt-static-hello-world-app
+    enableSubdomainAccess: true

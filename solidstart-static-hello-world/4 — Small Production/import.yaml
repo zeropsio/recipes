@@ -1,0 +1,35 @@
+# SolidStart Hello World — Small Production Environment
+# Production-ready setup optimized for moderate traffic.
+# Runs a minimum of 2 Nginx containers for availability and
+# load distribution; Zerops scales up automatically on demand.
+
+project:
+  name: solidstart-static-hello-world-small-prod
+
+services:
+  # Production service — Nginx serves the compiled SolidStart
+  # assets with zero-downtime deployment by default: new containers
+  # start alongside old containers, old ones are removed from the
+  # project balancer only after new ones are healthy.
+  - hostname: app
+    type: static
+    # 'prod' setup: npm ci → vinxi build → deploy .output/public/~
+    # Zerops pulls source code and zerops.yaml from this public
+    # repo and triggers the build/deploy pipeline on first import.
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/solidstart-static-hello-world-app
+    enableSubdomainAccess: true
+    envVariables:
+      # APP_ENV is available at build time as RUNTIME_APP_ENV.
+      # zerops.yaml reads: VITE_APP_ENV=${RUNTIME_APP_ENV:-production}
+      # — this bakes the environment name into the static bundle.
+      APP_ENV: production
+    # Always run at least 2 containers — eliminates single points
+    # of failure and distributes traffic across Nginx instances.
+    minContainers: 2
+    verticalAutoscaling:
+      # Reserve free RAM for Nginx worker processes and traffic
+      # spikes. Without minFreeRamGB, the container gets exactly
+      # minRam — hitting the limit causes an OOM restart.
+      minRam: 0.25
+      minFreeRamGB: 0.125

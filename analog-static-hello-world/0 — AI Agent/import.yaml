@@ -1,0 +1,31 @@
+# Analog Hello World — AI Agent environment.
+# Provides a development space for AI agents to build and version the
+# app, plus a staging service to preview production builds.
+project:
+  name: analog-static-hello-world-agent
+
+services:
+  # Dev service — AI agent works here via SSH.
+  # Uses nodejs@22 (not static) so the agent has Node.js available
+  # to run 'npm start' and interact with the source directly.
+  - hostname: appdev
+    type: nodejs@22
+    # zeropsSetup selects which setup from zerops.yaml in the source repo
+    # to use for building and deploying. 'dev' deploys full source +
+    # node_modules so the agent has a ready workspace.
+    zeropsSetup: dev
+    # buildFromGit triggers a build/deploy pipeline: Zerops pulls source
+    # code and zerops.yaml from this public repo automatically.
+    buildFromGit: https://github.com/zerops-recipe-apps/analog-static-hello-world-app
+    # Gives the service a public HTTPS URL on a Zerops subdomain —
+    # lets the agent (and you) verify the dev server from a browser.
+    enableSubdomainAccess: true
+
+  # Staging service — preview production builds before shipping.
+  # Uses the 'prod' setup: Vite compiles Analog into static assets,
+  # Nginx serves them. Build-time env vars are baked into the bundle.
+  - hostname: appstage
+    type: static
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/analog-static-hello-world-app
+    enableSubdomainAccess: true

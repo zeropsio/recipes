@@ -1,0 +1,24 @@
+# Nuxt Hello World — Stage environment.
+# Uses the same prod setup as production — full
+# 'nuxi generate' build with production env vars —
+# on a single container with lower scaling headroom.
+project:
+  name: nuxt-static-hello-world-stage
+
+services:
+  - hostname: app
+    type: static
+    # 'prod' setup: identical pipeline to production,
+    # so stage catches any build-time issues before they
+    # reach live traffic.
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this
+    # public repo to trigger the build/deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/nuxt-static-hello-world-app
+    enableSubdomainAccess: true
+    # Zerops auto-scales RAM within these bounds.
+    # minFreeRamGB reserves headroom for Nginx worker
+    # processes and traffic spikes.
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125

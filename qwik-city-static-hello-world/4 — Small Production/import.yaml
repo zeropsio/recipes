@@ -1,0 +1,33 @@
+# Qwik City Hello World — Small Production environment.
+# Production-ready setup optimized for moderate traffic.
+# Two Nginx containers serve the static site from the project
+# balancer, providing availability during rolling deploys.
+
+project:
+  name: qwik-city-static-hello-world-small-prod
+
+services:
+
+  - hostname: app
+    type: static
+
+    # 'prod' setup: Zerops pulls source, compiles with Node.js in a
+    # temporary build container, deploys compiled assets to Nginx.
+    # The application artifact is stored in internal Zerops storage
+    # and distributed to all runtime containers simultaneously.
+    zeropsSetup: prod
+
+    # Zerops pulls source code and zerops.yaml from this public repo
+    # to trigger the build and deploy pipeline.
+    buildFromGit: https://github.com/zerops-recipe-apps/qwik-city-static-hello-world-app
+
+    enableSubdomainAccess: true
+
+    # Always run at least 2 containers so the project balancer can
+    # route traffic to one while the other restarts during deploy.
+    minContainers: 2
+
+    verticalAutoscaling:
+      minRam: 0.25
+      # Reserve free RAM for Nginx workers and traffic spikes.
+      minFreeRamGB: 0.125
