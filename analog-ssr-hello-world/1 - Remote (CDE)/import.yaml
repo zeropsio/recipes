@@ -1,0 +1,44 @@
+# Analog SSR Hello World — Remote (CDE) environment.
+# Two services: appdev (SSH workspace) and appstage (staging
+# preview). Developers mount appdev via SSHFS or connect with
+# VS Code Remote SSH to work with their local tools against a
+# cloud-hosted Node.js environment.
+project:
+  name: analog-ssr-hello-world-remote
+
+services:
+  # appdev: SSH-accessible development container. Developers
+  # connect via IDE remote extension or zcli SSH — full source
+  # and node_modules are deployed, migrations run automatically.
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      # 0.5 GB minimum — sufficient for running Analog dev server
+      # via SSH. Uncomment and raise to 4 GB if build times are slow
+      # or IDE extensions consume significant memory:
+      # minRam: 4
+      # minFreeRamGB: 2
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # appstage: production-mode container. Developers push builds
+  # here to verify the prod pipeline before shipping.
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL for app data. Priority 10 starts data services
+  # before app containers, preventing connection errors on
+  # first boot when the database is not yet ready.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10

@@ -1,0 +1,28 @@
+# Angular SSR Hello World — Local environment.
+# Runs the app on the developer's machine while connecting to a
+# cloud PostgreSQL database via Zerops VPN. Use 'zcli vpn up' to
+# reach the database by its internal hostname.
+project:
+  name: angular-ssr-hello-world-local
+
+services:
+  # App service runs the prod setup in Zerops for deployment validation.
+  # The developer runs 'ng serve' locally against the same cloud DB,
+  # pointed at it via 'zcli vpn up'.
+  - hostname: app
+    type: nodejs@22
+    # 'prod' setup builds the optimized SSR bundle used for deployment
+    # validation from the developer's local machine via 'zcli push'.
+    zeropsSetup: prod
+    # Zerops pulls source code and zerops.yaml from this public
+    # repo and triggers the build pipeline automatically.
+    buildFromGit: https://github.com/zerops-recipe-apps/angular-ssr-hello-world-app
+    enableSubdomainAccess: true
+
+  # PostgreSQL for application data. Priority 10 starts the database
+  # before the app service, preventing connection errors on boot.
+  - hostname: db
+    type: postgresql@16
+    # NON_HA: single-node database — appropriate for local development.
+    mode: NON_HA
+    priority: 10

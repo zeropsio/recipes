@@ -1,0 +1,28 @@
+# Analog SSR Hello World — Stage environment.
+# Pre-production configuration: same prod build pipeline as
+# production but with reduced scaling settings. Use this to
+# catch integration issues before promoting to production.
+project:
+  name: analog-ssr-hello-world-stage
+
+services:
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.25
+      # Reserve headroom for SSR rendering spikes and V8 GC cycles.
+      minFreeRamGB: 0.125
+
+  # PostgreSQL for app data. Priority 10 starts data services
+  # before app containers, preventing connection errors on
+  # first boot when the database is not yet ready.
+  - hostname: db
+    type: postgresql@18
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
