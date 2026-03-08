@@ -1,0 +1,48 @@
+# Astro SSR Hello World - Highly-available Production Environment
+#
+# A minimal Astro SSR application with a server-rendered health check
+# page that connects to a PostgreSQL database, runs idempotent
+# migrations, and queries live data - demonstrating the full Zerops
+# SSR integration pattern.
+#
+# Enterprise-grade setup: dedicated CPU, HA database, serious core,
+# and generous RAM headroom for sustained SSR workloads.
+
+project:
+  name: astro-ssr-hello-world-ha-prod
+  # corePackage: SERIOUS provisions dedicated infrastructure for this
+  # project's balancer, logging, and metrics pipeline - no shared
+  # resources with other projects on the platform.
+  corePackage: SERIOUS
+
+services:
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    # buildFromGit pulls source code and zerops.yaml from this public
+    # repo and triggers the first build automatically on import.
+    buildFromGit: https://github.com/zerops-recipe-apps/astro-ssr-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      # DEDICATED mode reserves CPU cores exclusively for this service
+      # - eliminates CPU steal from noisy neighbours, critical for
+      # consistent SSR response times under sustained load.
+      cpuMode: DEDICATED
+      minRam: 0.5
+      # Larger free RAM headroom for V8 GC, SSR page rendering, and
+      # connection pool activity across multiple containers.
+      minFreeRamGB: 0.25
+
+  # PostgreSQL for app data. Priority 10 starts the database before
+  # app containers, ensuring connections succeed on first boot.
+  - hostname: db
+    type: postgresql@16
+    # HA mode replicates data across multiple nodes - survives a node
+    # failure without downtime or data loss.
+    mode: HA
+    priority: 10
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5

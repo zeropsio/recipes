@@ -1,0 +1,49 @@
+# Astro SSR Hello World - AI Agent Environment
+#
+# A minimal Astro SSR application with a server-rendered health check
+# page that connects to a PostgreSQL database, runs idempotent
+# migrations, and queries live data - demonstrating the full Zerops
+# SSR integration pattern.
+#
+# Two app services: appdev (dev setup) for the AI agent to build and
+# iterate on, appstage (prod setup) for validating the result.
+
+project:
+  name: astro-ssr-hello-world-agent
+
+services:
+  # Dev service: AI agent builds and iterates here using the dev setup
+  # from zerops.yaml. The dev setup deploys the full source tree and
+  # starts zsc noop, giving the agent an SSH workspace with the
+  # database already migrated.
+  - hostname: appdev
+    type: nodejs@22
+    # zeropsSetup selects which setup block from zerops.yaml to use.
+    zeropsSetup: dev
+    # buildFromGit pulls source code and zerops.yaml from this public
+    # repo and triggers the first build automatically on import.
+    buildFromGit: https://github.com/zerops-recipe-apps/astro-ssr-hello-world-app
+    # enableSubdomainAccess gives the service a public HTTPS URL on a
+    # Zerops subdomain - useful for previewing the running app.
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Staging service: AI agent pushes the prod setup here to verify
+  # the optimized build and readiness check pass before handing off.
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/astro-ssr-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL for app data. Priority 10 starts data services before
+  # app containers, preventing connection errors on first boot.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10

@@ -1,0 +1,42 @@
+# Astro SSR Hello World - Small Production Environment
+#
+# A minimal Astro SSR application with a server-rendered health check
+# page that connects to a PostgreSQL database, runs idempotent
+# migrations, and queries live data - demonstrating the full Zerops
+# SSR integration pattern.
+#
+# Production-ready setup with horizontal redundancy and auto-scaling.
+
+project:
+  name: astro-ssr-hello-world-small-prod
+
+services:
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    # buildFromGit pulls source code and zerops.yaml from this public
+    # repo and triggers the first build automatically on import.
+    buildFromGit: https://github.com/zerops-recipe-apps/astro-ssr-hello-world-app
+    enableSubdomainAccess: true
+    # minContainers: 2 ensures at least two containers are always
+    # running - eliminates single points of failure and enables
+    # zero-downtime deploys (new containers start before old ones
+    # are removed from the project balancer).
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.25
+      # Reserve free RAM for V8 GC cycles and SSR rendering spikes.
+      # Without headroom, memory pressure triggers OOM restarts.
+      minFreeRamGB: 0.125
+
+  # PostgreSQL for app data. Priority 10 starts the database before
+  # app containers, preventing connection errors on cold start.
+  - hostname: db
+    type: postgresql@16
+    # NON_HA = single-node. Suitable for moderate traffic where a
+    # brief DB restart is acceptable. Use HA for zero-downtime needs.
+    mode: NON_HA
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
