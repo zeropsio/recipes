@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(fi)"
+      "Bash(fi)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []
