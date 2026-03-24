@@ -1,0 +1,17 @@
+# zeropsPreprocessor=on
+# Local development environment — developer runs the
+# app on their own machine, connecting to a Zerops-hosted
+# PostgreSQL database via Zerops VPN (zcli vpn up).
+project:
+  name: laravel-hello-world-local
+
+services:
+  # PostgreSQL single-node database.
+  # Access via VPN: set DB_HOST=db.zerops in .env.
+  # NON_HA is sufficient for local dev — full HA
+  # isn't needed when only one person connects.
+  # priority: 10 starts this before app containers.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
