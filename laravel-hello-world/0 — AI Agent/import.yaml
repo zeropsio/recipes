@@ -1,0 +1,58 @@
+# zeropsPreprocessor=on
+# AI agent environment provides a development space
+# for AI agents to build and version the app. It includes
+# a dev service with the code repository and necessary
+# development tools, a staging service, and a low-resource
+# database.
+project:
+  name: laravel-hello-world-agent
+
+services:
+  # Set up the AI agent development environment —
+  # Zerops pulls source from the 'buildFromGit' repo,
+  # using the 'dev' zeropsSetup which deploys full source
+  # with dev tools. SSH in and start developing.
+  - hostname: appdev
+    type: php-nginx@8.4
+    # zeropsSetup selects the 'dev' setup from zerops.yaml
+    # in the buildFromGit repo and triggers the build.
+    zeropsSetup: dev
+    # buildFromGit: Zerops pulls source code and
+    # zerops.yaml from this public repository on the
+    # first deploy. One of several triggers — teams
+    # typically switch to zcli push or git integration.
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-hello-world-app
+    enableSubdomainAccess: true
+    # envSecrets: sensitive values set once at import time,
+    # persisted across deploys. APP_KEY is a 32-byte
+    # base64 secret required by Laravel for encryption.
+    # zeropsPreprocessor generates it automatically.
+    envSecrets:
+      APP_KEY: <@generateRandomString(<32>)>
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Deploy the staging service — Zerops pulls source
+  # from the 'buildFromGit' repo and uses the 'prod'
+  # zeropsSetup to build and deploy. Subdomain access
+  # provides a public HTTPS URL for browser testing.
+  - hostname: appstage
+    type: php-nginx@8.4
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-hello-world-app
+    enableSubdomainAccess: true
+    envSecrets:
+      APP_KEY: <@generateRandomString(<32>)>
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL single-node database for development.
+  # Accessible as 'db' hostname from 'appdev' and
+  # 'appstage' services. NON_HA is suitable for
+  # dev/staging where HA durability isn't required.
+  # priority: 10 starts this before app containers,
+  # preventing connection errors on boot.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
