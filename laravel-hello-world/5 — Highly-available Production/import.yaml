@@ -1,0 +1,40 @@
+# zeropsPreprocessor=on
+# Highly-available production environment — minimum 2
+# app containers behind the Zerops L7 balancer, HA
+# PostgreSQL. Zero-downtime rolling deploys. Suitable
+# for production workloads that require fault tolerance.
+project:
+  name: laravel-hello-world-prod-ha
+
+services:
+  # Production app — minimum 2 containers ensure no
+  # single point of failure. Rolling deploys replace
+  # one container at a time; readinessCheck gates
+  # traffic until the new container is healthy.
+  # zsc execOnce ensures migrations run exactly once
+  # across the parallel init of multiple containers.
+  - hostname: app
+    type: php-nginx@8.4
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-hello-world-app
+    enableSubdomainAccess: true
+    # envSecrets: persisted across deploys.
+    # Replace with your own APP_KEY before going live.
+    envSecrets:
+      APP_KEY: <@generateRandomString(<32>)>
+    verticalAutoscaling:
+      minRam: 0.5
+      maxRam: 4
+      minCpu: 0.5
+      maxCpu: 4
+    minContainers: 2
+    maxContainers: 6
+
+  # PostgreSQL HA — two-node cluster with synchronous
+  # replication. Automatic failover in ~10 s if the
+  # primary fails. Required for production data durability.
+  # priority: 10 starts this before app containers.
+  - hostname: db
+    type: postgresql@16
+    mode: HA
+    priority: 10
