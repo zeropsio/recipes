@@ -1,0 +1,37 @@
+# zeropsPreprocessor=on
+# Small production environment — single-container app
+# with HA PostgreSQL. Suitable for low-to-medium traffic
+# apps that need database durability without full app HA.
+project:
+  name: laravel-hello-world-prod-small
+
+services:
+  # Production app — single container. Autoscaling
+  # handles traffic spikes up to 4 vCPU / 4 GB RAM
+  # without config changes. Scale minContainers up
+  # for zero-downtime rolling deploys.
+  - hostname: app
+    type: php-nginx@8.4
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-hello-world-app
+    enableSubdomainAccess: true
+    # envSecrets: persisted across deploys.
+    # Replace with your own APP_KEY before going live.
+    envSecrets:
+      APP_KEY: <@generateRandomString(<32>)>
+    verticalAutoscaling:
+      minRam: 0.5
+      maxRam: 4
+      minCpu: 0.5
+      maxCpu: 4
+    minContainers: 1
+    maxContainers: 1
+
+  # PostgreSQL HA — two-node cluster with synchronous
+  # replication. Automatic failover in ~10 s if the
+  # primary fails. Required for production data durability.
+  # priority: 10 starts this before the app.
+  - hostname: db
+    type: postgresql@16
+    mode: HA
+    priority: 10
