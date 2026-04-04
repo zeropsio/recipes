@@ -1,0 +1,34 @@
+#zeropsPreprocessor=on
+
+# Highly-available production — HA database with automatic
+# failover, multi-container app with horizontal autoscaling.
+# SERIOUS core package enables HA features and dedicated support.
+project:
+  name: laravel-minimal-ha
+  corePackage: SERIOUS
+  # APP_KEY at project level — all app containers share the same
+  # encryption key so sessions and cookies work across instances.
+  envVariables:
+    APP_KEY: base64:<@generateRandomString(<32>)>
+
+services:
+  # PostgreSQL HA — three-node cluster with automatic failover.
+  # Zerops handles replication and promotion transparently.
+  # Higher priority ensures DB is healthy before app starts.
+  - hostname: db
+    type: postgresql@16
+    mode: HA
+    priority: 10
+
+  # Production runtime — minContainers: 2 ensures at least two
+  # instances are always running for redundancy. maxContainers: 4
+  # allows horizontal autoscaling under load. Readiness and health
+  # checks ensure traffic only reaches healthy containers.
+  - hostname: app
+    type: php-nginx@8.4
+    priority: 5
+    minContainers: 2
+    maxContainers: 4
+    enableSubdomainAccess: true
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zeropsio/recipe-laravel-minimal
