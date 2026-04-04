@@ -1,0 +1,30 @@
+#zeropsPreprocessor=on
+
+# AI Agent environment — a single dev container with full source
+# for AI-driven iteration. The agent SSHs in, edits code, and
+# sees changes immediately thanks to PHP's per-request interpretation.
+project:
+  name: laravel-minimal-ai
+  # APP_KEY is project-level so all services sharing the database
+  # can decrypt each other's data — critical for sessions and cookies.
+  envVariables:
+    APP_KEY: base64:<@generateRandomString(<32>)>
+
+services:
+  # PostgreSQL — starts first (priority 10) so the database is
+  # accepting connections before the app container runs migrations.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
+
+  # Dev runtime — buildFromGit triggers the initial deploy
+  # automatically. The AI agent can then SSH in and edit code
+  # directly — PHP interprets per-request, no restart needed.
+  - hostname: app
+    type: php-nginx@8.4
+    priority: 5
+    enableSubdomainAccess: true
+    maxContainers: 1
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zeropsio/recipe-laravel-minimal
