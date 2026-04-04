@@ -1,0 +1,43 @@
+#zeropsPreprocessor=on
+# Laravel minimal recipe — creates a project with PHP-Nginx,
+# PostgreSQL, and database-backed sessions/cache.
+
+project:
+  # Unique project name in Zerops
+  name: laravel-minimal-ai
+
+  # Preprocessor generates a random
+  # 32-char string, base64-encoded,
+  # used as the Laravel APP_KEY.
+  envVariables:
+    APP_KEY: "base64:<@generateRandomString(<32>)>"
+
+services:
+  # Provisions first (priority 10)
+  # so the app can run migrations
+  # on its first deploy.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
+
+  # Uses the "dev" zeropsSetup from
+  # zerops.yml in the repository.
+  # Builds from the recipe Git repo.
+  - hostname: appdev
+    type: php-nginx@8.4
+    priority: 5
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-minimal-app
+    zeropsSetup: dev
+    enableSubdomainAccess: true
+
+  # Uses the "prod" zeropsSetup from
+  # zerops.yml in the repository.
+  # Same source repo, different build
+  # configuration for production use.
+  - hostname: appstage
+    type: php-nginx@8.4
+    priority: 5
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-minimal-app
+    zeropsSetup: prod
+    enableSubdomainAccess: true
