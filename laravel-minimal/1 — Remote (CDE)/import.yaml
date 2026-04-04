@@ -1,0 +1,30 @@
+#zeropsPreprocessor=on
+
+# Remote development (CDE) — a cloud dev environment accessed
+# via SSH or VS Code Remote. Full source deployed with dev
+# dependencies so debugging and testing tools are available.
+project:
+  name: laravel-minimal-remote
+  # Shared APP_KEY at project level — ensures encryption
+  # consistency if you later add a stage service.
+  envVariables:
+    APP_KEY: base64:<@generateRandomString(<32>)>
+
+services:
+  # PostgreSQL — NON_HA is fine for development, keeps costs low
+  # while providing a real database for migration testing.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
+
+  # Dev runtime — PHP-FPM interprets per-request, so edits
+  # over SSH take effect immediately without rebuilds.
+  # maxContainers: 1 prevents accidental scaling during dev.
+  - hostname: app
+    type: php-nginx@8.4
+    priority: 5
+    enableSubdomainAccess: true
+    maxContainers: 1
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zeropsio/recipe-laravel-minimal
