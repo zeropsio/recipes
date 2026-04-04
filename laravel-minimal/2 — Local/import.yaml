@@ -1,0 +1,27 @@
+#zeropsPreprocessor=on
+# Local development — single prod service for running
+# alongside a local dev environment.
+project:
+  name: laravel-minimal-local
+  tags:
+    - zerops-recipe
+  envVariables:
+    # Shared encryption key — generated once at import.
+    APP_KEY: "base64:<@generateRandomString(<32>)>"
+
+services:
+  # PostgreSQL starts first — app depends on it for
+  # migrations during initCommands.
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
+
+  # Single app service with production config — local dev
+  # connects via zcli VPN tunnel.
+  - hostname: app
+    type: php-nginx@8.4
+    priority: 5
+    enableSubdomainAccess: true
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-minimal-app
+    zeropsSetup: prod
