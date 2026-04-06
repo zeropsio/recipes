@@ -4,8 +4,6 @@
 # enhanced scaling, dedicated resources, and HA components for improved
 # durability and performance.
 
-#zeropsPreprocessor=on
-
 # APP_KEY is Laravel's AES-256-CBC encryption key — must be identical across
 # all app containers for session validity behind the L7 balancer at HA scale.
 # corePackage: SERIOUS moves the project balancer, logging, and metrics onto

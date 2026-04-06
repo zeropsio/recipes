@@ -6,8 +6,6 @@
 # It includes a dev service with the code repository and necessary development
 # tools, a staging service, and a low-resource database.
 
-#zeropsPreprocessor=on
-
 # APP_KEY is Laravel's AES-256-CBC encryption key. Project-level so both appdev
 # and appstage containers can decrypt the same session and cache data stored in
 # the shared database.

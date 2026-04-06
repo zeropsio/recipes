@@ -3,8 +3,6 @@
 # Stage environment uses the same configuration as production, but runs on a
 # single container with lower scaling settings.
 
-#zeropsPreprocessor=on
-
 # APP_KEY is Laravel's AES-256-CBC encryption key. Project-level so the app
 # container can decrypt session cookies and encrypted database columns written
 # by any previous deploy.

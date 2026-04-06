@@ -5,8 +5,6 @@
 # It includes a dev service with the code repository and necessary development
 # tools, a staging service, and a low-resource database.
 
-#zeropsPreprocessor=on
-
 # APP_KEY is Laravel's AES-256-CBC encryption key (32 random bytes).
 # Project-level so session cookies and encrypted database columns remain valid
 # when the L7 balancer routes requests to any app container in the project.
