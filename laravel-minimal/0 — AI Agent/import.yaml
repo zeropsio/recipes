@@ -1,4 +1,4 @@
-#zeropsPreprocessor
+#zeropsPreprocessor=on
 
 # AI agent environment provides a development space for AI agents to build and
 # version the app.
