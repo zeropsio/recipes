@@ -1,0 +1,36 @@
+# Local environment supports local app development using zCLI VPN for database
+# access, while ensuring valid deployment processes using a staged app in
+# Zerops.
+
+#zeropsPreprocessor=on
+
+# APP_KEY is Laravel's AES-256-CBC encryption key (32 random bytes). Shared
+# across all containers so encrypted values and sessions remain valid.
+project:
+  name: laravel-minimal-local
+  envVariables:
+    APP_KEY: <@generateRandomString(<32>)>
+
+services:
+  # Local-env validator — develop on your machine with zcli vpn connecting to
+  # this Zerops-hosted Postgres, then push with zcli to verify the production
+  # build (composer install --no-dev, Vite compilation, config:cache) deploys
+  # cleanly before tagging a release.
+  - hostname: app
+    type: php-nginx@8.4
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-minimal-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Managed PostgreSQL reachable from your laptop via zcli VPN. Hosts schema,
+  # sessions, and cache for the minimal Laravel setup. Priority 10 ensures it
+  # starts before the app service.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+

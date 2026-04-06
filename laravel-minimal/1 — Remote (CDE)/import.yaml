@@ -1,0 +1,50 @@
+# Remote (CDE) environment allows developers to build the app **within Zerops**
+# via SSH, supporting the full development lifecycle without local tool
+# installation.
+# It includes a dev service with the code repository and necessary development
+# tools, a staging service, and a low-resource database.
+
+#zeropsPreprocessor=on
+
+# APP_KEY is Laravel's AES-256-CBC encryption key. Project-level so both appdev
+# and appstage containers can decrypt the same session and cache data stored in
+# the shared database.
+project:
+  name: laravel-minimal-remote
+  envVariables:
+    APP_KEY: <@generateRandomString(<32>)>
+
+services:
+  # Remote development workspace — SSH or IDE-SSHFS into the container and
+  # edit source live. zeropsSetup:dev runs a full Composer install so pint,
+  # phpunit, and pail are available on the container. PHP interprets each
+  # request — no restart cycle between edits.
+  - hostname: appdev
+    type: php-nginx@8.4
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-minimal-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Staging for remote developers — zeropsSetup:prod mirrors the production
+  # pipeline (optimized autoloader, Vite build, framework cache warming) so you
+  # can validate deploys before merging to main.
+  - hostname: appstage
+    type: php-nginx@8.4
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-minimal-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL — handles schema, sessions, cache, and queue for the minimal
+  # Laravel tier. NON_HA because remote dev environments are disposable and
+  # easily recreated.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
