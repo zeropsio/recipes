@@ -1,0 +1,51 @@
+# AI agent environment provides a development space for AI agents to build and
+# version the app.
+# It includes a dev service with the code repository and necessary development
+# tools, a staging service, and a low-resource database.
+
+#zeropsPreprocessor=on
+
+# APP_KEY is Laravel's AES-256-CBC encryption key (32 random bytes).
+# Project-level so session cookies and encrypted database columns remain valid
+# when the L7 balancer routes requests to any app container in the project.
+project:
+  name: laravel-minimal-agent
+  envVariables:
+    APP_KEY: <@generateRandomString(<32>)>
+
+services:
+  # AI agent workspace — zeropsSetup:dev deploys the full source tree so the
+  # agent can SSH in and edit PHP files over SSHFS. PHP-FPM reinterprets each
+  # request, no restart needed. Subdomain gives the agent a URL to verify output
+  # against.
+  - hostname: appdev
+    type: php-nginx@8.4
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-minimal-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Staging slot for AI agents — zeropsSetup:prod validates the production
+  # build pipeline (composer install --no-dev, Vite asset compilation,
+  # config:cache + route:cache + view:cache in initCommands) before the agent
+  # marks the task complete.
+  - hostname: appstage
+    type: php-nginx@8.4
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-minimal-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL backing store for schema, sessions, cache, and queued jobs —
+  # all Laravel drivers default to 'database' in the minimal tier. Shared by
+  # appdev and appstage. NON_HA is fine for agent workspaces; priority 10
+  # ensures db is ready before the app containers start.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
