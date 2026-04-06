@@ -4,8 +4,6 @@
 # access, while ensuring valid deployment processes using a staged app in
 # Zerops.
 
-#zeropsPreprocessor=on
-
 # APP_KEY is Laravel's AES-256-CBC encryption key (32 random bytes). Shared
 # across all containers so encrypted values and sessions remain valid.
 project:

@@ -3,8 +3,6 @@
 # Small production environment offers a production-ready setup optimized for
 # moderate throughput.
 
-#zeropsPreprocessor=on
-
 # APP_KEY is Laravel's AES-256-CBC encryption key — critical in production
 # because session cookies break if containers disagree on the key. Project-level
 # ensures every container in the project shares the same value.
