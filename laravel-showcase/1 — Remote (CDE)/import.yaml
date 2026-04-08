@@ -1,0 +1,93 @@
+#zeropsPreprocessor=on
+
+# Remote (CDE) environment allows developers to build the app **within Zerops**
+# via SSH, supporting the full development lifecycle without local tool
+# installation.
+# It includes a dev service with the code repository and necessary development
+# tools, a staging service, a low-resource database, a cache store, an object
+# storage, and a search engine.
+
+# APP_KEY — Laravel encryption key shared across all containers. Project-level
+# ensures session cookies remain valid regardless of which container behind the
+# L7 balancer handles the request.
+project:
+  name: laravel-showcase-remote
+  envVariables:
+    APP_KEY: <@generateRandomString(<32>)>
+
+services:
+  # Remote development workspace — SSH or mount via IDE-SSHFS and edit source
+  # live. zeropsSetup:dev installs the full Composer dependency set including
+  # dev tools (phpunit, pint, pail). PHP-FPM serves each request from disk, so
+  # edits take effect immediately without restart. prepareCommands installs Node
+  # so the developer can run Vite HMR (npm run dev) over SSH.
+  - hostname: appdev
+    type: php-nginx@8.4
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Staging for remote developers — zeropsSetup:prod mirrors the production
+  # build: no-dev Composer, Vite compilation, config/route/view caching. Lets
+  # the developer validate the full deploy pipeline before pushing to CI or
+  # tagging a release.
+  - hostname: appstage
+    type: php-nginx@8.4
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Queue worker for the remote dev environment — processes background jobs
+  # dispatched by the app. Same codebase as the app, different entry point
+  # (artisan queue:work). No dev variant needed — the developer runs the
+  # worker process from appdev during iteration.
+  - hostname: workerstage
+    type: php-nginx@8.4
+    zeropsSetup: worker
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL — shared persistence for articles, migrations, and the jobs
+  # table. NON_HA appropriate for a development environment where data is
+  # replaceable.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Valkey — serves as the cache, session, and queue backend. Replaces three
+  # database-backed drivers with a single in-memory store, reducing P95 latency
+  # on session reads and cache lookups.
+  - hostname: redis
+    type: valkey@7.2
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # S3-compatible object storage — the developer can test file upload flows
+  # (Flysystem S3 adapter) against a real MinIO-backed bucket without needing a
+  # local MinIO install.
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Meilisearch — indexes Article models via Laravel Scout. The developer can
+  # test search queries against a real engine with typo tolerance and ranking,
+  # not a database LIKE fallback.
+  - hostname: search
+    type: meilisearch@1.20
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+

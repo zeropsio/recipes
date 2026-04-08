@@ -1,0 +1,97 @@
+#zeropsPreprocessor=on
+
+# AI agent environment provides a development space for AI agents to build and
+# version the app.
+# It includes a dev service with the code repository and necessary development
+# tools, a staging service, a low-resource database, a cache store, an object
+# storage, and a search engine.
+
+# APP_KEY is Laravel's AES-256-CBC encryption key — 32 random bytes generated
+# by the preprocessor. Project-level so every container (app + worker) shares
+# the same key, which is required for reading encrypted columns and validating
+# session cookies written by any container behind the L7 balancer.
+project:
+  name: laravel-showcase-agent
+  envVariables:
+    APP_KEY: <@generateRandomString(<32>)>
+
+services:
+  # AI agent workspace — zeropsSetup:dev runs composer install (full dev deps)
+  # and deploys the entire source tree. PHP-FPM reinterprets on every request so
+  # the agent can edit files over SSHFS and see results instantly via the
+  # subdomain URL. maxContainers:1 prevents file conflicts when editing over a
+  # single mount point.
+  - hostname: appdev
+    type: php-nginx@8.4
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Staging slot for the agent — zeropsSetup:prod runs composer install
+  # --no-dev, compiles Vite assets, and warms config/route/view caches. The
+  # agent cross-deploys here to validate the production build pipeline before
+  # finishing the task. readinessCheck gates traffic until the health endpoint
+  # responds.
+  - hostname: appstage
+    type: php-nginx@8.4
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Background queue worker — zeropsSetup:worker runs composer install
+  # --no-dev and starts artisan queue:work as the foreground process. Consumes
+  # jobs dispatched by the app via Redis. No HTTP traffic, no healthCheck —
+  # the process itself is the liveness signal.
+  - hostname: workerstage
+    type: php-nginx@8.4
+    zeropsSetup: worker
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL — stores articles, sessions table (used by the database session
+  # driver on first deploy before Redis takes over), and job/failed_job tables.
+  # Shared by appdev, appstage, and workerstage. NON_HA is fine for an agent
+  # workspace. Priority 10 ensures the database accepts connections before app
+  # containers run migrations.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Valkey (Redis-compatible) — handles cache, sessions, and queue in the
+  # showcase tier. A single service replaces three separate database-backed
+  # drivers, reducing latency for all three concerns. The predis PHP client
+  # connects without a compiled C extension.
+  - hostname: redis
+    type: valkey@7.2
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # S3-compatible object storage (MinIO backend) — the app uses Flysystem's S3
+  # adapter with path-style endpoints for file uploads. Private policy keeps
+  # uploaded files accessible only through the app.
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Meilisearch full-text search — Laravel Scout indexes Article models here.
+  # The app queries it from the dashboard's live search feature. Internal HTTP
+  # between services, no SSL.
+  - hostname: search
+    type: meilisearch@1.20
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+

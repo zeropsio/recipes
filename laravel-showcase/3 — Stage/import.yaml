@@ -1,0 +1,75 @@
+#zeropsPreprocessor=on
+
+# Stage environment uses the same configuration as production, but runs on a
+# single container with lower scaling settings.
+
+# APP_KEY — encryption key shared across app and worker. Generated once at
+# import and fixed thereafter.
+project:
+  name: laravel-showcase-stage
+  envVariables:
+    APP_KEY: <@generateRandomString(<32>)>
+
+services:
+  # Staging — mirrors production configuration (composer install --no-dev,
+  # Vite asset compilation, config/route/view caching) on a single container
+  # with moderate scaling. Public subdomain for QA review and stakeholder demos.
+  # readinessCheck ensures the L7 balancer only routes traffic after the health
+  # endpoint responds.
+  - hostname: app
+    type: php-nginx@8.4
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Queue worker — validates background job processing with production-grade
+  # configuration. Single container sufficient for staging workloads.
+  - hostname: worker
+    type: php-nginx@8.4
+    zeropsSetup: worker
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL — single-node staging database. Runs migrations and seeds on
+  # deploy. Data is replaceable, so NON_HA is appropriate.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
+  # Valkey — handles cache, sessions, and queue. Single-node for staging;
+  # validates that all three Redis-backed drivers work correctly with production
+  # config.
+  - hostname: redis
+    type: valkey@7.2
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
+  # S3-compatible object storage — staging bucket for file upload testing.
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Meilisearch — staging search index. initCommands runs scout:import after
+  # seeding to populate the index.
+  - hostname: search
+    type: meilisearch@1.20
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
