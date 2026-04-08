@@ -1,0 +1,74 @@
+#zeropsPreprocessor=on
+
+# Local environment supports local app development using zCLI VPN for database
+# access, while ensuring valid deployment processes using a staged app in
+# Zerops.
+
+# APP_KEY — 32-byte AES-256-CBC encryption key shared across app and worker
+# containers.
+project:
+  name: laravel-showcase-local
+  envVariables:
+    APP_KEY: <@generateRandomString(<32>)>
+
+services:
+  # Local-development validator — develop on localhost with zcli vpn
+  # connecting to the Zerops-hosted services (Postgres, Redis, Meilisearch, S3).
+  # Push with zcli to this container to verify the production build (no-dev
+  # Composer, Vite assets, cache warming) deploys cleanly before tagging a
+  # release. enableSubdomainAccess provides a public URL for smoke testing.
+  - hostname: app
+    type: php-nginx@8.4
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Queue worker — processes background jobs dispatched by the app. Validates
+  # that the queue pipeline (Redis driver + artisan queue:work) functions
+  # correctly with the production build before release.
+  - hostname: worker
+    type: php-nginx@8.4
+    zeropsSetup: worker
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL — reachable from the developer's laptop via zcli VPN. Runs
+  # migrations and seeds on deploy. Priority 10 ensures it accepts connections
+  # before app containers start.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Valkey — cache, session, and queue backend. Reachable via zcli VPN for
+  # local development, so the developer's localhost app connects to the same
+  # Redis instance the deployed validator uses.
+  - hostname: redis
+    type: valkey@7.2
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # S3-compatible object storage — MinIO-backed bucket for file upload
+  # testing. path-style endpoints required (virtual-hosted style not supported).
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Meilisearch — full-text search engine reachable via zcli VPN. The local
+  # app can query it directly during development.
+  - hostname: search
+    type: meilisearch@1.20
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
