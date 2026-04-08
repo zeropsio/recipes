@@ -1,0 +1,79 @@
+#zeropsPreprocessor=on
+
+# Small production environment offers a production-ready setup optimized for
+# moderate throughput.
+
+# APP_KEY — production encryption key shared across all app and worker
+# containers. Critical for session validity when the L7 balancer distributes
+# requests across multiple containers.
+project:
+  name: laravel-showcase-small-prod
+  envVariables:
+    APP_KEY: <@generateRandomString(<32>)>
+
+services:
+  # Small production — minContainers: 2 guarantees two app containers at all
+  # times, enabling rolling deploys with zero downtime (one container serves
+  # traffic while the other rebuilds). Zerops autoscales RAM within
+  # verticalAutoscaling bounds to absorb traffic spikes without manual
+  # intervention.
+  - hostname: app
+    type: php-nginx@8.4
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Production queue worker — processes background jobs with --tries=3 retry
+  # policy. Single container sufficient for moderate job volumes; scale
+  # minContainers if queue depth grows.
+  - hostname: worker
+    type: php-nginx@8.4
+    zeropsSetup: worker
+    buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL — production database with NON_HA. Adequate for small
+  # production workloads; automated backups provide data safety.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
+  # Valkey — production cache, session, and queue backend. In-memory latency
+  # keeps session reads and cache lookups fast under production load.
+  - hostname: redis
+    type: valkey@7.2
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
+  # S3-compatible object storage — production file storage with private access
+  # policy.
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Meilisearch — production search index. scout:import in initCommands
+  # ensures the index stays populated after every deploy.
+  - hostname: search
+    type: meilisearch@1.20
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
