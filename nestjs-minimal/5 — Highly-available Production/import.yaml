@@ -1,0 +1,41 @@
+# Highly-available production environment provides a production setup with
+# enhanced scaling, dedicated resources, and HA components for improved
+# durability and performance.
+
+# corePackage: SERIOUS moves the project's L7 balancer, logging pipeline, and
+# metrics onto dedicated infrastructure — eliminates shared-tenant overhead
+# for consistent request latency at production throughput. No shared secrets
+# needed for NestJS minimal.
+project:
+  name: nestjs-minimal-ha-prod
+  corePackage: SERIOUS
+
+services:
+  # HA production — cpuMode: DEDICATED pins CPU cores exclusively to this
+  # service so shared-tenant workloads cannot introduce latency jitter under
+  # sustained load. minContainers: 2 with autoscaling handles capacity; the
+  # readinessCheck prevents traffic reaching containers that are still running
+  # TypeORM migrations.
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-minimal-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL HA — replicates data across three nodes so a single-node
+  # failure causes no data loss or downtime. Dedicated CPU ensures database
+  # operations run on pinned cores without co-tenant interference.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: HA
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5
+

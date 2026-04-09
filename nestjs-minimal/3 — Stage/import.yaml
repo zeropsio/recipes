@@ -1,0 +1,32 @@
+# Stage environment uses the same configuration as production, but runs on a
+# single container with lower scaling settings.
+
+# No project-level secrets for the minimal tier.
+project:
+  name: nestjs-minimal-stage
+
+services:
+  # Staging — mirrors production configuration (npm ci + nest build + npm
+  # prune --omit=dev) but runs on a single container with lower vertical
+  # scaling. Public subdomain for QA review. Git integration or zcli push from
+  # CI triggers deploys; readinessCheck gates traffic until the health endpoint
+  # responds.
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-minimal-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL single-node — staging data is disposable and easily re-seeded.
+  # NON_HA keeps costs low while matching the production schema and driver.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
