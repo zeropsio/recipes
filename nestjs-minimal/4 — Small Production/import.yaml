@@ -1,0 +1,35 @@
+# Small production environment offers a production-ready setup optimized for
+# moderate throughput.
+
+# No project-level secrets — NestJS minimal has no encryption or session
+# signing that requires a shared key across containers.
+project:
+  name: nestjs-minimal-small-prod
+
+services:
+  # Small production — minContainers: 2 keeps at least two app containers
+  # running at all times, spreading load across nodes and maintaining
+  # availability during rolling deploys when Zerops replaces containers one at a
+  # time. Vertical autoscaling adjusts RAM within bounds; minFreeRamGB leaves
+  # headroom for V8 GC spikes.
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-minimal-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL single-node — sufficient for small production workloads. The
+  # database auto-scales disk (never shrinks) and RAM within vertical bounds.
+  # For higher durability with automatic failover, deploy with HA mode.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
