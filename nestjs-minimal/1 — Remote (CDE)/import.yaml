@@ -1,0 +1,45 @@
+# Remote (CDE) environment allows developers to build the app **within Zerops**
+# via SSH, supporting the full development lifecycle without local tool
+# installation.
+# It includes a dev service with the code repository and necessary development
+# tools, a staging service, and a low-resource database.
+
+# No project-level secrets — database credentials flow through cross-service
+# references, not shared env vars.
+project:
+  name: nestjs-minimal-remote
+
+services:
+  # Remote development workspace — SSH or VS Code Remote into the container
+  # and edit NestJS source live. zeropsSetup:dev runs `npm install` (including
+  # devDependencies like TypeScript, ts-node, and @nestjs/cli) so the full
+  # NestJS toolchain is available on the container for hot-reload development.
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-minimal-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Staging for remote developers — zeropsSetup:prod mirrors the CI build
+  # pipeline (npm ci + nest build + prune) so you can validate that compiled
+  # output and production dependencies deploy correctly before merging.
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-minimal-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL — same schema as the agent workspace. Shared by appdev and
+  # appstage. NON_HA because remote dev databases are replaceable and easily
+  # re-seeded via initCommands.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+

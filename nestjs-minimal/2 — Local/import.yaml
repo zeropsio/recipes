@@ -1,0 +1,31 @@
+# Local environment supports local app development using zCLI VPN for database
+# access, while ensuring valid deployment processes using a staged app in
+# Zerops.
+
+# No project-level secrets needed for the minimal tier.
+project:
+  name: nestjs-minimal-local
+
+services:
+  # Local-development validator — develop on your machine with `zcli vpn up`
+  # to reach the Zerops-hosted PostgreSQL, then push with `zcli push` to this
+  # container to verify the production build (TypeScript compilation, dependency
+  # pruning) deploys cleanly before tagging a release.
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-minimal-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Managed PostgreSQL reachable from your laptop via zcli VPN — run
+  # migrations and seed data locally while the database lives on Zerops
+  # infrastructure. Priority 10 so db starts before the app container.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
