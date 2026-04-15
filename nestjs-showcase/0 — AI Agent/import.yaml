@@ -1,0 +1,140 @@
+#zeropsPreprocessor=on
+
+# AI agent environment provides a development space for AI agents to build and
+# version the app.
+# It includes a app dev service with the code repository and necessary
+# development tools, a app staging service, a api dev service with the code
+# repository and necessary development tools, a api staging service, a
+# low-resource database, a cache store, a messaging service, an object storage,
+# and a search engine.
+
+# AI agent workspace — the agent SSHs into dev containers, builds, and
+# verifies via public subdomain URLs before cross-deploying to stage.
+project:
+  name: nestjs-showcase-agent
+  envVariables:
+    # APP_SECRET shared across every container behind the L7 balancer —
+    # signed tokens and session cookies must verify everywhere, or
+    # users see random 401s the moment a deploy rolls.
+    APP_SECRET: <@generateRandomString(<32>)>
+    DEV_API_URL: https://apidev-${zeropsSubdomainHost}-3000.prg1.zerops.app
+    DEV_APP_URL: https://appdev-${zeropsSubdomainHost}-5173.prg1.zerops.app
+    STAGE_API_URL: https://apistage-${zeropsSubdomainHost}-3000.prg1.zerops.app
+    STAGE_APP_URL: https://appstage-${zeropsSubdomainHost}.prg1.zerops.app
+
+services:
+  # Svelte SPA dev container — the agent runs Vite's dev server here because
+  # static Nginx has no shell or Node runtime. startWithoutCode means the
+  # container is RUNNING before any deploy, so the agent can SSH in immediately.
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 1
+
+  # Static Nginx serving the production-built Svelte bundle. Cross-deployed from
+  # appdev using setup: prod, which compiles the SPA and strips the dist/
+  # wrapper via the tilde suffix so index.html lands at the Nginx docroot.
+  - hostname: appstage
+    type: static
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # NestJS API dev container — the agent iterates here via SSH, running
+  # ts-node directly against source. initCommands handle migrations and seeding
+  # with execOnce so a mid-build restart doesn't re-run them.
+  - hostname: apidev
+    type: nodejs@22
+    priority: 5
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 1
+
+  # Production NestJS API — cross-deployed from apidev using setup: prod. The
+  # readinessCheck gates L7 balancer traffic until TypeORM connections are
+  # established and migrations are complete.
+  - hostname: apistage
+    type: nodejs@22
+    priority: 5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # NestJS NATS worker dev container — the agent starts the microservice
+  # manually via SSH because there is no HTTP port to probe. Shares the database
+  # with apidev but never runs its own migrations.
+  - hostname: workerdev
+    type: nodejs@22
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
+    verticalAutoscaling:
+      minRam: 1
+
+  # Production worker — cross-deployed from workerdev using setup: prod.
+  # Connects to NATS and consumes job messages. No HTTP port means no
+  # readinessCheck; Zerops monitors the process exit code instead.
+  - hostname: workerstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL primary database — shared by both the API and worker services.
+  # Migrations are owned exclusively by the API's initCommands to prevent schema
+  # drift between codebases.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Valkey cache — used by the API for response caching and TTL-based
+  # key-value demos. Requires no authentication on Zerops, so connecting with a
+  # password field causes NOAUTH errors.
+  - hostname: redis
+    type: valkey@7.2
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # NATS message broker — the API publishes job payloads and the worker
+  # subscribes. Credentials must be passed as separate connection options
+  # because URL-embedded creds are silently ignored by nats.js.
+  - hostname: queue
+    type: nats@2.12
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # S3-compatible object storage (MinIO backend) — used for file upload demos.
+  # forcePathStyle is mandatory because MinIO doesn't support virtual-hosted
+  # bucket addressing.
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Meilisearch full-text search — indexed from seeded items at deploy time.
+  # The API uses masterKey for admin operations; defaultSearchKey is read-only
+  # and would return 403 on index writes.
+  - hostname: search
+    type: meilisearch@1.20
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
