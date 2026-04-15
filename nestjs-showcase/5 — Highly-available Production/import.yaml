@@ -1,0 +1,120 @@
+#zeropsPreprocessor=on
+
+# Highly-available production environment provides a production setup with
+# enhanced scaling, dedicated resources, and HA components for improved
+# durability and performance.
+
+# HA production — DEDICATED CPU mode with corePackage: SERIOUS for guaranteed
+# compute allocation. mode: HA on managed services provides automatic failover
+# without operator intervention.
+project:
+  name: nestjs-showcase-ha-prod
+  corePackage: SERIOUS
+  envVariables:
+    # APP_SECRET shared across every container behind the L7 balancer —
+    # signed tokens and session cookies must verify everywhere, or
+    # users see random 401s the moment a deploy rolls.
+    APP_SECRET: <@generateRandomString(<32>)>
+    STAGE_API_URL: https://api-${zeropsSubdomainHost}-3000.prg1.zerops.app
+    STAGE_APP_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
+
+services:
+  # Static Nginx with minContainers: 2 and DEDICATED CPU — guaranteed compute
+  # prevents noisy-neighbor latency spikes on the L7 balancer's TLS termination
+  # path. corePackage: SERIOUS reserves a minimum resource allocation.
+  - hostname: app
+    type: static
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Production NestJS API with DEDICATED CPU and minContainers: 2 — guaranteed
+  # compute prevents request latency variance caused by shared-CPU scheduling.
+  # The healthCheck catches process hangs that would otherwise serve errors
+  # until manual restart.
+  - hostname: api
+    type: nodejs@22
+    priority: 5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Production worker with DEDICATED CPU and minContainers: 2 — NATS queue
+  # group prevents duplicate processing. Graceful SIGTERM handling drains
+  # in-flight jobs before the container exits during rolling deploys.
+  - hostname: worker
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
+    minContainers: 2
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # PostgreSQL in HA mode — three-node replication with automatic failover.
+  # The API's connection string resolves to the current primary; failover is
+  # transparent to the application layer.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: HA
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5
+
+  # Valkey in HA mode — three-node replication ensures cache availability
+  # survives a single-node failure. Session data stored here persists across
+  # failovers without application-level retry.
+  - hostname: redis
+    type: valkey@7.2
+    priority: 10
+    mode: HA
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5
+
+  # NATS in HA mode — three-node cluster with built-in leader election.
+  # JetStream provides at-least-once delivery guarantees that survive broker
+  # failover.
+  - hostname: queue
+    type: nats@2.12
+    priority: 10
+    mode: HA
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5
+
+  # S3-compatible object storage — HA is the default mode for object storage.
+  # Files are replicated across the storage cluster automatically.
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Meilisearch in HA mode — search index replication ensures query
+  # availability during node maintenance. Index rebuilds from the database
+  # provide a recovery path if replication state diverges.
+  - hostname: search
+    type: meilisearch@1.20
+    priority: 10
+    mode: HA
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5
+

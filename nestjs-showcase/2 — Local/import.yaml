@@ -1,0 +1,99 @@
+#zeropsPreprocessor=on
+
+# Local environment supports local app development using zCLI VPN for database
+# access, while ensuring valid deployment processes using a staged app in
+# Zerops.
+
+# Local development setup — the developer runs the app locally while Zerops
+# hosts the managed services. zcli vpn tunnels local traffic to the Zerops
+# project network.
+project:
+  name: nestjs-showcase-local
+  envVariables:
+    # APP_SECRET shared across every container behind the L7 balancer —
+    # signed tokens and session cookies must verify everywhere, or
+    # users see random 401s the moment a deploy rolls.
+    APP_SECRET: <@generateRandomString(<32>)>
+    STAGE_API_URL: https://api-${zeropsSubdomainHost}-3000.prg1.zerops.app
+    STAGE_APP_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
+
+services:
+  # Static Nginx serving the Svelte SPA. In this env, the developer typically
+  # runs Vite locally and only deploys to this service for integration testing
+  # against the full managed-service stack.
+  - hostname: app
+    type: static
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Production NestJS API — builds TypeScript and serves from dist/. Connected
+  # to all managed services via cross-service env var references that resolve at
+  # container start.
+  - hostname: api
+    type: nodejs@22
+    priority: 5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Production NestJS worker consuming NATS jobs. Shares the database with the
+  # API — entity files must stay in sync across both codebases to prevent
+  # QueryFailedError at runtime.
+  - hostname: worker
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL database — accessible from the developer's local machine via
+  # zcli vpn. The API's initCommands handle migrations so the developer doesn't
+  # need to run them manually.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Valkey cache — no authentication. Local apps connect through the VPN
+  # tunnel using the service hostname and port.
+  - hostname: redis
+    type: valkey@7.2
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # NATS message broker — local worker processes can subscribe through the VPN
+  # tunnel, but credentials must be passed as separate options (not
+  # URL-embedded) because nats.js silently ignores URL creds.
+  - hostname: queue
+    type: nats@2.12
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # S3-compatible object storage — local apps must set forcePathStyle: true
+  # because the MinIO backend doesn't support virtual-hosted bucket URLs.
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Meilisearch search engine — the masterKey is required for index management
+  # operations; the defaultSearchKey only permits read queries.
+  - hostname: search
+    type: meilisearch@1.20
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
