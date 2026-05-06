@@ -34,6 +34,7 @@ services:
   - hostname: appstage
     type: nodejs@22
     zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nextjs-ssr-hello-world-app
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 0.5
