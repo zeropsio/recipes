@@ -1,0 +1,122 @@
+#zeropsPreprocessor=on
+
+# Same project-scope shape as tier 2 — APP_SECRET auto-injection,
+# API_URL and FRONTEND_URL composed from ${zeropsSubdomainHost} for
+# build-time SPA bake and runtime API CORS. Replace the URL constants
+# with your own stage hostnames once you swap subdomain access for a
+# custom domain.
+project:
+  name: nestjs-showcase-stage
+  envVariables:
+    APP_SECRET: <@generateRandomString(<32>)>
+    API_URL: https://api-${zeropsSubdomainHost}-3000.prg1.zerops.app
+    FRONTEND_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
+
+services:
+  # Single api container on zeropsSetup: prod, now with 0.25 GB
+  # minFreeRamGB so rehearsal load spikes don't push the working set
+  # into swap. Single shared-CPU container — predictable for stage
+  # rehearsal, not for sustained production. Bump
+  # verticalAutoscaling.minRam if monitoring shows containers
+  # approaching the 0.5 GB ceiling under your QA load.
+  - hostname: api
+    type: nodejs@22
+    priority: 5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Single app container on zeropsSetup: prod — same shape as
+  # tier 2. The 0.25 GB minFreeRamGB applies but the SPA runtime
+  # barely touches it; the working set is tiny. Disable
+  # enableSubdomainAccess once you have a custom domain configured
+  # for stage.
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Single worker container on zeropsSetup: prod with 0.25 GB
+  # minFreeRamGB headroom — absorbs spikes during rehearsal load.
+  # The SIGTERM drain in main means a single-container deploy still
+  # cleanly finishes in-flight messages on cutover, so the
+  # queue-state counters on the SPA stay coherent during stage
+  # rehearsal redeploys.
+  - hostname: worker
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Single Postgres instance — snapshots run, no replica, restoring
+  # means downtime; rehearsal-grade data, manual-restore window
+  # acceptable. 0.25 GB minFreeRamGB headroom prevents swap thrash
+  # during rehearsal load spikes; bump verticalAutoscaling.minRam if
+  # QA load runs push the working set above the current 0.25 GB
+  # target.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
+  # Single unauthenticated Valkey instance with 0.25 GB minFreeRamGB
+  # spike headroom. Adjust verticalAutoscaling.minRam if rehearsal
+  # load shows the working set growing past 0.25 GB — eviction starts
+  # hammering Postgres long before that becomes an outright cache
+  # miss-storm.
+  - hostname: cache
+    type: valkey@7.2
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
+  # Single NATS instance with 0.25 GB minFreeRamGB. Fire-and-forget
+  # delivery to the worker queue group — a broker restart still drops
+  # publishes the workers haven't picked up, so rehearsal scenarios
+  # that must replay should bracket their tests with the
+  # queue-state counters before and after.
+  - hostname: broker
+    type: nats@2.12
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
+  # S3-compatible object storage — the only adapt path is
+  # objectStorageSize because there is no mode field or
+  # verticalAutoscaling block on this service type; bump it when
+  # stage uploads outgrow the current quota under your QA
+  # scenarios.
+  - hostname: storage
+    type: object-storage
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Single-node Meilisearch with 0.25 GB minFreeRamGB — absorbs
+  # rehearsal index-update spikes. Bump verticalAutoscaling.minRam
+  # if rehearsal search latency correlates with index growth past
+  # the 0.25 GB ceiling because the api's POST /api/search/reindex
+  # remains the recovery path after a wipe.
+  - hostname: search
+    type: meilisearch@1.20
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
