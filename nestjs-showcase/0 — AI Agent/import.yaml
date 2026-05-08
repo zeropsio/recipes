@@ -1,0 +1,149 @@
+#zeropsPreprocessor=on
+
+# APP_SECRET is generated once at import and auto-injected into every
+# container so JWT signing on api and shared-secret use on worker pick
+# it up under the same project-scope name. Rotate via the Zerops UI's
+# project envs once you suspect leakage.
+# API_URL / FRONTEND_URL / DEV_API_URL / DEV_FRONTEND_URL are URL
+# constants composed from ${zeropsSubdomainHost} that resolve at
+# provision time — the SPA bakes ${API_URL} into its bundle, the api
+# reads ${FRONTEND_URL} for CORS, no first-deploy race.
+project:
+  name: nestjs-showcase-agent
+  envVariables:
+    APP_SECRET: <@generateRandomString(<32>)>
+    API_URL: https://apistage-${zeropsSubdomainHost}-3000.prg1.zerops.app
+    DEV_API_URL: https://apidev-${zeropsSubdomainHost}-3000.prg1.zerops.app
+    DEV_FRONTEND_URL: https://appdev-${zeropsSubdomainHost}-5173.prg1.zerops.app
+    FRONTEND_URL: https://appstage-${zeropsSubdomainHost}.prg1.zerops.app
+
+services:
+  # api at tier 0 ships as the apidev/apistage dev-pair. apidev runs
+  # the dev setup (devDependencies retained, ts-node migration scripts,
+  # zsc noop --silent so the coding agent owns the nest watcher over
+  # SSH); apistage runs the prod setup so cross-deployed staging
+  # traffic exercises the compiled artifact. Single shared-CPU
+  # container per slot, no spike headroom — disposable workspace
+  # footprint sized for iteration, not traffic.
+  - hostname: apidev
+    type: nodejs@22
+    priority: 5
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 1
+
+  - hostname: apistage
+    type: nodejs@22
+    priority: 5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # app at tier 0 ships as the appdev/appstage dev-pair. appdev runs
+  # the dev setup (Vite dev server on 5173 with HMR over the SSHFS
+  # mount); appstage runs the prod setup so the SPA loads as its
+  # compiled bundle in staging. Single shared-CPU container per slot
+  # — disposable workspace footprint.
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 1
+
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # worker at tier 0 ships as the workerdev/workerstage dev-pair —
+  # standalone NestJS process (no HTTP listener) that subscribes to
+  # NATS jobs.> with queue group 'workers' so replicas load-balance.
+  # workerdev idles on zsc noop --silent for SSH-driven nest --watch;
+  # workerstage runs the compiled main.js. Single shared-CPU container
+  # per slot because tier-0 throughput is iteration-grade.
+  - hostname: workerdev
+    type: nodejs@22
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
+    verticalAutoscaling:
+      minRam: 1
+
+  - hostname: workerstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL backs the items CRUD and feeds the Meilisearch reindex.
+  # Single instance with the smallest managed-RAM target — snapshots
+  # run, but there is no replica, so restoring means downtime;
+  # acceptable because tier-0 data is disposable. Priority 10 ensures
+  # db accepts connections before the api's initCommands fire migrate
+  # and seed at first deploy.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Valkey backs the cache-demo (read-through with TTL + counters) and
+  # the queue-demo counter list. Single unauthenticated instance —
+  # ${cache_user}/${cache_password} do not exist as auto-injects on
+  # this service family, so api/worker code reads CACHE_HOST and
+  # CACHE_PORT only. Smallest managed-RAM target because cache misses
+  # fall through to db until the working set warms back up.
+  - hostname: cache
+    type: valkey@7.2
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # NATS broker — the api publishes job events on a single subject and
+  # the worker subscribes with queue group 'workers' so replicas
+  # load-balance instead of fanning out. Single instance; client code
+  # uses Pattern A (NATS_HOST / PORT / USER / PASS as four separate
+  # aliases) because the connection-string form double-auths and the
+  # server rejects with Authorization Violation.
+  - hostname: broker
+    type: nats@2.12
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # S3-compatible object storage (MinIO under the hood) for the
+  # upload/list/presign flow on the SPA Storage card. No mode field on
+  # this service type and no verticalAutoscaling block — the only
+  # adapt path is objectStorageSize; bump it when uploads outgrow the
+  # current quota. Durability and availability are whatever the managed
+  # backend provides.
+  - hostname: storage
+    type: object-storage
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Meilisearch indexes the items table for the SPA Search card and is
+  # re-populated by the api's reindex endpoint and by the worker's
+  # item-created handler when new rows arrive over NATS. Single-node
+  # with the smallest managed-RAM target — disposable workspace.
+  # ${search_masterKey} is the admin key (never exposed to the SPA);
+  # ${search_defaultSearchKey} is the read-only key for browser code.
+  - hostname: search
+    type: meilisearch@1.20
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
