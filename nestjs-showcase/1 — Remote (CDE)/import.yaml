@@ -1,0 +1,129 @@
+#zeropsPreprocessor=on
+
+# Remote CDE environment — same paired dev/stage shape as
+# tier 0 but framed for human-porter coding over SSH.
+#
+# APP_SECRET regenerates at import; the four URL constants
+# point at the dev + stage slots so the SPA reaches either
+# side. Replace these with your own hostnames once you swap
+# subdomain access for a custom domain.
+project:
+  name: nestjs-showcase-remote
+  envVariables:
+    APP_SECRET: <@generateRandomString(<32>)>
+    API_URL: https://apistage-${zeropsSubdomainHost}-3000.prg1.zerops.app
+    DEV_API_URL: https://apidev-${zeropsSubdomainHost}-3000.prg1.zerops.app
+    DEV_FRONTEND_URL: https://appdev-${zeropsSubdomainHost}-5173.prg1.zerops.app
+    FRONTEND_URL: https://appstage-${zeropsSubdomainHost}.prg1.zerops.app
+
+services:
+  # Same paired `apidev` (dev source + SSH) and `apistage`
+  # (prod build) slots as tier 0, framed for human-porter
+  # coding — SSH into `apidev`, edit under `/var/www`, and run
+  # the NestJS app interactively against the same managed
+  # services `apistage` consumes.
+  - hostname: apidev
+    type: nodejs@22
+    priority: 5
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 1
+
+  - hostname: apistage
+    type: nodejs@22
+    priority: 5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Same paired `appdev` (Vite on 5173 with HMR) and `appstage`
+  # (`base: static` Nginx) slots as tier 0 — edit Svelte files
+  # over SSH on `appdev` and watch HMR refresh in your browser,
+  # because `appstage` serves the last built bundle for review
+  # on a separate URL.
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 1
+
+  - hostname: appstage
+    type: static
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Same paired `workerdev` + `workerstage` worker slots as
+  # tier 0 — pure NATS consumer, no HTTP. Iterate on
+  # subscription handlers in `workerdev` while `workerstage`
+  # carries the last deployed build.
+  - hostname: workerdev
+    type: nodejs@22
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
+    verticalAutoscaling:
+      minRam: 1
+
+  - hostname: workerstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Same single-instance NON_HA Postgres as tier 0 — sized for
+  # CDE iteration; snapshots cover restoration if your scratch
+  # data matters.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Single-node Valkey — cache demo + rate-limit-style scratch
+  # data for the human-porter dev workspace; no separate cache
+  # instance for `appdev` vs `appstage`.
+  - hostname: cache
+    type: valkey@7.2
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Same single-node NATS as tier 0 — core pub/sub fan-out
+  # from api to worker. Restarts drop in-flight messages
+  # (no persistence); fine for CDE iteration.
+  - hostname: broker
+    type: nats@2.12
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Same 1 GB object-storage bucket as tier 0 — bump
+  # `objectStorageSize` once your CDE fixture set
+  # outgrows the quota.
+  - hostname: storage
+    type: object-storage
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Single-node Meilisearch — same shape as tier 0; bump
+  # `verticalAutoscaling.minRam` if your CDE corpus grows
+  # past 0.25 GB working set.
+  - hostname: search
+    type: meilisearch@1.20
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+

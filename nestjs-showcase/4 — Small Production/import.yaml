@@ -1,0 +1,116 @@
+#zeropsPreprocessor=on
+
+# Small production environment — production-ready setup
+# optimized for moderate throughput.
+#
+# APP_SECRET is generated once at import and shared across
+# every api + worker container so JWT verification holds when
+# the L7 balancer distributes requests across replicas. Replace
+# API_URL / FRONTEND_URL with real domains once you swap
+# subdomain access for a custom domain.
+project:
+  name: nestjs-showcase-small-prod
+  envVariables:
+    APP_SECRET: <@generateRandomString(<32>)>
+    API_URL: https://api-${zeropsSubdomainHost}-3000.prg1.zerops.app
+    FRONTEND_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
+
+services:
+  # Run two api replicas on shared CPU — `minContainers: 2`
+  # keeps rolling deploys zero-downtime (one container serves
+  # traffic while the other rebuilds). Bump
+  # verticalAutoscaling.maxRam when monitoring shows containers
+  # approaching the current ceiling under steady-state load.
+  - hostname: api
+    type: nodejs@22
+    priority: 5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Two app replicas on `base: static` — Nginx serves the
+  # built bundle; `minContainers: 2` keeps the SPA reachable
+  # during rolling deploys. Disable `enableSubdomainAccess`
+  # once you have a custom domain configured.
+  - hostname: app
+    type: static
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Two worker replicas on shared CPU — the NATS queue group
+  # load-balances `jobs.index.<id>` across them. Bump
+  # verticalAutoscaling.maxRam if production job batches push
+  # memory near the ceiling.
+  - hostname: worker
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Single-instance NON_HA Postgres — restoring from snapshot
+  # means downtime, the small-prod tradeoff. The 0.25 GB
+  # free-RAM headroom absorbs production load spikes; bump
+  # verticalAutoscaling.minRam when monitoring shows query
+  # latency creeping up under steady-state working set.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
+  # Single-node Valkey — sized for production cache traffic;
+  # bump verticalAutoscaling.minRam when monitoring shows the
+  # eviction rate climbing as cached working set grows.
+  - hostname: cache
+    type: valkey@7.2
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
+  # Single-node NATS — pub/sub fan-out across both worker
+  # replicas via the queue group, so produced jobs spread
+  # across whichever consumers are currently connected.
+  - hostname: broker
+    type: nats@2.12
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
+  # MinIO bucket — bump `objectStorageSize` when production
+  # uploads outgrow the current quota; durability and
+  # availability are whatever the managed S3-compatible backend
+  # provides, not a recipe knob.
+  - hostname: storage
+    type: object-storage
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Single-node Meilisearch — bump verticalAutoscaling.minRam
+  # if production search latency correlates with index growth
+  # past the current ceiling.
+  - hostname: search
+    type: meilisearch@1.20
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+

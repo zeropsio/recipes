@@ -1,0 +1,98 @@
+#zeropsPreprocessor=on
+
+# Local environment — single-slot api + app + worker against
+# low-resource managed services.
+#
+# APP_SECRET regenerates at import. API_URL / FRONTEND_URL
+# now resolve to the bare `api` / `app` subdomains (no dev/
+# stage suffix); the SPA bakes `API_URL` at build and the api
+# allow-lists `FRONTEND_URL` for CORS.
+project:
+  name: nestjs-showcase-local
+  envVariables:
+    APP_SECRET: <@generateRandomString(<32>)>
+    API_URL: https://api-${zeropsSubdomainHost}-3000.prg1.zerops.app
+    FRONTEND_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
+
+services:
+  # Single `api` slot on `zeropsSetup: prod` — compiled
+  # NestJS JS, one container behind the L7 balancer. No
+  # paired dev runtime at this tier; iterate locally and
+  # redeploy when ready.
+  - hostname: api
+    type: nodejs@22
+    priority: 5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Single `app` slot on `base: static` — Nginx serves the
+  # built Svelte bundle on the default port. `VITE_API_URL`
+  # bakes the bare `api` subdomain into the bundle at build
+  # time.
+  - hostname: app
+    type: static
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Single `worker` slot — one container subscribed to
+  # `jobs.index.<id>`; the queue group still applies but
+  # load-balances to a single replica at this tier.
+  - hostname: worker
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Same single-instance NON_HA Postgres as tier 1 — local-test
+  # data; snapshots-only durability is enough for this scope.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Single-node Valkey — keeps the cache demo working
+  # end-to-end on a local-shape deploy.
+  - hostname: cache
+    type: valkey@7.2
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Single-node NATS — pub/sub fan-out from the single api
+  # replica to the single worker replica. Restarts drop
+  # in-flight messages.
+  - hostname: broker
+    type: nats@2.12
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # 1 GB MinIO bucket — same as tier 1; bump
+  # `objectStorageSize` if your local fixtures exceed the
+  # quota.
+  - hostname: storage
+    type: object-storage
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Single-node Meilisearch — same shape as tier 1; bump
+  # `verticalAutoscaling.minRam` if local index growth pushes
+  # search latency.
+  - hostname: search
+    type: meilisearch@1.20
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+

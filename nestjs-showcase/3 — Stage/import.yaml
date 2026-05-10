@@ -1,0 +1,110 @@
+#zeropsPreprocessor=on
+
+# Stage environment uses the same configuration as production,
+# but runs on the lowest scaling settings.
+#
+# APP_SECRET is generated once at import and shared across api +
+# worker so JWT verification holds across container restarts.
+# Replace API_URL / FRONTEND_URL with your own stage hostnames
+# once subdomain access is swapped for a custom domain.
+project:
+  name: nestjs-showcase-stage
+  envVariables:
+    APP_SECRET: <@generateRandomString(<32>)>
+    API_URL: https://api-${zeropsSubdomainHost}-3000.prg1.zerops.app
+    FRONTEND_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
+
+services:
+  # Single api container on shared CPU — compiled NestJS JS
+  # behind the L7 balancer for QA + rehearsal traffic. Bump
+  # verticalAutoscaling.maxRam if monitoring shows the
+  # container approaching its current ceiling under stage
+  # load.
+  - hostname: api
+    type: nodejs@22
+    priority: 5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Single app container on `base: static` — Nginx serves the
+  # built Svelte bundle. Replace the `enableSubdomainAccess`
+  # subdomain with a custom domain once your stage URL is
+  # stabilized.
+  - hostname: app
+    type: static
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Single worker container — one queue-group consumer
+  # processing index jobs. Bump verticalAutoscaling.maxRam
+  # if rehearsal job batches push memory near the ceiling.
+  - hostname: worker
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Single-instance NON_HA Postgres — restoring from snapshot
+  # means downtime, the rehearsal-grade tradeoff. The
+  # `minFreeRamGB: 0.25` headroom keeps query bursts off the
+  # swap path; bump verticalAutoscaling.minRam if QA load
+  # pushes the working set above 0.25 GB.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
+  # Single-node Valkey — same shape as tier 2 but with the
+  # 0.25 GB free-RAM headroom; bump verticalAutoscaling.minRam
+  # if cached working set grows past 0.25 GB.
+  - hostname: cache
+    type: valkey@7.2
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
+  # Single-node NATS — same pub/sub shape as tier 2; the
+  # 0.25 GB headroom absorbs reconnection bursts when worker
+  # replicas restart during stage rehearsals.
+  - hostname: broker
+    type: nats@2.12
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
+  # MinIO bucket — bump `objectStorageSize` once your stage
+  # fixture set outgrows the current 1 GB quota under
+  # rehearsal load.
+  - hostname: storage
+    type: object-storage
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Single-node Meilisearch — bump verticalAutoscaling.minRam
+  # if stage search latency correlates with index growth past
+  # the 0.25 GB ceiling.
+  - hostname: search
+    type: meilisearch@1.20
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
