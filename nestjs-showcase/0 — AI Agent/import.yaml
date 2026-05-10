@@ -1,0 +1,148 @@
+#zeropsPreprocessor=on
+
+# AI agent environment — paired dev/stage runtime slots
+# for every codebase plus low-resource managed services
+# for end-to-end iteration.
+#
+# APP_SECRET is generated once at import and shared across
+# api + worker for JWT signing. API_URL / FRONTEND_URL point
+# at the stage slots; DEV_API_URL / DEV_FRONTEND_URL point
+# at the dev slots so the SPA can talk to either side.
+project:
+  name: nestjs-showcase-agent
+  envVariables:
+    APP_SECRET: <@generateRandomString(<32>)>
+    API_URL: https://apistage-${zeropsSubdomainHost}-3000.prg1.zerops.app
+    DEV_API_URL: https://apidev-${zeropsSubdomainHost}-3000.prg1.zerops.app
+    DEV_FRONTEND_URL: https://appdev-${zeropsSubdomainHost}-5173.prg1.zerops.app
+    FRONTEND_URL: https://appstage-${zeropsSubdomainHost}.prg1.zerops.app
+
+services:
+  # Deploy the NestJS api codebase across two slots: `apidev`
+  # (zeropsSetup: dev — full source, SSH-driven editing for
+  # agents) and `apistage` (zeropsSetup: prod — compiled JS
+  # under the L7 balancer). Both slots reach the same db, cache,
+  # broker, search, and storage. Subdomain access is on at
+  # `apidev` (port 3000) so the SPA dev runtime can call it.
+  - hostname: apidev
+    type: nodejs@22
+    priority: 5
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 1
+
+  - hostname: apistage
+    type: nodejs@22
+    priority: 5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Deploy the Svelte SPA across two slots: `appdev` runs Vite's
+  # dev server on 5173 (HMR for agent UI work) and `appstage`
+  # serves the built bundle on `base: static` (Nginx, default
+  # port). `VITE_API_URL` bakes the api URL into the bundle at
+  # build time — the project envs resolve before scaffold so the
+  # bundle ships with real URLs, not unresolved tokens.
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 1
+
+  - hostname: appstage
+    type: static
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Deploy the standalone NATS worker across two slots
+  # (`workerdev`, `workerstage`). The worker subscribes to
+  # `jobs.index.<id>` via a queue group — when the api fans
+  # out indexing jobs, NATS load-balances them across whichever
+  # worker replicas are connected. No HTTP traffic, no
+  # subdomain — pure background consumer.
+  - hostname: workerdev
+    type: nodejs@22
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
+    verticalAutoscaling:
+      minRam: 1
+
+  - hostname: workerstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Deploy low-resource PostgreSQL database, used by the NestJS
+  # api codebase to store items + per-deploy migration markers,
+  # because both the `apidev` (dev) and `apistage` (prod build)
+  # slots connect to the same database so iteration data and
+  # staged data live side-by-side. Priority 10 guarantees
+  # Postgres accepts connections before the api's
+  # initCommand-driven TypeORM migrations run.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Spin up Valkey in single-node mode. Valkey is an open-source
+  # Redis-compatible key/value store the api uses for the cache
+  # demo (hit/miss counters + recent kind list) and as a short-
+  # term cache layer. Both `apidev` and `apistage` share the
+  # same instance — iteration data and staged data live in one
+  # keyspace.
+  - hostname: cache
+    type: valkey@7.2
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Deploy a single-node NATS messaging broker, used by the api
+  # to publish jobs on subject `jobs.index.<id>` and by the worker
+  # codebase to subscribe via a queue group — fire-and-forget
+  # core pub/sub, so the broker holds no message state. Shared
+  # by `apidev`/`apistage` publishers and `workerdev`/`workerstage`
+  # subscribers.
+  - hostname: broker
+    type: nats@2.12
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Deploy S3-compatible object storage on the MinIO backend,
+  # used by the api for file uploads and 10-minute presigned
+  # GET URLs, so the showcase upload card has a real backing
+  # bucket. `objectStorageSize: 1` is enough headroom for early
+  # iteration; bump it once your fixture set outgrows 1 GB.
+  - hostname: storage
+    type: object-storage
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Deploy a single-node Meilisearch index, used by the api for
+  # full-text search over indexed items — the api also reads the
+  # document count for the Search card live state. Bump
+  # `verticalAutoscaling.minRam` if the fixture corpus grows past
+  # the 0.25 GB ceiling.
+  - hostname: search
+    type: meilisearch@1.20
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
