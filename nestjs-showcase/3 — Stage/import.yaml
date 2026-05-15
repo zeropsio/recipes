@@ -1,0 +1,116 @@
+#zeropsPreprocessor=on
+
+# Stage environment uses the same configuration as production,
+# but runs on the lowest scaling settings. APP_SECRET is generated
+# at import and shared across api + worker for JWT verification.
+# Replace API_URL / FRONTEND_URL with your own stage hostnames once
+# you swap subdomain access for a custom stage domain.
+project:
+  name: nestjs-showcase-stage
+  envVariables:
+    APP_SECRET: <@generateRandomString(<32>)>
+    API_URL: https://api-${zeropsSubdomainHost}-3000.prg1.zerops.app
+    FRONTEND_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
+
+services:
+  # Single-container NestJS API on shared CPU — the 0.25 GB
+  # minFreeRamGB headroom keeps Node's heap-growth bursts off the
+  # swap path during stage-rehearsal traffic. Bump
+  # verticalAutoscaling.minRam when stage QA pushes response
+  # latency past your stage SLO.
+  - hostname: api
+    type: nodejs@22
+    priority: 5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Single-container SPA on `base: static` — Nginx serves the
+  # compiled bundle that VITE_API_URL pointed at the api's URL during
+  # build. 0.25 GB minFreeRamGB headroom absorbs concurrent fetch
+  # spikes when QA hammers the SPA from multiple browsers.
+  - hostname: app
+    type: static
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Single-container worker subscribed to the `showcase/jobs` NATS
+  # subject hierarchy under the workers queue group — the 0.25 GB
+  # minFreeRamGB headroom keeps job-handler memory bursts off the
+  # swap path during stage rehearsal queue-load tests so latency
+  # stays predictable.
+  - hostname: worker
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Set higher priority for databases and storages,
+  # because the app depends on those services.
+  # Single-instance NON_HA Postgres — used by the api codebase to
+  # persist items + upload metadata. Restoring from snapshot means
+  # downtime at stage; bump verticalAutoscaling.minRam when stage
+  # workloads push query latency past your SLO.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
+  # Single-node Valkey at stage scale — the cache-demo counters and
+  # worker event list keep their warmth across rehearsal traffic. The
+  # 0.25 GB minFreeRamGB headroom prevents eviction-storm spikes when
+  # concurrent QA flows churn keys.
+  - hostname: cache
+    type: valkey@7.2
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
+  # Single-node NATS at stage scale — fire-and-forget pub/sub for the
+  # `showcase/jobs` subject hierarchy; the workers queue group
+  # load-balances delivery across worker replicas. 0.25 GB
+  # minFreeRamGB headroom absorbs publish-burst spikes during
+  # rehearsal traffic.
+  - hostname: broker
+    type: nats@2.12
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
+  # Private object-storage bucket at stage — 1 GB quota covers
+  # rehearsal upload fixtures. Bump objectStorageSize when stage QA
+  # datasets outgrow the quota.
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Single-node Meilisearch at stage — the items index is rebuilt
+  # from production-shaped seed data during rehearsals. Bump
+  # verticalAutoscaling.minRam when index size correlates with
+  # stage search latency past your SLO.
+  - hostname: search
+    type: meilisearch@1.20
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+

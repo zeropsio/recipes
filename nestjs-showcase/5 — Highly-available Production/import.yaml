@@ -1,0 +1,130 @@
+#zeropsPreprocessor=on
+
+# Highly-available production environment — dedicated CPU, SERIOUS
+# corePackage on the project. APP_SECRET is the production
+# encryption key shared across api + worker; rotate via the Zerops
+# UI's project envs once you suspect leakage. Replace API_URL /
+# FRONTEND_URL once a custom production domain is configured.
+project:
+  name: nestjs-showcase-ha-prod
+  corePackage: SERIOUS
+  envVariables:
+    APP_SECRET: <@generateRandomString(<32>)>
+    API_URL: https://api-${zeropsSubdomainHost}-3000.prg1.zerops.app
+    FRONTEND_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
+
+services:
+  # Run two NestJS API replicas on dedicated CPU — predictable
+  # latency under load, no shared-CPU jitter from neighbour services.
+  # minContainers: 2 keeps rolling deploys zero-downtime. 0.5 GB
+  # minFreeRamGB headroom absorbs heap-growth bursts; bump
+  # verticalAutoscaling.maxRam when monitoring shows containers
+  # approaching the current ceiling.
+  - hostname: api
+    type: nodejs@22
+    priority: 5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+      minFreeRamGB: 0.5
+
+  # Run two SPA replicas on dedicated CPU — Nginx serves the compiled
+  # bundle from two containers, no shared-CPU latency jitter. 0.5 GB
+  # minFreeRamGB headroom buffers concurrent-fetch spikes at peak.
+  # Bump verticalAutoscaling.maxRam if production traffic outgrows
+  # the current ceiling.
+  - hostname: app
+    type: static
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+      minFreeRamGB: 0.5
+
+  # Run 2 worker replicas on dedicated CPU — the workers queue group
+  # on NATS load-balances the `showcase/jobs` deliveries across both,
+  # and the second container keeps the queue moving during rolling
+  # deploys. Bump verticalAutoscaling.maxRam if heavy production
+  # jobs push container memory past the current ceiling.
+  - hostname: worker
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
+    minContainers: 2
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+      minFreeRamGB: 0.5
+
+  # Set higher priority for databases and storages,
+  # because the app depends on those services.
+  # HA Postgres on dedicated CPU — used by the api codebase to
+  # persist items + upload metadata. Cluster replicates writes across
+  # nodes, so a node loss fails over without a manual restore window;
+  # bump verticalAutoscaling.minRam when working-set growth pushes
+  # query latency past your production SLO.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: HA
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5
+
+  # HA Valkey on dedicated CPU — the cluster replicates state so a
+  # node loss fails over without flushing the cache demo's counters or
+  # the worker event list. Bump verticalAutoscaling.minRam when
+  # eviction rates drift up under production working-set growth.
+  - hostname: cache
+    type: valkey@7.2
+    priority: 10
+    mode: HA
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5
+
+  # HA NATS on dedicated CPU — clustered nodes preserve pub/sub
+  # liveness through a node loss, so the `showcase/jobs` fan-out and
+  # the workers queue-group load-balancing keep working without an
+  # operator intervention. Bump verticalAutoscaling.minRam if
+  # publish-burst spikes saturate the cluster's working set at peak.
+  - hostname: broker
+    type: nats@2.12
+    priority: 10
+    mode: HA
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5
+
+  # Private object-storage bucket for production uploads — durability
+  # and availability come from the managed S3-compatible backend.
+  # Bump objectStorageSize when production upload volume outgrows
+  # the current quota.
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Single-node Meilisearch on dedicated CPU with a 1 GB managed RAM
+  # floor — bump verticalAutoscaling.minRam if production search
+  # latency correlates with index growth past the current ceiling.
+  - hostname: search
+    type: meilisearch@1.20
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5
+
