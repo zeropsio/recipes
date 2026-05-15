@@ -1,0 +1,109 @@
+#zeropsPreprocessor=on
+
+# Local environment — single-slot runtimes for end-to-end
+# functional testing. APP_SECRET is regenerated at import; rotate
+# via the Zerops UI's project envs once you suspect leakage.
+# Replace API_URL / FRONTEND_URL with your own hostnames once you
+# swap subdomain access for a custom domain.
+project:
+  name: nestjs-showcase-local
+  envVariables:
+    APP_SECRET: <@generateRandomString(<32>)>
+    API_URL: https://api-${zeropsSubdomainHost}-3000.prg1.zerops.app
+    FRONTEND_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
+
+services:
+  # Deploy the NestJS API as a single-slot production runtime —
+  # `api` builds from git, runs `node dist/main.js`, and gates traffic
+  # on /api/health readiness so initCommand-driven migrations finish
+  # before requests land. Subdomain access is on for browser walks
+  # and curl smoke-tests — disable it once you have a custom domain.
+  - hostname: api
+    type: nodejs@22
+    priority: 5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Deploy the SPA on `base: static` — the built bundle is served by
+  # Nginx with no port suffix in the subdomain. VITE_API_URL is baked
+  # at build time from API_URL, so the frontend hits the api on first
+  # load without a chicken-and-egg dance. Disable subdomain access
+  # once you wire a custom domain.
+  - hostname: app
+    type: static
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Deploy the background worker — single-slot runtime subscribed to
+  # the `showcase/jobs` NATS subject hierarchy with the workers queue
+  # group. No HTTP surface, no subdomain access; the worker writes
+  # job results back into valkey for the api's queue-state endpoint
+  # to surface.
+  - hostname: worker
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Set higher priority for databases and storages,
+  # because the app depends on those services.
+  # Single-instance Postgres for local end-to-end testing — automatic
+  # snapshots cover restoration; functional-test data is regenerated
+  # from seed scripts. Bump verticalAutoscaling.minRam when your seed
+  # dataset's working set pushes query latency.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Single-node Valkey for local functional testing — 0.25 GB
+  # managed RAM is plenty for the cache demo's hit/miss counters
+  # and the queue-state event list during end-to-end runs.
+  - hostname: cache
+    type: valkey@7.2
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Single-node NATS — the api publishes to the `showcase/jobs`
+  # subject hierarchy and the worker subscribes with the workers
+  # queue group. Functional-test traffic is light, so the smallest
+  # managed RAM handles publish bursts during browser walks without
+  # backpressure.
+  - hostname: broker
+    type: nats@2.12
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Private object-storage bucket on the managed MinIO backend — 1 GB
+  # quota covers upload-demo fixtures during functional tests. Bump
+  # objectStorageSize when test datasets outgrow the quota.
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Single-node Meilisearch for end-to-end search-path checks — the
+  # index gets rebuilt from seed data on every functional run. Bump
+  # verticalAutoscaling.minRam if your fixture corpus is large enough
+  # to push search latency past acceptable test timings.
+  - hostname: search
+    type: meilisearch@1.20
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+

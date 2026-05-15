@@ -1,0 +1,151 @@
+#zeropsPreprocessor=on
+
+# AI Agent environment — a dev + stage pair for every codebase and
+# low-resource managed services. APP_SECRET is shared across all
+# runtimes so JWT verification holds across containers; API_URL /
+# FRONTEND_URL point at the staged subdomains, DEV_* at the dev
+# runtimes. Replace these once you swap subdomain access for a
+# custom domain.
+project:
+  name: nestjs-showcase-agent
+  envVariables:
+    APP_SECRET: <@generateRandomString(<32>)>
+    API_URL: https://apistage-${zeropsSubdomainHost}-3000.prg1.zerops.app
+    DEV_API_URL: https://apidev-${zeropsSubdomainHost}-3000.prg1.zerops.app
+    DEV_FRONTEND_URL: https://appdev-${zeropsSubdomainHost}-5173.prg1.zerops.app
+    FRONTEND_URL: https://appstage-${zeropsSubdomainHost}.prg1.zerops.app
+
+services:
+  # Deploy the NestJS API in a dev + stage pair — `apidev` is the
+  # development workspace runtime (idle until you start the framework
+  # manually over SSH with `npm run start:dev`); `apistage` is the
+  # production-build runtime that backs the SPA's API_URL. 1 GB RAM
+  # on dev keeps Nest's watch mode + ts-node compile path off the
+  # swap; subdomain access is on so you can curl the API from outside
+  # the project network.
+  - hostname: apidev
+    type: nodejs@22
+    priority: 5
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 1
+
+  - hostname: apistage
+    type: nodejs@22
+    priority: 5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Deploy the SPA in a dev + stage pair — `appdev` runs Vite on
+  # port 5173 (port-suffixed subdomain) for hot-reload iteration;
+  # `appstage` ships a compiled bundle on `base: static` (no port
+  # suffix). VITE_API_URL bakes API_URL into the stage bundle at
+  # build time, so the SPA points at apistage without a chicken-and-
+  # egg redeploy after the API mints its subdomain.
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 1
+
+  - hostname: appstage
+    type: static
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Deploy the background worker in a dev + stage pair — `workerdev`
+  # is the idle development workspace, `workerstage` runs the
+  # production build consuming jobs published on the `showcase/jobs`
+  # NATS subject hierarchy. No subdomain access on either slot
+  # because the worker has no HTTP surface; it only subscribes to
+  # broker subjects and writes results back into valkey for the
+  # queue-state endpoint to surface.
+  - hostname: workerdev
+    type: nodejs@22
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
+    verticalAutoscaling:
+      minRam: 1
+
+  - hostname: workerstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Set higher priority for databases and storages,
+  # because the app depends on those services.
+  # Deploy low-resource PostgreSQL database, used by the api codebase
+  # to persist items + per-deploy migration markers — both the
+  # development runtime (apidev) and the staged runtime (apistage)
+  # connect to this one instance, so priority 10 guarantees Postgres
+  # is accepting connections before any initCommand migration runs.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Spin up Valkey in single-node mode — an open-source Redis-
+  # compatible key/value store used by the api for the cache demo
+  # (hit/miss counters, payload TTL) and by the worker for the
+  # queue-state events list. Smallest managed RAM (0.25 GB) is plenty
+  # for a few demo keys; iteration data is replaceable.
+  - hostname: cache
+    type: valkey@7.2
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Deploy single-node NATS broker — the api publishes job envelopes
+  # under the `showcase/jobs/<kind>` subject hierarchy and the worker
+  # subscribes via the workers queue group, so delivery load-balances
+  # across worker replicas with fire-and-forget semantics. Clients
+  # wire NATS_HOST / NATS_PORT / NATS_USER / NATS_PASSWORD as four
+  # separate env vars; composing a single nats://user:pass@host URL
+  # by hand triggers double-auth and the broker rejects the CONNECT.
+  - hostname: broker
+    type: nats@2.12
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Deploy object storage on the managed S3-compatible MinIO backend,
+  # used by the api for the upload demo. 1 GB quota covers the
+  # handful of fixtures an agent uploads during iteration; bump
+  # objectStorageSize when your demo dataset outgrows the current
+  # quota. Bucket policy is `private` — every GET goes through a
+  # pre-signed URL minted by the api.
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Deploy single-node Meilisearch — used by the api for the
+  # full-text search demo over the items table; reindex calls fire
+  # from the items create / update / delete paths. Smallest managed
+  # RAM (0.25 GB) suits the demo dataset; bump verticalAutoscaling.
+  # minRam if your seed grows past a few thousand documents and
+  # search latency creeps up.
+  - hostname: search
+    type: meilisearch@1.20
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+

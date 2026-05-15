@@ -1,0 +1,122 @@
+#zeropsPreprocessor=on
+
+# Small production environment — two-container runtimes on shared
+# CPU for moderate throughput. APP_SECRET is the production
+# encryption key shared across all api + worker containers,
+# critical for JWT validity when the L7 balancer distributes
+# requests across replicas.
+project:
+  name: nestjs-showcase-small-prod
+  envVariables:
+    APP_SECRET: <@generateRandomString(<32>)>
+    API_URL: https://api-${zeropsSubdomainHost}-3000.prg1.zerops.app
+    FRONTEND_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
+
+services:
+  # Run two NestJS API replicas on shared CPU — minContainers: 2
+  # keeps rolling deploys zero-downtime (one container serves traffic
+  # while the other rebuilds). The L7 balancer distributes requests
+  # across replicas. Bump verticalAutoscaling.maxRam when monitoring
+  # shows containers approaching the current ceiling.
+  - hostname: api
+    type: nodejs@22
+    priority: 5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Run two SPA replicas on `base: static` — Nginx serves the
+  # compiled bundle from two containers, and minContainers: 2 keeps
+  # rolling deploys zero-downtime. Bump verticalAutoscaling.maxRam if
+  # fetch-burst concurrency outgrows the current ceiling at peak
+  # production traffic.
+  - hostname: app
+    type: static
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Run 2 worker replicas — both subscribe to the `showcase/jobs`
+  # subject hierarchy with the workers queue group, so NATS
+  # load-balances job delivery between them and the second container
+  # keeps the queue moving during rolling deploys. Bump
+  # verticalAutoscaling.maxRam if heavy jobs push container memory
+  # near the ceiling.
+  - hostname: worker
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Set higher priority for databases and storages,
+  # because the app depends on those services.
+  # Single-instance NON_HA Postgres — used by the api codebase to
+  # persist items + upload metadata at small-prod scale. The 0.25 GB
+  # minFreeRamGB headroom absorbs production load spikes; bump
+  # verticalAutoscaling.minRam when monitoring shows query latency
+  # creeping up under steady-state working set.
+  - hostname: db
+    type: postgresql@18
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
+  # Single-node Valkey at small-prod scale — the cache demo serves
+  # real production cache traffic from a single replica. Bump
+  # verticalAutoscaling.minRam when working-set growth pushes
+  # eviction rates past acceptable hit-ratio thresholds.
+  - hostname: cache
+    type: valkey@7.2
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
+  # Single-node NATS for the `showcase/jobs` fan-out — the workers
+  # queue group on 2 worker replicas spreads delivery across both.
+  # Node loss interrupts pub/sub liveness until the broker restarts;
+  # bump verticalAutoscaling.minRam if publish-burst spikes saturate
+  # the broker's working set under production traffic.
+  - hostname: broker
+    type: nats@2.12
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
+  # Private object-storage bucket for production uploads — durability
+  # and availability come from the managed S3-compatible backend. Bump
+  # objectStorageSize when production upload volume outgrows the
+  # current quota.
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Single-node Meilisearch — bump verticalAutoscaling.minRam if
+  # production search latency correlates with index growth past the
+  # 0.25 GB ceiling.
+  - hostname: search
+    type: meilisearch@1.20
+    priority: 10
+    mode: NON_HA
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
