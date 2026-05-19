@@ -76,12 +76,11 @@ services:
     objectStorageSize: 1
     objectStoragePolicy: private
 
-  # Meilisearch HA — replicated search index for high availability. Queries
-  # continue serving during node replacement.
+  # Meilisearch NON_HA — single node, Meilisearch doesn't offer HA
   - hostname: search
     type: meilisearch@1.20
     priority: 10
-    mode: HA
+    mode: NON_HA
     verticalAutoscaling:
       cpuMode: DEDICATED
       minRam: 1
