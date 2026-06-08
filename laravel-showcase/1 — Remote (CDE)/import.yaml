@@ -53,22 +53,19 @@ services:
       minRam: 0.5
 
   # PostgreSQL — shared persistence for articles, migrations, and the jobs
-  # table. NON_HA appropriate for a development environment where data is
+  # table. Single-node is appropriate for a development environment where data is
   # replaceable.
   - hostname: db
-    type: postgresql@18
+    type: postgresql:single@18
+    profile: oltp-hobby
     priority: 10
-    mode: NON_HA
-    verticalAutoscaling:
-      minRam: 0.25
 
   # Valkey — serves as the cache, session, and queue backend. Replaces three
   # database-backed drivers with a single in-memory store, reducing P95 latency
   # on session reads and cache lookups.
   - hostname: redis
-    type: valkey@7.2
+    type: valkey:single@7.2
     priority: 10
-    mode: NON_HA
     verticalAutoscaling:
       minRam: 0.25
 
@@ -85,9 +82,7 @@ services:
   # test search queries against a real engine with typo tolerance and ranking,
   # not a database LIKE fallback.
   - hostname: search
-    type: meilisearch@1.20
+    type: meilisearch:single@1.20
     priority: 10
-    mode: NON_HA
     verticalAutoscaling:
       minRam: 0.25
-

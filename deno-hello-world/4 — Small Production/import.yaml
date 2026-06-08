@@ -28,6 +28,6 @@ services:
   # strategy. Priority 10 starts the database before
   # the app containers.
   - hostname: db
-    type: postgresql@16
-    mode: NON_HA
+    type: postgresql:single@16
+    profile: oltp-production
     priority: 10

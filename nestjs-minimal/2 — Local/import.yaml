@@ -23,9 +23,6 @@ services:
   # migrations and seed data locally while the database lives on Zerops
   # infrastructure. Priority 10 so db starts before the app container.
   - hostname: db
-    type: postgresql@18
+    type: postgresql:single@18
+    profile: oltp-hobby
     priority: 10
-    mode: NON_HA
-    verticalAutoscaling:
-      minRam: 0.25
-

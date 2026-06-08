@@ -31,20 +31,18 @@ services:
   # Priority 10 starts data services before app containers,
   # preventing connection errors on first deploy.
   - hostname: db
-    type: postgresql@17
-    mode: NON_HA
+    type: postgresql:single@17
+    profile: oltp-staging
     priority: 10
 
   # Valkey (Redis-compatible) for event caching and active job tracking.
   - hostname: redis
-    type: valkey@7.2
-    mode: NON_HA
+    type: valkey:single@7.2
     priority: 10
 
   # NATS message queue — decouples the app from the worker.
   - hostname: queue
-    type: nats@2.12
-    mode: NON_HA
+    type: nats:single@2.12
     priority: 10
 
   # S3-compatible object storage for images,

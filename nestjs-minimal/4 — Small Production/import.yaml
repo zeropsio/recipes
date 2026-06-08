@@ -26,10 +26,6 @@ services:
   # database auto-scales disk (never shrinks) and RAM within vertical bounds.
   # For higher durability with automatic failover, deploy with HA mode.
   - hostname: db
-    type: postgresql@18
+    type: postgresql:single@18
+    profile: oltp-production
     priority: 10
-    mode: NON_HA
-    verticalAutoscaling:
-      minRam: 0.25
-      minFreeRamGB: 0.25
-

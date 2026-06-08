@@ -39,19 +39,16 @@ services:
   # migrations and seeds on deploy. Priority 10 ensures it accepts connections
   # before app containers start.
   - hostname: db
-    type: postgresql@18
+    type: postgresql:single@18
+    profile: oltp-hobby
     priority: 10
-    mode: NON_HA
-    verticalAutoscaling:
-      minRam: 0.25
 
   # Valkey — cache, session, and queue backend. Reachable via zcli VPN for
   # local development, so the developer's localhost app connects to the same
   # Redis instance the deployed validator uses.
   - hostname: redis
-    type: valkey@7.2
+    type: valkey:single@7.2
     priority: 10
-    mode: NON_HA
     verticalAutoscaling:
       minRam: 0.25
 
@@ -66,9 +63,7 @@ services:
   # Meilisearch — full-text search engine reachable via zcli VPN. The local
   # app can query it directly during development.
   - hostname: search
-    type: meilisearch@1.20
+    type: meilisearch:single@1.20
     priority: 10
-    mode: NON_HA
     verticalAutoscaling:
       minRam: 0.25
-

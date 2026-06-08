@@ -26,6 +26,6 @@ services:
   # Priority 10 starts the database before the app service, preventing
   # connection errors on first boot — higher priority starts first.
   - hostname: db
-    type: postgresql@18
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-staging
     priority: 10

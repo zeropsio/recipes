@@ -23,13 +23,11 @@ services:
       minRam: 0.5
       minFreeRamGB: 0.25
 
-  # PostgreSQL single-node database. NON_HA is appropriate for
-  # staging — matches production schema without the cost of
+  # PostgreSQL single-node database, appropriate for staging —
+  # it matches the production schema without the cost of
   # full replication. Priority 10 starts the database before
   # the app container, preventing startup connection failures.
   - hostname: db
-    type: postgresql@18
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-staging
     priority: 10
-    verticalAutoscaling:
-      minRam: 0.25

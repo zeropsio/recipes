@@ -35,9 +35,9 @@ services:
   # PostgreSQL single-node database for development and staging.
   # Accessible as 'db' hostname from 'appdev' and 'appstage'.
   # Priority 10 ensures the database starts before the app services,
-  # preventing connection errors on first boot. NON_HA is suitable
+  # preventing connection errors on first boot. Single-node is suitable
   # for dev/staging where single-node durability is acceptable.
   - hostname: db
-    type: postgresql@18
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-staging
     priority: 10

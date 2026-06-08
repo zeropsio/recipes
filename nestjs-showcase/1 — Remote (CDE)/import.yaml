@@ -82,23 +82,20 @@ services:
   # because the app depends on those services.
   # Single-instance Postgres for the human-porter CDE workspace —
   # snapshots cover restoration; iteration data is replaceable, so
-  # the trade-off is acceptable. Bump verticalAutoscaling.minRam if
-  # your CDE seed dataset grows past the 0.25 GB working set.
+  # the trade-off is acceptable. Switch to the oltp-staging profile
+  # if your CDE workspace needs more reserved RAM headroom.
   - hostname: db
-    type: postgresql@18
+    type: postgresql:single@18
+    profile: oltp-hobby
     priority: 10
-    mode: NON_HA
-    verticalAutoscaling:
-      minRam: 0.25
 
   # Single-node Valkey sized for CDE iteration — the cache demo's
   # hit/miss counters + queue-state event list fit comfortably in
   # 0.25 GB. Bump verticalAutoscaling.minRam if your dev runs
   # stockpile working sets larger than the default.
   - hostname: cache
-    type: valkey@7.2
+    type: valkey:single@7.2
     priority: 10
-    mode: NON_HA
     verticalAutoscaling:
       minRam: 0.25
 
@@ -107,9 +104,8 @@ services:
   # workerdev at the same broker over SSH for ad-hoc subscriber
   # debugging against the job subjects.
   - hostname: broker
-    type: nats@2.12
+    type: nats:single@2.12
     priority: 10
-    mode: NON_HA
     verticalAutoscaling:
       minRam: 0.25
 
@@ -127,9 +123,7 @@ services:
   # verticalAutoscaling.minRam if your seed grows large enough that
   # search latency creeps up under interactive querying.
   - hostname: search
-    type: meilisearch@1.20
+    type: meilisearch:single@1.20
     priority: 10
-    mode: NON_HA
     verticalAutoscaling:
       minRam: 0.25
-

@@ -56,22 +56,19 @@ services:
   # because the app depends on those services.
   # Single-instance Postgres for local end-to-end testing — automatic
   # snapshots cover restoration; functional-test data is regenerated
-  # from seed scripts. Bump verticalAutoscaling.minRam when your seed
-  # dataset's working set pushes query latency.
+  # from seed scripts. Switch to the oltp-staging profile if your
+  # seed dataset needs more reserved RAM headroom.
   - hostname: db
-    type: postgresql@18
+    type: postgresql:single@18
+    profile: oltp-hobby
     priority: 10
-    mode: NON_HA
-    verticalAutoscaling:
-      minRam: 0.25
 
   # Single-node Valkey for local functional testing — 0.25 GB
   # managed RAM is plenty for the cache demo's hit/miss counters
   # and the queue-state event list during end-to-end runs.
   - hostname: cache
-    type: valkey@7.2
+    type: valkey:single@7.2
     priority: 10
-    mode: NON_HA
     verticalAutoscaling:
       minRam: 0.25
 
@@ -81,9 +78,8 @@ services:
   # managed RAM handles publish bursts during browser walks without
   # backpressure.
   - hostname: broker
-    type: nats@2.12
+    type: nats:single@2.12
     priority: 10
-    mode: NON_HA
     verticalAutoscaling:
       minRam: 0.25
 
@@ -101,9 +97,7 @@ services:
   # verticalAutoscaling.minRam if your fixture corpus is large enough
   # to push search latency past acceptable test timings.
   - hostname: search
-    type: meilisearch@1.20
+    type: meilisearch:single@1.20
     priority: 10
-    mode: NON_HA
     verticalAutoscaling:
       minRam: 0.25
-

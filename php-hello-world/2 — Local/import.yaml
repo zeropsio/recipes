@@ -23,8 +23,8 @@ services:
   # via 'zcli vpn up'. This lets your locally running PHP app connect to
   # the cloud database using the same env vars as the Zerops service.
   # Priority 10 starts the database before the app service.
-  # NON_HA is a single node — appropriate for local development.
+  # A single node — appropriate for local development.
   - hostname: db
-    type: postgresql@18
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-hobby
     priority: 10

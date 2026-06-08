@@ -40,9 +40,9 @@ services:
   # PostgreSQL for application data. Priority 10 starts data
   # services before app containers, preventing connection errors
   # on first boot.
+  # Single-node database - sufficient for development;
+  # use HA mode for production workloads.
   - hostname: db
-    type: postgresql@18
-    # NON_HA: single-node database - sufficient for development;
-    # use HA mode for production workloads.
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-hobby
     priority: 10

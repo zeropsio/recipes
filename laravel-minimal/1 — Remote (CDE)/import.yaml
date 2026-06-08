@@ -39,12 +39,9 @@ services:
       minRam: 0.5
 
   # PostgreSQL — handles schema, sessions, cache, and queue for the minimal
-  # Laravel tier. NON_HA because remote dev environments are disposable and
+  # Laravel tier. Single-node because remote dev environments are disposable and
   # easily recreated.
   - hostname: db
-    type: postgresql@18
+    type: postgresql:single@18
+    profile: oltp-hobby
     priority: 10
-    mode: NON_HA
-    verticalAutoscaling:
-      minRam: 0.25
-

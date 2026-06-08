@@ -40,13 +40,11 @@ services:
   # PostgreSQL single-node database shared by 'appdev' and
   # 'appstage'. Both services reference it as 'db_hostname',
   # 'db_port', 'db_user', and 'db_password' in their env vars.
-  # NON_HA is suitable for development and staging where
+  # Single-node is suitable for development and staging where
   # HA durability is not required.
   # Priority 10 starts the database before the app containers,
   # preventing connection errors on startup.
   - hostname: db
-    type: postgresql@18
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-staging
     priority: 10
-    verticalAutoscaling:
-      minRam: 0.25

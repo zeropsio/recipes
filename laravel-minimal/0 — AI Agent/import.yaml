@@ -40,12 +40,9 @@ services:
 
   # PostgreSQL backing store for schema, sessions, cache, and queued jobs —
   # all Laravel drivers default to 'database' in the minimal tier. Shared by
-  # appdev and appstage. NON_HA is fine for agent workspaces; priority 10
+  # appdev and appstage. Single-node is fine for agent workspaces; priority 10
   # ensures db is ready before the app containers start.
   - hostname: db
-    type: postgresql@18
+    type: postgresql:single@18
+    profile: oltp-staging
     priority: 10
-    mode: NON_HA
-    verticalAutoscaling:
-      minRam: 0.25
-

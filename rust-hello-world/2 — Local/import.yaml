@@ -22,6 +22,6 @@ services:
   # via 'zcli vpn up' using the 'db' hostname. Priority 10 starts
   # data services before app containers, preventing connection errors.
   - hostname: db
-    type: postgresql@17
-    mode: NON_HA
+    type: postgresql:single@17
+    profile: oltp-hobby
     priority: 10

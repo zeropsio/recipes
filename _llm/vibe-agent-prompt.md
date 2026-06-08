@@ -144,17 +144,15 @@ project:
 services:
   # Application service - built from any public Git repository
   - hostname: app
-    type: bun@latest
+    type: alpine/bun@latest
     # Enable public access via Zerops subdomain
-    zeropsSubdomain:
-      suffix: app
+    enableSubdomainAccess: true
     # Build from public Git repository (can be any public repo, not just zerops-recipe-apps)
     buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
 
   # Database service - managed by Zerops
   - hostname: db
-    type: postgresql@16
-    mode: HA  # High Availability - use NON_HA for dev/stage
+    type: postgresql:ha@18 # High Availability - use postgresql:single@18 for dev/stage
     # Services are sorted by priority in descending order before creation
     # Higher priority = created sooner (e.g., DB before app)
     priority: 10
@@ -165,28 +163,29 @@ services:
 ```yaml
 # yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/zerops-yaml-json-schema.json
 
-# Service name must match hostname in import.yaml
-app:
-  # Build configuration
-  build:
-    # Base image - see https://docs.zerops.io/zerops-yaml/base-list
-    base: bun@latest
-    # Commands to build the application
-    buildCommands:
-      - bun install
-      - bun run build
-    # Files/folders to deploy (relative to repo root)
-    deployFiles:
-      - dist
-      - package.json
-    # Cache between builds - see https://docs.zerops.io/features/build-cache
-    cache:
-      - node_modules
+zerops:
+  # Service name must match hostname in import.yaml
+  - setup: app
+    # Build configuration
+    build:
+      # Base image - see https://docs.zerops.io/zerops-yaml/base-list
+      base: alpine/bun@latest
+      # Commands to build the application
+      buildCommands:
+        - bun install
+        - bun run build
+      # Files/folders to deploy (relative to repo root)
+      deployFiles:
+        - dist
+        - package.json
+      # Cache between builds - see https://docs.zerops.io/features/build-cache
+      cache:
+        - node_modules
 
-  # Runtime configuration
-  run:
-    # Command to start the application
-    start: bun run start
+    # Runtime configuration
+    run:
+      # Command to start the application
+      start: bun run start
 ```
 
 ### Key Documentation
@@ -246,10 +245,11 @@ Optional: `knowledge-base` (anywhere, as needed)
 ```yaml
 services:
   - hostname: db
-    type: postgresql@16
     # HA mode provides automatic failover and read replicas
-    # Use NON_HA for development to reduce costs
-    mode: HA
+    # Use postgresql:single@18 for development to reduce costs
+    type: postgresql:ha@18
+    # Use oltp-staging or oltp-hobby for development to reduce costs
+    profile: oltp-production
     # Higher priority = created first. DB must exist before app starts.
     priority: 10
 ```

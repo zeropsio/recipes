@@ -67,26 +67,20 @@ services:
   # because the app depends on those services.
   # HA Postgres on dedicated CPU — used by the api codebase to
   # persist items + upload metadata. Cluster replicates writes across
-  # nodes, so a node loss fails over without a manual restore window;
-  # bump verticalAutoscaling.minRam when working-set growth pushes
-  # query latency past your production SLO.
+  # nodes, so a node loss fails over without a manual restore window.
+  # Switch to the oltp-enterprise profile for more reserved headroom.
   - hostname: db
-    type: postgresql@18
+    type: postgresql:ha@18
+    profile: oltp-production
     priority: 10
-    mode: HA
-    verticalAutoscaling:
-      cpuMode: DEDICATED
-      minRam: 1
-      minFreeRamGB: 0.5
 
   # HA Valkey on dedicated CPU — the cluster replicates state so a
   # node loss fails over without flushing the cache demo's counters or
   # the worker event list. Bump verticalAutoscaling.minRam when
   # eviction rates drift up under production working-set growth.
   - hostname: cache
-    type: valkey@7.2
+    type: valkey:ha@7.2
     priority: 10
-    mode: HA
     verticalAutoscaling:
       cpuMode: DEDICATED
       minRam: 1
@@ -98,9 +92,8 @@ services:
   # operator intervention. Bump verticalAutoscaling.minRam if
   # publish-burst spikes saturate the cluster's working set at peak.
   - hostname: broker
-    type: nats@2.12
+    type: nats:ha@2.12
     priority: 10
-    mode: HA
     verticalAutoscaling:
       cpuMode: DEDICATED
       minRam: 1
@@ -120,11 +113,9 @@ services:
   # floor — bump verticalAutoscaling.minRam if production search
   # latency correlates with index growth past the current ceiling.
   - hostname: search
-    type: meilisearch@1.20
+    type: meilisearch:single@1.20
     priority: 10
-    mode: NON_HA
     verticalAutoscaling:
       cpuMode: DEDICATED
       minRam: 1
       minFreeRamGB: 0.5
-

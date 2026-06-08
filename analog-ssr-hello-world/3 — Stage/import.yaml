@@ -20,9 +20,6 @@ services:
   # before app containers, preventing connection errors on
   # first boot when the database is not yet ready.
   - hostname: db
-    type: postgresql@18
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-staging
     priority: 10
-    verticalAutoscaling:
-      minRam: 0.5
-      minFreeRamGB: 0.25

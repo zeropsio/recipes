@@ -26,8 +26,8 @@ services:
   # this database locally via `zcli vpn up`, which routes traffic
   # over WireGuard to the Zerops private network. Priority 10
   # starts data services before app containers.
+  # Single-node database - suitable for local development.
   - hostname: db
-    type: postgresql@18
-    # NON_HA: single-node database - suitable for local development.
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-hobby
     priority: 10

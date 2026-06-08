@@ -23,12 +23,9 @@ services:
 
   # PostgreSQL for application data. Priority 10 ensures the database
   # is ready before the app container runs migrations in initCommands.
+  # Single-node database - same as production config but
+  # without replication, matching stage's lower-cost profile.
   - hostname: db
-    type: postgresql@18
-    # NON_HA = single-node database - same as production config but
-    # without replication, matching stage's lower-cost profile.
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-staging
     priority: 10
-    verticalAutoscaling:
-      minRam: 0.5
-      minFreeRamGB: 0.25
