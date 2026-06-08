@@ -21,12 +21,8 @@ services:
       minFreeRamGB: 0.25
 
   # PostgreSQL single-node — staging data is disposable and easily re-seeded.
-  # NON_HA keeps costs low while matching the production schema and driver.
+  # Single-node keeps costs low while matching the production schema and driver.
   - hostname: db
-    type: postgresql@18
+    type: postgresql:single@18
+    profile: oltp-staging
     priority: 10
-    mode: NON_HA
-    verticalAutoscaling:
-      minRam: 0.25
-      minFreeRamGB: 0.25
-

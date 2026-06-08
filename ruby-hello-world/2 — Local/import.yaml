@@ -25,6 +25,6 @@ services:
   # Priority 10 starts the database first, preventing
   # connection errors when the app container boots.
   - hostname: db
-    type: postgresql@18
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-hobby
     priority: 10

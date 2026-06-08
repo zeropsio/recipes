@@ -36,12 +36,9 @@ services:
 
   # PostgreSQL — stores the greetings table used by the dashboard CRUD demo.
   # TypeORM synchronize handles schema in dev; the migrate.ts script handles it
-  # in prod. NON_HA is appropriate for a dev/staging database. Priority 10
+  # in prod. Single-node is appropriate for a dev/staging database. Priority 10
   # ensures db accepts connections before app containers attempt migrations.
   - hostname: db
-    type: postgresql@18
+    type: postgresql:single@18
+    profile: oltp-staging
     priority: 10
-    mode: NON_HA
-    verticalAutoscaling:
-      minRam: 0.25
-

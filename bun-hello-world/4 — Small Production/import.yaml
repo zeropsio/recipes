@@ -24,9 +24,6 @@ services:
   # or configuring your own backup export strategy via the Zerops UI.
   # Priority 10 starts the database before the app — prevents connection errors on deploy.
   - hostname: db
-    type: postgresql@18
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-production
     priority: 10
-    verticalAutoscaling:
-      minRam: 0.25
-      minFreeRamGB: 0.125

@@ -92,11 +92,9 @@ services:
   # connect to this one instance, so priority 10 guarantees Postgres
   # is accepting connections before any initCommand migration runs.
   - hostname: db
-    type: postgresql@18
+    type: postgresql:single@18
+    profile: oltp-staging
     priority: 10
-    mode: NON_HA
-    verticalAutoscaling:
-      minRam: 0.25
 
   # Spin up Valkey in single-node mode — an open-source Redis-
   # compatible key/value store used by the api for the cache demo
@@ -104,9 +102,8 @@ services:
   # queue-state events list. Smallest managed RAM (0.25 GB) is plenty
   # for a few demo keys; iteration data is replaceable.
   - hostname: cache
-    type: valkey@7.2
+    type: valkey:single@7.2
     priority: 10
-    mode: NON_HA
     verticalAutoscaling:
       minRam: 0.25
 
@@ -118,9 +115,8 @@ services:
   # separate env vars; composing a single nats://user:pass@host URL
   # by hand triggers double-auth and the broker rejects the CONNECT.
   - hostname: broker
-    type: nats@2.12
+    type: nats:single@2.12
     priority: 10
-    mode: NON_HA
     verticalAutoscaling:
       minRam: 0.25
 
@@ -143,9 +139,7 @@ services:
   # minRam if your seed grows past a few thousand documents and
   # search latency creeps up.
   - hostname: search
-    type: meilisearch@1.20
+    type: meilisearch:single@1.20
     priority: 10
-    mode: NON_HA
     verticalAutoscaling:
       minRam: 0.25
-

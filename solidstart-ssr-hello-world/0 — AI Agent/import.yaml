@@ -40,6 +40,6 @@ services:
   # the database before app containers — prevents connection
   # errors during initCommands (migration) on first deploy.
   - hostname: db
-    type: postgresql@16
-    mode: NON_HA
+    type: postgresql:single@16
+    profile: oltp-staging
     priority: 10

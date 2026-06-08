@@ -26,12 +26,10 @@ services:
   # local JVM can connect directly to this database using the
   # db_hostname, db_port, db_user, and db_password values from
   # the Zerops dashboard — same connection string as production.
-  # NON_HA is single-node, appropriate for local development.
+  # Single-node, appropriate for local development.
   # Priority 10 ensures the database is ready before the app
   # container starts and attempts its connection.
   - hostname: db
-    type: postgresql@18
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-hobby
     priority: 10
-    verticalAutoscaling:
-      minRam: 0.25

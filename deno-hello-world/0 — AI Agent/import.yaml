@@ -36,9 +36,9 @@ services:
   # Accessible as 'db' hostname from 'appdev' and
   # 'appstage' services. Priority 10 starts data services
   # before app containers, preventing connection errors
-  # on startup. NON_HA is suitable for dev/staging where
+  # on startup. Single-node is suitable for dev/staging where
   # high-availability durability is not required.
   - hostname: db
-    type: postgresql@16
-    mode: NON_HA
+    type: postgresql:single@16
+    profile: oltp-staging
     priority: 10

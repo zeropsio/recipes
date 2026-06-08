@@ -45,8 +45,8 @@ services:
   # PostgreSQL single-node database for both services.
   # Priority 10 ensures the database starts before the app services —
   # higher priority = starts first, preventing connection errors on boot.
-  # NON_HA is a single node — suitable for dev/staging workloads.
+  # A single node — suitable for dev/staging workloads.
   - hostname: db
-    type: postgresql@18
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-hobby
     priority: 10

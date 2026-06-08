@@ -22,6 +22,6 @@ services:
   # Single-node database — production parity in topology but
   # without the HA overhead. Sufficient for pre-production testing.
   - hostname: db
-    type: postgresql@16
-    mode: NON_HA
+    type: postgresql:single@16
+    profile: oltp-staging
     priority: 10

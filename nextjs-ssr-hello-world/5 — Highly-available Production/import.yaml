@@ -33,15 +33,9 @@ services:
 
   # PostgreSQL with HA replication. Priority 10 ensures primary and
   # replica nodes are ready before app containers start.
+  # HA mode replicates data across multiple nodes - no single point
+  # of failure. Automatic failover if the primary node goes down.
   - hostname: db
-    type: postgresql@18
-    # HA mode replicates data across multiple nodes - no single point
-    # of failure. Automatic failover if the primary node goes down.
-    mode: HA
+    type: postgresql:ha@18
+    profile: oltp-production
     priority: 10
-    verticalAutoscaling:
-      cpuMode: DEDICATED
-      # Larger minRam for the database handles query buffers and
-      # connection pool overhead from multiple app containers.
-      minRam: 1
-      minFreeRamGB: 0.5

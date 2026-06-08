@@ -26,9 +26,9 @@ services:
   # PostgreSQL for application data. Priority 10 ensures the database
   # is ready before the app container runs its migration in
   # initCommands.
+  # Single-node database - cost-effective for local dev
+  # where the database runs in the cloud for VPN access.
   - hostname: db
-    type: postgresql@18
-    # NON_HA = single-node database - cost-effective for local dev
-    # where the database runs in the cloud for VPN access.
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-hobby
     priority: 10

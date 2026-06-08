@@ -34,12 +34,9 @@ services:
       minRam: 0.5
 
   # PostgreSQL — same schema as the agent workspace. Shared by appdev and
-  # appstage. NON_HA because remote dev databases are replaceable and easily
+  # appstage. Single-node because remote dev databases are replaceable and easily
   # re-seeded via initCommands.
   - hostname: db
-    type: postgresql@18
+    type: postgresql:single@18
+    profile: oltp-hobby
     priority: 10
-    mode: NON_HA
-    verticalAutoscaling:
-      minRam: 0.25
-

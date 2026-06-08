@@ -32,14 +32,10 @@ services:
       minFreeRamGB: 0.25
 
   # PostgreSQL HA database — data is replicated across multiple nodes,
-  # eliminating the single point of failure present in NON_HA mode.
+  # eliminating the single point of failure present in a single-node setup.
   # Automatic encrypted backups are enabled by default.
   # Priority 10 starts the database before the app containers.
   - hostname: db
-    type: postgresql@18
-    mode: HA
+    type: postgresql:ha@18
+    profile: oltp-production
     priority: 10
-    verticalAutoscaling:
-      cpuMode: DEDICATED
-      minRam: 1
-      minFreeRamGB: 0.5

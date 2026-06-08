@@ -28,9 +28,6 @@ services:
   # sessions, and cache for the minimal Laravel setup. Priority 10 ensures it
   # starts before the app service.
   - hostname: db
-    type: postgresql@18
+    type: postgresql:single@18
+    profile: oltp-hobby
     priority: 10
-    mode: NON_HA
-    verticalAutoscaling:
-      minRam: 0.25
-

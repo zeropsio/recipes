@@ -32,10 +32,6 @@ services:
   # If the primary node fails, a replica is promoted automatically
   # - no manual intervention and no data loss.
   - hostname: db
-    type: postgresql@18
-    mode: HA
+    type: postgresql:ha@18
+    profile: oltp-production
     priority: 10
-    verticalAutoscaling:
-      cpuMode: DEDICATED
-      minRam: 1
-      minFreeRamGB: 0.5

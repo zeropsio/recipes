@@ -33,8 +33,8 @@ services:
     enableSubdomainAccess: true
 
   # PostgreSQL - starts before app containers (priority 10).
-  # mode: NON_HA is a single-node database - suitable for development.
+  # Single-node database - suitable for development.
   - hostname: db
-    type: postgresql@16
-    mode: NON_HA
+    type: postgresql:single@16
+    profile: oltp-hobby
     priority: 10

@@ -47,8 +47,8 @@ services:
   # 'appstage' service and developers from 'appdev'
   # typically connect to this database.
   - hostname: db
-    type: postgresql@16
-    mode: NON_HA
+    type: postgresql:single@16
+    profile: oltp-hobby
     priority: 10
   
   # Spin up Redis-compatible Valkey,
@@ -57,8 +57,7 @@ services:
   # by both the staging 'appstage' service
   # and developers from the 'appdev' service.
   - hostname: redis
-    type: valkey@7.2
-    mode: NON_HA
+    type: valkey:single@7.2
     priority: 10
   
   # Create 'public-read' object storage bucket,

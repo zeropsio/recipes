@@ -30,12 +30,10 @@ services:
       minRam: 0.5
 
   # PostgreSQL single-node database for development — shared by both appdev and appstage.
-  # NON_HA is appropriate for dev/staging where high-availability isn't required.
+  # Single-node is appropriate for dev/staging where high-availability isn't required.
   # Priority 10 ensures the database starts before the app services, preventing
   # connection errors during container startup.
   - hostname: db
-    type: postgresql@18
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-staging
     priority: 10
-    verticalAutoscaling:
-      minRam: 0.25

@@ -38,9 +38,9 @@ services:
   # PostgreSQL for application data. Priority 10 ensures the database
   # starts before the app containers, preventing connection errors
   # on first boot.
+  # Single-node database - sufficient for development
+  # and agent workflows where data durability is not critical.
   - hostname: db
-    type: postgresql@18
-    # NON_HA = single-node database - sufficient for development
-    # and agent workflows where data durability is not critical.
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-staging
     priority: 10

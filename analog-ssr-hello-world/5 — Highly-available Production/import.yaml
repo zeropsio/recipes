@@ -27,13 +27,9 @@ services:
       # and Node.js memory fragmentation without OOM restarts.
       minFreeRamGB: 0.25
 
+  # HA mode replicates data across multiple nodes — survives a
+  # single-node failure without data loss or service interruption.
   - hostname: db
-    type: postgresql@18
-    # HA mode replicates data across multiple nodes — survives a
-    # single-node failure without data loss or service interruption.
-    mode: HA
+    type: postgresql:ha@18
+    profile: oltp-production
     priority: 10
-    verticalAutoscaling:
-      cpuMode: DEDICATED
-      minRam: 1
-      minFreeRamGB: 0.5

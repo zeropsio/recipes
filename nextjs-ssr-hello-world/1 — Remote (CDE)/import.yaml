@@ -43,9 +43,9 @@ services:
   # PostgreSQL for application data. Priority 10 starts the database
   # before app containers, so the migration in initCommands succeeds
   # on first deploy.
+  # Single-node database - sufficient for development
+  # environments where data loss on restart is acceptable.
   - hostname: db
-    type: postgresql@18
-    # NON_HA = single-node database - sufficient for development
-    # environments where data loss on restart is acceptable.
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-hobby
     priority: 10

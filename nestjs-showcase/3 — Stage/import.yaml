@@ -56,26 +56,22 @@ services:
 
   # Set higher priority for databases and storages,
   # because the app depends on those services.
-  # Single-instance NON_HA Postgres — used by the api codebase to
+  # Single-instance Postgres — used by the api codebase to
   # persist items + upload metadata. Restoring from snapshot means
-  # downtime at stage; bump verticalAutoscaling.minRam when stage
-  # workloads push query latency past your SLO.
+  # downtime at stage. Switch to the oltp-production profile if stage
+  # workloads need more reserved RAM headroom.
   - hostname: db
-    type: postgresql@18
+    type: postgresql:single@18
+    profile: oltp-staging
     priority: 10
-    mode: NON_HA
-    verticalAutoscaling:
-      minRam: 0.25
-      minFreeRamGB: 0.25
 
   # Single-node Valkey at stage scale — the cache-demo counters and
   # worker event list keep their warmth across rehearsal traffic. The
   # 0.25 GB minFreeRamGB headroom prevents eviction-storm spikes when
   # concurrent QA flows churn keys.
   - hostname: cache
-    type: valkey@7.2
+    type: valkey:single@7.2
     priority: 10
-    mode: NON_HA
     verticalAutoscaling:
       minRam: 0.25
       minFreeRamGB: 0.25
@@ -86,9 +82,8 @@ services:
   # minFreeRamGB headroom absorbs publish-burst spikes during
   # rehearsal traffic.
   - hostname: broker
-    type: nats@2.12
+    type: nats:single@2.12
     priority: 10
-    mode: NON_HA
     verticalAutoscaling:
       minRam: 0.25
       minFreeRamGB: 0.25
@@ -107,10 +102,8 @@ services:
   # verticalAutoscaling.minRam when index size correlates with
   # stage search latency past your SLO.
   - hostname: search
-    type: meilisearch@1.20
+    type: meilisearch:single@1.20
     priority: 10
-    mode: NON_HA
     verticalAutoscaling:
       minRam: 0.25
       minFreeRamGB: 0.25
-

@@ -36,22 +36,18 @@ services:
       minFreeRamGB: 0.25
 
   # PostgreSQL — single-node staging database. Runs migrations and seeds on
-  # deploy. Data is replaceable, so NON_HA is appropriate.
+  # deploy. Data is replaceable, so single-node is appropriate.
   - hostname: db
-    type: postgresql@18
+    type: postgresql:single@18
+    profile: oltp-staging
     priority: 10
-    mode: NON_HA
-    verticalAutoscaling:
-      minRam: 0.25
-      minFreeRamGB: 0.25
 
   # Valkey — handles cache, sessions, and queue. Single-node for staging;
   # validates that all three Redis-backed drivers work correctly with production
   # config.
   - hostname: redis
-    type: valkey@7.2
+    type: valkey:single@7.2
     priority: 10
-    mode: NON_HA
     verticalAutoscaling:
       minRam: 0.25
       minFreeRamGB: 0.25
@@ -66,10 +62,8 @@ services:
   # Meilisearch — staging search index. initCommands runs scout:import after
   # seeding to populate the index.
   - hostname: search
-    type: meilisearch@1.20
+    type: meilisearch:single@1.20
     priority: 10
-    mode: NON_HA
     verticalAutoscaling:
       minRam: 0.25
       minFreeRamGB: 0.25
-

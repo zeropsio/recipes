@@ -61,7 +61,7 @@ Study these for patterns and best practices:
 
 ## Output Schema: research.md
 
-```markdown
+````markdown
 # {Software Name} — Zerops Recipe Research
 
 ## Overview
@@ -138,6 +138,7 @@ Refer to: https://docs.zerops.io/features/env-variables
 - Type: {PostgreSQL, MySQL, MongoDB, none — check type-list}
 - Minimum version: {version}
 - Initialization: {any setup scripts needed}
+- Recommended profile: {autoscaling profile for the selected type and version – only if supported}
 
 ### Object Storage
 
@@ -148,11 +149,11 @@ Refer to: https://docs.zerops.io/features/env-variables
 
 Refer to: https://docs.zerops.io/references/import-yaml/type-list
 
-| Service | Type          | Purpose          | Priority         |
-|---------|---------------|------------------|------------------|
-| db      | postgresql@16 | Primary database | 10 (start first) |
-| cache   | keydb@latest  | Session cache    | 5                |
-| app     | {runtime}     | Application      | 1 (start last)   |
+| Service | Type                 | Purpose          | Priority         |
+|---------|----------------------|------------------|------------------|
+| db      | postgresql:ha@18     | Primary database | 10 (start first) |
+| cache   | valkey:single@latest | Session cache    | 5                |
+| app     | {runtime}            | Application      | 1 (start last)   |
 
 Note: Higher priority = created sooner.
 
@@ -162,7 +163,7 @@ Refer to: https://docs.zerops.io/features/scaling-ha
 
 - {Memory requirements (language-dependent: Java needs more than Go)}
 - {CPU considerations}
-- {When to use HA vs NON_HA mode}
+- {When to use HA vs Single type for managed services}
 
 ## Maintenance Guide
 
@@ -205,7 +206,7 @@ Refer to: https://docs.zerops.io/features/scaling-ha
 - {Deviations from standard patterns}
 - {Which reference recipe is most similar}
 
-```
+````
 
 ---
 

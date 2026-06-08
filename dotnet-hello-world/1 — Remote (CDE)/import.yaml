@@ -35,12 +35,10 @@ services:
       minRam: 0.5
 
   # PostgreSQL single-node for development and staging.
-  # NON_HA = single node, suitable for non-production workloads.
+  # Single node, suitable for non-production workloads.
   # Priority 10 ensures the database is ready before app containers
   # attempt their first connection — prevents startup crash loops.
   - hostname: db
-    type: postgresql@16
-    mode: NON_HA
+    type: postgresql:single@16
+    profile: oltp-hobby
     priority: 10
-    verticalAutoscaling:
-      minRam: 0.25

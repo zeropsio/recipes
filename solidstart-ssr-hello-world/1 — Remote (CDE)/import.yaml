@@ -37,6 +37,6 @@ services:
   # the database is ready before app containers start — preventing
   # connection errors during the migration initCommand.
   - hostname: db
-    type: postgresql@16
-    mode: NON_HA
+    type: postgresql:single@16
+    profile: oltp-hobby
     priority: 10

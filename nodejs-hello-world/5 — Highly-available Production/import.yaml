@@ -29,14 +29,10 @@ services:
   # PostgreSQL HA — replicates data across multiple nodes,
   # eliminating a single point of failure. Automatic failover
   # keeps the database available during node restarts.
-  # DEDICATED cpuMode prevents database CPU contention under
+  # Dedicated CPU prevents database CPU contention under
   # write-heavy workloads. Priority 10 starts the database
   # cluster before app containers.
   - hostname: db
-    type: postgresql@18
-    mode: HA
+    type: postgresql:ha@18
+    profile: oltp-production
     priority: 10
-    verticalAutoscaling:
-      cpuMode: DEDICATED
-      minRam: 1
-      minFreeRamGB: 0.5

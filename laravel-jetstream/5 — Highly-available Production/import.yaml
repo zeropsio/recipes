@@ -39,15 +39,14 @@ services:
   # used by the Laravel app to store data. Automatic,
   # encrypted backups are enabled by default too.
   - hostname: db
-    type: postgresql@16
-    mode: HA
+    type: postgresql:ha@16
+    profile: oltp-production
     priority: 10
 
   # Spin up Valkey, an open-source Redis-compatible
   # key/value storage for caching, sessions, queues, etc.
   - hostname: redis
-    type: valkey@7.2
-    mode: HA
+    type: valkey:ha@7.2
     priority: 10
 
   # Create 'public-read' object storage bucket,

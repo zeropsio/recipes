@@ -22,9 +22,9 @@ services:
   # PostgreSQL for application data. Priority 10 starts data
   # services before app containers, preventing connection errors
   # on first boot.
+  # Single-node database - sufficient for staging; upgrade
+  # to HA mode in production for data redundancy.
   - hostname: db
-    type: postgresql@18
-    # NON_HA: single-node database - sufficient for staging; upgrade
-    # to HA mode in production for data redundancy.
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-staging
     priority: 10

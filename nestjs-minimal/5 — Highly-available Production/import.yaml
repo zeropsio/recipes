@@ -31,11 +31,6 @@ services:
   # failure causes no data loss or downtime. Dedicated CPU ensures database
   # operations run on pinned cores without co-tenant interference.
   - hostname: db
-    type: postgresql@18
+    type: postgresql:ha@18
+    profile: oltp-production
     priority: 10
-    mode: HA
-    verticalAutoscaling:
-      cpuMode: DEDICATED
-      minRam: 1
-      minFreeRamGB: 0.5
-

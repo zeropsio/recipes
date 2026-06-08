@@ -48,26 +48,20 @@ services:
   # Priority 10 starts data services before app containers,
   # preventing connection errors on first deploy.
   - hostname: db
-    type: postgresql@17
-    mode: HA
+    type: postgresql:ha@17
+    profile: oltp-production
     priority: 10
-    verticalAutoscaling:
-      cpuMode: DEDICATED
-      minRam: 2
-      minFreeRamGB: 1
 
   # Valkey HA — replicated cache for event tracking and job counters,
   # ensuring cache availability even if a node fails.
   - hostname: redis
-    type: valkey@7.2
-    mode: HA
+    type: valkey:ha@7.2
     priority: 10
 
   # NATS HA — replicated message queue for reliable event delivery
   # between the app and worker services.
   - hostname: queue
-    type: nats@2.12
-    mode: HA
+    type: nats:ha@2.12
     priority: 10
 
   # S3-compatible object storage — larger capacity for production workloads.

@@ -33,9 +33,6 @@ services:
   # dedicated backup strategy. Priority 10 ensures the database starts
   # before app containers.
   - hostname: db
-    type: postgresql@18
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-production
     priority: 10
-    verticalAutoscaling:
-      minRam: 0.25
-      minFreeRamGB: 0.125

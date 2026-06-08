@@ -5,8 +5,8 @@ project:
 
 services:
   - hostname: db
-    type: postgresql@17
-    mode: HA
+    type: postgresql:ha@17
+    profile: oltp-production
     priority: 10
 
   - hostname: umami

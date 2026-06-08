@@ -18,12 +18,10 @@ services:
       minRam: 0.5
       minFreeRamGB: 0.25  # Reserve headroom for request spikes and GC pressure
 
-  # PostgreSQL single-node database for staging. NON_HA is appropriate here — staging
+  # PostgreSQL single-node database for staging — appropriate because staging
   # data is replaceable and does not need production-grade durability.
   # Priority 10 starts the database first, preventing app connection errors on deploy.
   - hostname: db
-    type: postgresql@18
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-staging
     priority: 10
-    verticalAutoscaling:
-      minRam: 0.25

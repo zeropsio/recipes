@@ -20,6 +20,6 @@ services:
   # PostgreSQL for app data. Priority 10 starts data services
   # before app containers, preventing connection errors at startup.
   - hostname: db
-    type: postgresql@17
-    mode: NON_HA
+    type: postgresql:single@17
+    profile: oltp-production
     priority: 10

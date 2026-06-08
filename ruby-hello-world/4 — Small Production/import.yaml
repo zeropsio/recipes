@@ -32,6 +32,6 @@ services:
   # your own backup export strategy.
   # Priority 10 starts the database before app containers.
   - hostname: db
-    type: postgresql@18
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-production
     priority: 10

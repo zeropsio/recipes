@@ -43,13 +43,13 @@ services:
 
   # PostgreSQL single-node database shared by both
   # 'appdev' and 'appstage'. Accessible as the 'db'
-  # hostname from either service. NON_HA is a single
+  # hostname from either service. A single
   # container — suitable for development where HA
   # durability isn't required. Priority 10 ensures
   # the database starts before app containers, so
   # the DB is accepting connections when the app
   # runs its first migration.
   - hostname: db
-    type: postgresql@16
-    mode: NON_HA
+    type: postgresql:single@16
+    profile: oltp-hobby
     priority: 10

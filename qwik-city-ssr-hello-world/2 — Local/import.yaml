@@ -26,10 +26,10 @@ services:
   # PostgreSQL accessible locally via zcli VPN. Run `zcli vpn up` to
   # connect — then use DB_HOST=db.zerops (internal hostname) in your
   # local .env to point the local dev server at this database.
+  # Single-node database — sufficient for local development.
   - hostname: db
-    type: postgresql@16
-    # NON_HA: single-node database — sufficient for local development.
-    mode: NON_HA
+    type: postgresql:single@16
+    profile: oltp-hobby
     priority: 10
     verticalAutoscaling:
       minRam: 0.5

@@ -27,12 +27,9 @@ services:
 
   # PostgreSQL for application data. Priority 10 starts the database
   # before app containers so migrations run against a ready database.
+  # Single-node database - suitable for production workloads
+  # where a short outage during database restart is acceptable.
   - hostname: db
-    type: postgresql@18
-    # NON_HA = single-node database - suitable for production workloads
-    # where a short outage during database restart is acceptable.
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-production
     priority: 10
-    verticalAutoscaling:
-      minRam: 0.5
-      minFreeRamGB: 0.25

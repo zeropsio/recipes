@@ -42,14 +42,12 @@ services:
 
   # PostgreSQL single-node database. Accessible from both 'appdev'
   # and 'appstage' using the 'db_hostname', 'db_port', 'db_user',
-  # and 'db_password' generated env vars. NON_HA uses a single
+  # and 'db_password' generated env vars. It uses a single
   # node — fine for development environments where HA durability
   # is not required.
   # Higher priority starts the database first, before app containers
   # attempt their database connections.
   - hostname: db
-    type: postgresql@18
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-hobby
     priority: 10
-    verticalAutoscaling:
-      minRam: 0.25

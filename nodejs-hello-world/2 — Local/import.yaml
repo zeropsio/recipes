@@ -24,8 +24,6 @@ services:
   # shown in the Zerops dashboard. Priority 10 starts
   # the database before the app container.
   - hostname: db
-    type: postgresql@18
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-hobby
     priority: 10
-    verticalAutoscaling:
-      minRam: 0.25

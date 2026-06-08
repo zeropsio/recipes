@@ -29,9 +29,9 @@ services:
 
   # PostgreSQL single-node database with automatic encrypted backups
   # enabled by default. For production traffic with strict durability
-  # requirements, consider HA mode (mode: HA) or your own backup strategy.
+  # requirements, consider HA mode or your own backup strategy.
   # Priority 10 ensures the database is ready before app containers start.
   - hostname: db
-    type: postgresql@18
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-production
     priority: 10

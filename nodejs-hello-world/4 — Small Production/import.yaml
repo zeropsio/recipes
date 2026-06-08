@@ -26,9 +26,6 @@ services:
   # on by default. For higher-traffic production, consider
   # HA mode (see Environment 5) or an external backup strategy.
   - hostname: db
-    type: postgresql@18
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-production
     priority: 10
-    verticalAutoscaling:
-      minRam: 0.25
-      minFreeRamGB: 0.125

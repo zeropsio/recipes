@@ -37,11 +37,9 @@ services:
       minRam: 0.5
 
   # PostgreSQL single-node database — accessible as 'db' hostname from both appdev
-  # and appstage. NON_HA is suitable for development where durability isn't critical.
+  # and appstage. Single-node is suitable for development where durability isn't critical.
   # Priority 10 starts the database before app services to prevent connection errors.
   - hostname: db
-    type: postgresql@18
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-hobby
     priority: 10
-    verticalAutoscaling:
-      minRam: 0.25

@@ -20,8 +20,8 @@ services:
       minFreeRamGB: 0.25
 
   - hostname: db
-    type: postgresql@17
-    mode: HA
+    type: postgresql:single@17
+    profile: oltp-production
     priority: 10
 
   - hostname: storage
