@@ -40,8 +40,8 @@ services:
   # PostgreSQL single-node database shared between dev
   # and staging. Priority 10 ensures the database starts
   # before app containers — no connection errors on first
-  # deploy. NON_HA is single-node, suitable for dev/stage.
+  # deploy. Single-node, suitable for dev/stage.
   - hostname: db
-    type: postgresql@18
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-hobby
     priority: 10

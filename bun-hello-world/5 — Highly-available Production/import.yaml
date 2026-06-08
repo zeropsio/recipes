@@ -29,10 +29,6 @@ services:
   # Dedicated CPU ensures database operations don't compete with other workloads.
   # Priority 10 starts the database before app containers.
   - hostname: db
-    type: postgresql@18
-    mode: HA
+    type: postgresql:ha@18
+    profile: oltp-production
     priority: 10
-    verticalAutoscaling:
-      cpuMode: DEDICATED
-      minRam: 1
-      minFreeRamGB: 0.5

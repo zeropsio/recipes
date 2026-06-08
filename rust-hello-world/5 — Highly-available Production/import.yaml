@@ -25,10 +25,6 @@ services:
   # HA PostgreSQL — automatic failover across availability zones.
   # Dedicated CPUs prevent noisy-neighbor latency on queries.
   - hostname: db
-    type: postgresql@17
-    mode: HA
+    type: postgresql:ha@17
+    profile: oltp-production
     priority: 10
-    verticalAutoscaling:
-      cpuMode: DEDICATED
-      minRam: 1
-      minFreeRamGB: 0.5

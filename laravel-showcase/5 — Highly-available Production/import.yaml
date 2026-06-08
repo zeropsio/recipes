@@ -48,21 +48,16 @@ services:
   # failure causes no data loss or downtime. Dedicated CPU ensures database
   # operations maintain consistent latency regardless of co-located workloads.
   - hostname: db
-    type: postgresql@18
+    type: postgresql:ha@18
+    profile: oltp-production
     priority: 10
-    mode: HA
-    verticalAutoscaling:
-      cpuMode: DEDICATED
-      minRam: 1
-      minFreeRamGB: 0.5
 
   # Valkey HA — replicated across nodes for high availability. Cache, session,
   # and queue operations survive node failures without data loss. Dedicated CPU
   # prevents latency spikes from shared-tenant interference.
   - hostname: redis
-    type: valkey@7.2
+    type: valkey:ha@7.2
     priority: 10
-    mode: HA
     verticalAutoscaling:
       cpuMode: DEDICATED
       minRam: 1
@@ -76,13 +71,11 @@ services:
     objectStorageSize: 1
     objectStoragePolicy: private
 
-  # Meilisearch NON_HA — single node, Meilisearch doesn't offer HA
+  # Meilisearch single-node — Meilisearch doesn't offer HA
   - hostname: search
-    type: meilisearch@1.20
+    type: meilisearch:single@1.20
     priority: 10
-    mode: NON_HA
     verticalAutoscaling:
       cpuMode: DEDICATED
       minRam: 1
       minFreeRamGB: 0.5
-

@@ -92,7 +92,7 @@ If you wish to upgrade to highly-available 3-node setup, follow these instructio
     > https://www.elastic.co/docs/deploy-manage/tools/snapshot-and-restore/create-snapshots#manually-create-snapshot
 
 7. delete the current `elkstorage` service
-8. create a new `elkstorage` service with `mode: HA` and set S3 access secrets as environment variables
+8. create a new `elkstorage` service with `type: ha` and set S3 access secrets as environment variables
 
     ```shell
     S3_ACCESS_KEY=<copied-access-key-id>

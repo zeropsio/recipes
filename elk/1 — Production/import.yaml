@@ -7,8 +7,7 @@ services:
   # Centerpiece of the ELK stack, Elasticsearch service.
   # Serves as a storage for the logs, traces, settings, etc.
   - hostname: elkstorage
-    type: elasticsearch@8.16
-    mode: HA
+    type: elasticsearch:ha@8.16
     priority: 10
 
   - hostname: kibana

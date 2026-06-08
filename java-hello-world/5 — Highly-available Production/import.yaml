@@ -32,15 +32,11 @@ services:
 
   # PostgreSQL HA database — data replicated across multiple nodes.
   # HA mode eliminates the single point of failure present in
-  # NON_HA: if one node fails, a replica is promoted automatically.
-  # DEDICATED cpuMode ensures database CPU is never shared with
+  # a single-node setup: if one node fails, a replica is promoted automatically.
+  # Dedicated CPU ensures database CPU is never shared with
   # other workloads. Priority 10 guarantees the database cluster
   # is ready before any app container connects.
   - hostname: db
-    type: postgresql@18
-    mode: HA
+    type: postgresql:ha@18
+    profile: oltp-production
     priority: 10
-    verticalAutoscaling:
-      cpuMode: DEDICATED
-      minRam: 1
-      minFreeRamGB: 0.5

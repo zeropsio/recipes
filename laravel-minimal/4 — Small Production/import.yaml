@@ -27,13 +27,9 @@ services:
       minFreeRamGB: 0.25
 
   # PostgreSQL single-node for the minimal tier. Handles schema, sessions,
-  # cache, and queue. For higher data durability, deploy with mode: HA which
+  # cache, and queue. For higher data durability, deploy in HA mode which
   # replicates across multiple nodes.
   - hostname: db
-    type: postgresql@18
+    type: postgresql:single@18
+    profile: oltp-production
     priority: 10
-    mode: NON_HA
-    verticalAutoscaling:
-      minRam: 0.25
-      minFreeRamGB: 0.25
-

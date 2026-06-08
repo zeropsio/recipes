@@ -23,8 +23,8 @@ services:
   # PostgreSQL single-node database — same schema as production.
   # Priority 10 starts the database before the app, preventing
   # connection errors during container initialization.
-  # NON_HA is appropriate for staging; use HA mode for production.
+  # Single-node is appropriate for staging; use HA mode for production.
   - hostname: db
-    type: postgresql@18
-    mode: NON_HA
+    type: postgresql:single@18
+    profile: oltp-staging
     priority: 10

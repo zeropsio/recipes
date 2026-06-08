@@ -18,9 +18,9 @@ services:
     enableSubdomainAccess: true
 
   - hostname: db
-    type: postgresql@17
+    type: postgresql:ha@17
+    profile: oltp-production
     priority: 10
-    mode: HA
 
   - hostname: storage
     type: object-storage

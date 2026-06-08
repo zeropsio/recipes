@@ -19,8 +19,8 @@ services:
       DJANGO_SUPERUSER_PASSWORD: <@generateRandomString(<12>)>
 
   - hostname: db
-    type: postgresql@17
-    mode: NON_HA
+    type: postgresql:single@17
+    profile: oltp-hobby
     priority: 10
 
   - hostname: storage

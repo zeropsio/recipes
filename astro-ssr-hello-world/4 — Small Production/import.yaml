@@ -31,12 +31,9 @@ services:
 
   # PostgreSQL for app data. Priority 10 starts the database before
   # app containers, preventing connection errors on cold start.
+  # Single-node. Suitable for moderate traffic where a
+  # brief DB restart is acceptable. Use HA for zero-downtime needs.
   - hostname: db
-    type: postgresql@16
-    # NON_HA = single-node. Suitable for moderate traffic where a
-    # brief DB restart is acceptable. Use HA for zero-downtime needs.
-    mode: NON_HA
+    type: postgresql:single@16
+    profile: oltp-production
     priority: 10
-    verticalAutoscaling:
-      minRam: 0.5
-      minFreeRamGB: 0.25

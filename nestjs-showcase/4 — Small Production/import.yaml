@@ -61,27 +61,22 @@ services:
 
   # Set higher priority for databases and storages,
   # because the app depends on those services.
-  # Single-instance NON_HA Postgres — used by the api codebase to
-  # persist items + upload metadata at small-prod scale. The 0.25 GB
-  # minFreeRamGB headroom absorbs production load spikes; bump
-  # verticalAutoscaling.minRam when monitoring shows query latency
-  # creeping up under steady-state working set.
+  # Single-instance Postgres — used by the api codebase to
+  # persist items + upload metadata at small-prod scale. The
+  # oltp-production profile reserves generous RAM headroom for
+  # steady-state production load.
   - hostname: db
-    type: postgresql@18
+    type: postgresql:single@18
+    profile: oltp-production
     priority: 10
-    mode: NON_HA
-    verticalAutoscaling:
-      minRam: 0.25
-      minFreeRamGB: 0.25
 
   # Single-node Valkey at small-prod scale — the cache demo serves
   # real production cache traffic from a single replica. Bump
   # verticalAutoscaling.minRam when working-set growth pushes
   # eviction rates past acceptable hit-ratio thresholds.
   - hostname: cache
-    type: valkey@7.2
+    type: valkey:single@7.2
     priority: 10
-    mode: NON_HA
     verticalAutoscaling:
       minRam: 0.25
       minFreeRamGB: 0.25
@@ -92,9 +87,8 @@ services:
   # bump verticalAutoscaling.minRam if publish-burst spikes saturate
   # the broker's working set under production traffic.
   - hostname: broker
-    type: nats@2.12
+    type: nats:single@2.12
     priority: 10
-    mode: NON_HA
     verticalAutoscaling:
       minRam: 0.25
       minFreeRamGB: 0.25
@@ -113,10 +107,8 @@ services:
   # production search latency correlates with index growth past the
   # 0.25 GB ceiling.
   - hostname: search
-    type: meilisearch@1.20
+    type: meilisearch:single@1.20
     priority: 10
-    mode: NON_HA
     verticalAutoscaling:
       minRam: 0.25
       minFreeRamGB: 0.25
-

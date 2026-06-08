@@ -23,9 +23,9 @@ services:
 
   # PostgreSQL for app data. Priority 10 ensures the database
   # starts before the app container attempts to connect.
+  # Single-node database — adequate for local dev
+  # where losing a few minutes of data is acceptable.
   - hostname: db
-    type: postgresql@16
-    # NON_HA: single-node database — adequate for local dev
-    # where losing a few minutes of data is acceptable.
-    mode: NON_HA
+    type: postgresql:single@16
+    profile: oltp-hobby
     priority: 10

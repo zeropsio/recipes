@@ -19,9 +19,9 @@ services:
       minRam: 2
 
   - hostname: db
-    type: postgresql@17
+    type: postgresql:single@17
+    profile: oltp-hobby
     priority: 10
-    mode: NON_HA
 
   - hostname: storage
     type: object-storage

@@ -30,13 +30,9 @@ services:
 
   # PostgreSQL for app data. Priority 10 starts data services before
   # app containers, preventing connection errors on first boot.
+  # HA: data replicated across multiple nodes — survives single-node
+  # failure without data loss or manual intervention.
   - hostname: db
-    type: postgresql@16
-    # HA: data replicated across multiple nodes — survives single-node
-    # failure without data loss or manual intervention.
-    mode: HA
+    type: postgresql:ha@16
+    profile: oltp-production
     priority: 10
-    verticalAutoscaling:
-      cpuMode: DEDICATED
-      minRam: 1
-      minFreeRamGB: 0.5

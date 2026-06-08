@@ -26,13 +26,9 @@ services:
       minFreeRamGB: 0.25
 
   # PostgreSQL single-node — hosts schema, sessions, cache, and queued jobs
-  # for the minimal tier. NON_HA because staging data is replaceable and cost
+  # for the minimal tier. Single-node because staging data is replaceable and cost
   # efficiency matters.
   - hostname: db
-    type: postgresql@18
+    type: postgresql:single@18
+    profile: oltp-staging
     priority: 10
-    mode: NON_HA
-    verticalAutoscaling:
-      minRam: 0.25
-      minFreeRamGB: 0.25
-
