@@ -1,0 +1,19 @@
+# No managed services and no project-level secrets to generate here —
+# the project block only carries the project name.
+project:
+  name: elixir-minimal-local
+
+services:
+  # Run the production-shaped setup directly, with no separate dev
+  # container running alongside it — you connect over SSH or SSHFS from
+  # your own machine instead. Single container on shared CPU matches
+  # local-iteration traffic; bump verticalAutoscaling.minRam if `mix`
+  # builds or local load testing push memory past the current floor.
+  - hostname: app
+    type: elixir@1.16
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/elixir-minimal-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
