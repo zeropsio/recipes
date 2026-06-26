@@ -1,0 +1,25 @@
+# No managed services and no project-level secrets to generate here —
+# the project block only carries the project name.
+project:
+  name: elixir-minimal-remote
+
+services:
+  # Single-container dev service sized for a human porter working from
+  # a cloud IDE — source is SSHFS-mounted, so that `mix` commands run
+  # directly against live edits without a redeploy.
+  - hostname: appdev
+    type: elixir@1.16
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/elixir-minimal-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 1
+
+  - hostname: appstage
+    type: elixir@1.16
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/elixir-minimal-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+

@@ -1,0 +1,25 @@
+# corePackage: SERIOUS raises the project's build-time, backup, and
+# egress allowances and is required for multi-container infrastructure
+# at this scale. No managed services or secrets live in this block, so
+# corePackage is the only project-level setting that changes here.
+project:
+  name: elixir-minimal-ha-prod
+  corePackage: SERIOUS
+
+services:
+  # Dedicated CPU removes shared-neighbour jitter from request latency,
+  # because no other project's workload competes for the same core.
+  # `minFreeRamGB: 0.5` doubles the spike headroom from small
+  # production; bump verticalAutoscaling.minRam when monitoring shows
+  # steady-state RAM usage saturating the current floor.
+  - hostname: app
+    type: elixir@1.16
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/elixir-minimal-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+      minFreeRamGB: 0.5
+

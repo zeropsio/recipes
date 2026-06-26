@@ -1,0 +1,21 @@
+# No managed services and no project-level secrets to generate here —
+# the project block only carries the project name.
+project:
+  name: elixir-minimal-small-prod
+
+services:
+  # Run two app containers on shared CPU — minContainers: 2 gives the
+  # service capacity for concurrent traffic, because one container alone
+  # can't absorb a crash without dropping requests. Bump
+  # verticalAutoscaling.minRam when monitoring shows steady-state RAM
+  # usage saturating the current floor.
+  - hostname: app
+    type: elixir@1.16
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/elixir-minimal-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+

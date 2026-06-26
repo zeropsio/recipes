@@ -1,0 +1,27 @@
+# This recipe has no managed services and no project-level secrets to
+# generate — the project block only carries the project name.
+# Everything the app needs lives in its own zerops.yaml.
+project:
+  name: elixir-minimal-agent
+
+services:
+  # Run the dev service for AI agents to build and version the Elixir
+  # app — source is mounted at /var/www so that edits land immediately,
+  # no rebuild needed. Single container on shared CPU is enough for one
+  # agent's iteration loop.
+  - hostname: appdev
+    type: elixir@1.16
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/elixir-minimal-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 1
+
+  - hostname: appstage
+    type: elixir@1.16
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/elixir-minimal-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
