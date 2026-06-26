@@ -1,0 +1,20 @@
+# No managed services and no project-level secrets to generate here —
+# the project block only carries the project name.
+project:
+  name: elixir-minimal-stage
+
+services:
+  # Single container on shared CPU, rehearsal-grade rather than
+  # production-grade. `minFreeRamGB: 0.25` adds spike headroom so a
+  # burst of staging traffic doesn't push the container into swap; bump
+  # verticalAutoscaling.minRam if QA load runs push the working set
+  # past the current floor.
+  - hostname: app
+    type: elixir@1.16
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/elixir-minimal-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
