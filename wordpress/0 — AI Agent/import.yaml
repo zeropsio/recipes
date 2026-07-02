@@ -1,0 +1,74 @@
+# zeropsPreprocessor=on
+
+# AI Agent — a dev + stage pair for agent-driven development (the topology this recipe
+# was built on). The dev half builds with the `dev` setup (full Composer install,
+# OPcache revalidation) and boots with the source tree ready for an AI agent (or you)
+# to adopt and drive via the mounted filesystem + a dev server. The stage half builds
+# with the `prod` setup as an always-running reference. Both share single-node stores;
+# each container serves on its own subdomain because WP_HOME/WP_SITEURL come from the
+# container's own WORDPRESS_URL, so the shared database never forces a cross-redirect.
+
+project:
+  name: wordpress-agent
+  corePackage: LIGHT
+  tags:
+    - wordpress
+    - cms
+    - ai-agent
+
+services:
+  # ---- managed stores (start first) ----
+  - hostname: db
+    type: mariadb:single@10.6
+    priority: 10
+  - hostname: cache
+    type: valkey:single@7.2
+    priority: 10
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 2
+    # Media is served by GET; no public bucket listing.
+    objectStoragePolicy: public-objects-read
+
+  # ---- dev half (agent workstation: `dev` setup, live edits over SSH) ----
+  - hostname: appdev
+    type: php-nginx@8.4
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/wordpress-app
+    enableSubdomainAccess: true
+    envSecrets:
+      WORDPRESS_TITLE: WordPress on Zerops
+      WORDPRESS_ADMIN_USER: zadmin
+      WORDPRESS_ADMIN_EMAIL: admin@example.com   # change after deploy (Settings → General)
+      WORDPRESS_ADMIN_PASSWORD: <@generateRandomString(<20>)>
+      # Unique auth keys & salts
+      WORDPRESS_AUTH_KEY:         <@generateRandomString(<64>)>
+      WORDPRESS_SECURE_AUTH_KEY:  <@generateRandomString(<64>)>
+      WORDPRESS_LOGGED_IN_KEY:    <@generateRandomString(<64>)>
+      WORDPRESS_NONCE_KEY:        <@generateRandomString(<64>)>
+      WORDPRESS_AUTH_SALT:        <@generateRandomString(<64>)>
+      WORDPRESS_SECURE_AUTH_SALT: <@generateRandomString(<64>)>
+      WORDPRESS_LOGGED_IN_SALT:   <@generateRandomString(<64>)>
+      WORDPRESS_NONCE_SALT:       <@generateRandomString(<64>)>
+
+  # ---- stage half (`prod` setup: always-running reference) ----
+  - hostname: appstage
+    type: php-nginx@8.4
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/wordpress-app
+    enableSubdomainAccess: true
+    envSecrets:
+      WORDPRESS_TITLE: WordPress on Zerops
+      WORDPRESS_ADMIN_USER: zadmin
+      WORDPRESS_ADMIN_EMAIL: admin@example.com   # change after deploy (Settings → General)
+      WORDPRESS_ADMIN_PASSWORD: <@generateRandomString(<20>)>
+      # Unique auth keys & salts
+      WORDPRESS_AUTH_KEY:         <@generateRandomString(<64>)>
+      WORDPRESS_SECURE_AUTH_KEY:  <@generateRandomString(<64>)>
+      WORDPRESS_LOGGED_IN_KEY:    <@generateRandomString(<64>)>
+      WORDPRESS_NONCE_KEY:        <@generateRandomString(<64>)>
+      WORDPRESS_AUTH_SALT:        <@generateRandomString(<64>)>
+      WORDPRESS_SECURE_AUTH_SALT: <@generateRandomString(<64>)>
+      WORDPRESS_LOGGED_IN_SALT:   <@generateRandomString(<64>)>
+      WORDPRESS_NONCE_SALT:       <@generateRandomString(<64>)>

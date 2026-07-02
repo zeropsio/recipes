@@ -1,13 +1,29 @@
 # zeropsPreprocessor=on
+
+# Highly-available Production — HA managed clusters (MariaDB, Valkey) with automatic
+# failover; the app on dedicated CPU, scaling 2 -> 6 containers behind zero-downtime
+# rolling deploys. The topology for a real, public WordPress site. Disable subdomain
+# access once your own domain is attached.
+
 project:
-  name: wordpress-development
+  name: wordpress
+  corePackage: SERIOUS
+  tags:
+    - wordpress
+    - cms
+    - php
 
 services:
+  # ---- app (production build; dedicated CPU, autoscaling 2 -> 6) ----
   - hostname: app
     type: php-nginx@8.4
+    zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/wordpress-app
-    zeropsSetup: dev
     enableSubdomainAccess: true
+    minContainers: 2
+    maxContainers: 6
+    verticalAutoscaling:
+      cpuMode: DEDICATED
     envSecrets:
       WORDPRESS_TITLE: WordPress on Zerops
       WORDPRESS_ADMIN_USER: zadmin
@@ -22,26 +38,16 @@ services:
       WORDPRESS_SECURE_AUTH_SALT: <@generateRandomString(<64>)>
       WORDPRESS_LOGGED_IN_SALT:   <@generateRandomString(<64>)>
       WORDPRESS_NONCE_SALT:       <@generateRandomString(<64>)>
-    verticalAutoscaling:
-      minRam: 1
 
+  # ---- managed stores (HA clusters with failover; enable backups on db) ----
   - hostname: db
-    type: mariadb:single@10.6
+    type: mariadb:ha@10.6
     priority: 10
-
   - hostname: cache
-    type: valkey:single@7.2
-    profile: hobby
+    type: valkey:ha@7.2
     priority: 10
-
   - hostname: storage
     type: object-storage
     priority: 10
-    objectStorageSize: 2
-    # Media is served by GET; no public bucket listing.
+    objectStorageSize: 50
     objectStoragePolicy: public-objects-read
-
-  - hostname: mailpit
-    type: go@1
-    buildFromGit: https://github.com/zerops-recipe-apps/mailpit-app
-    enableSubdomainAccess: true
