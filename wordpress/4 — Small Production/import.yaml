@@ -1,18 +1,29 @@
 # zeropsPreprocessor=on
+
+# Small Production — single-node managed stores; the app on shared CPU, scaling
+# 1 -> 2 containers behind a readiness-gated rolling deploy. The cheapest way to run
+# WordPress for real; not redundant. Disable subdomain access once your own domain
+# is attached.
+
 project:
-  name: wordpress-production
-  corePackage: SERIOUS
+  name: wordpress
+  corePackage: LIGHT
+  tags:
+    - wordpress
+    - cms
+    - php
 
 services:
+  # ---- app (production build; shared CPU, autoscaling 1 -> 2) ----
   - hostname: app
     type: php-nginx@8.4
-    buildFromGit: https://github.com/zerops-recipe-apps/wordpress-app
     zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/wordpress-app
     enableSubdomainAccess: true
-    minContainers: 2
-    maxContainers: 6
+    minContainers: 1
+    maxContainers: 2
     verticalAutoscaling:
-      cpuMode: DEDICATED
+      minRam: 0.5
     envSecrets:
       WORDPRESS_TITLE: WordPress on Zerops
       WORDPRESS_ADMIN_USER: zadmin
@@ -28,22 +39,15 @@ services:
       WORDPRESS_LOGGED_IN_SALT:   <@generateRandomString(<64>)>
       WORDPRESS_NONCE_SALT:       <@generateRandomString(<64>)>
 
+  # ---- managed stores (single-node; enable backups on db in the GUI) ----
   - hostname: db
-    type: mariadb:ha@10.6
+    type: mariadb:single@10.6
     priority: 10
-
   - hostname: cache
-    type: valkey:ha@7.2
-    profile: staging
+    type: valkey:single@7.2
     priority: 10
-
   - hostname: storage
     type: object-storage
     priority: 10
-    objectStorageSize: 25
+    objectStorageSize: 10
     objectStoragePolicy: public-objects-read
-
-  - hostname: mailpit
-    type: go@1
-    buildFromGit: https://github.com/zerops-recipe-apps/mailpit-app
-    enableSubdomainAccess: true

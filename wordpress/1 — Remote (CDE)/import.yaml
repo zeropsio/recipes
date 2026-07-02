@@ -1,0 +1,49 @@
+# zeropsPreprocessor=on
+
+# Remote (CDE) — one cloud development container carrying the whole app (the `dev`
+# setup: full Composer build, OPcache revalidation so edits take effect immediately),
+# plus single-node stores. Connect your IDE / SSH and iterate inside Zerops with no
+# local toolchain; the `app` subdomain serves what you build.
+
+project:
+  name: wordpress-remote
+  corePackage: LIGHT
+  tags:
+    - wordpress
+    - cms
+    - remote-cde
+
+services:
+  # ---- managed stores (start first) ----
+  - hostname: db
+    type: mariadb:single@10.6
+    priority: 10
+  - hostname: cache
+    type: valkey:single@7.2
+    priority: 10
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 2
+    objectStoragePolicy: public-objects-read
+
+  # ---- single cloud dev container (`dev` setup; SSH in and iterate) ----
+  - hostname: app
+    type: php-nginx@8.4
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/wordpress-app
+    enableSubdomainAccess: true
+    envSecrets:
+      WORDPRESS_TITLE: WordPress on Zerops
+      WORDPRESS_ADMIN_USER: zadmin
+      WORDPRESS_ADMIN_EMAIL: admin@example.com   # change after deploy (Settings → General)
+      WORDPRESS_ADMIN_PASSWORD: <@generateRandomString(<20>)>
+      # Unique auth keys & salts
+      WORDPRESS_AUTH_KEY:         <@generateRandomString(<64>)>
+      WORDPRESS_SECURE_AUTH_KEY:  <@generateRandomString(<64>)>
+      WORDPRESS_LOGGED_IN_KEY:    <@generateRandomString(<64>)>
+      WORDPRESS_NONCE_KEY:        <@generateRandomString(<64>)>
+      WORDPRESS_AUTH_SALT:        <@generateRandomString(<64>)>
+      WORDPRESS_SECURE_AUTH_SALT: <@generateRandomString(<64>)>
+      WORDPRESS_LOGGED_IN_SALT:   <@generateRandomString(<64>)>
+      WORDPRESS_NONCE_SALT:       <@generateRandomString(<64>)>

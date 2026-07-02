@@ -1,0 +1,28 @@
+# zeropsPreprocessor=on
+
+# Local — backing stores only (MariaDB, Valkey, object storage); no app container.
+# Bring up the Zerops VPN (`zcli vpn up`) and run WordPress on your own machine,
+# pointing WORDPRESS_DB_*, WORDPRESS_REDIS_* and WORDPRESS_STORAGE_* at the internal
+# db / cache / storage hostnames. The cheapest way to develop against real managed
+# services.
+
+project:
+  name: wordpress-local
+  corePackage: LIGHT
+  tags:
+    - wordpress
+    - cms
+    - local
+
+services:
+  - hostname: db
+    type: mariadb:single@10.6
+    priority: 10
+  - hostname: cache
+    type: valkey:single@7.2
+    priority: 10
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 2
+    objectStoragePolicy: public-objects-read

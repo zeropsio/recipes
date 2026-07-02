@@ -7,22 +7,26 @@ WordPress
 - **Shape:** <!-- #ZEROPS_EXTRACT_START:shape# -->app<!-- #ZEROPS_EXTRACT_END:shape# --> — you fork the app repo and deploy your own copy.
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-Production-grade [WordPress](https://wordpress.org) on [Zerops](https://zerops.io) — Composer-managed core, an isolated web root, a Redis object cache, S3-backed media, and real cron. Bedrock's 12-factor philosophy, wired natively into the platform.
+Production-grade [WordPress](https://wordpress.org) on [Zerops](https://zerops.io) — Composer-managed core, an isolated web root, a Redis object cache, S3-backed media, and real cron. A 12-factor take on WordPress, wired natively into the platform.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 
 ⬇️ **Full recipe page and deploy with one-click**
 
-[![Deploy on Zerops](https://github.com/zeropsio/recipe-shared-assets/blob/main/deploy-button/light/deploy-button.svg)](https://app.zerops.io/recipes/wordpress?environment=production)
+[![Deploy on Zerops](https://github.com/zeropsio/recipe-shared-assets/blob/main/deploy-button/light/deploy-button.svg)](https://app.zerops.io/recipes/wordpress?environment=small-production)
 
-Offered in two environments:
+Offered as environments for the whole development lifecycle — from an AI-agent or remote (CDE) workstation, through local development and stage, up to production on shared or dedicated HA hardware.
 
-- **Development** [[info]](/0%20—%20Development) — [[deploy with one click]](https://app.zerops.io/recipes/wordpress?environment=development)
-- **Production** [[info]](/1%20—%20Production) — [[deploy with one click]](https://app.zerops.io/recipes/wordpress?environment=production)
+- **AI Agent** [[info]](/0%20—%20AI%20Agent) — [[deploy with one click]](https://app.zerops.io/recipes/wordpress?environment=ai-agent)
+- **Remote (CDE)** [[info]](/1%20—%20Remote%20(CDE)) — [[deploy with one click]](https://app.zerops.io/recipes/wordpress?environment=remote-cde)
+- **Local** [[info]](/2%20—%20Local) — [[deploy with one click]](https://app.zerops.io/recipes/wordpress?environment=local)
+- **Stage** [[info]](/3%20—%20Stage) — [[deploy with one click]](https://app.zerops.io/recipes/wordpress?environment=stage)
+- **Small Production** [[info]](/4%20—%20Small%20Production) — [[deploy with one click]](https://app.zerops.io/recipes/wordpress?environment=small-production)
+- **Highly-available Production** [[info]](/5%20—%20Highly-available%20Production) — [[deploy with one click]](https://app.zerops.io/recipes/wordpress?environment=highly-available-production)
 
 <!-- #ZEROPS_EXTRACT_START:description# -->
 WordPress runs the open web, but the default "unzip it on a box" setup fights every cloud-native practice: core and plugins live in the document root, uploads pin you to one disk, and configuration hides in a file full of secrets. This recipe reshapes it into a 12-factor app. WordPress core, plugins and themes are Composer dependencies; only a `public/` directory is web-served (config, `vendor/` and tooling sit above it, unreachable over HTTP); every setting is read from the environment. Media is offloaded to S3 object storage and a persistent object cache lives on Valkey, so nothing durable touches the container disk and the app scales horizontally without going stale.
 
-Two environments cover the lifecycle: **Development** is a single low-resource stack with `WP_DEBUG` on for building and testing your site; **Production** promotes the database and cache to highly-available clusters and runs the app on dedicated CPU across multiple containers behind zero-downtime rolling deploys.
+Six environments cover the whole lifecycle: an **AI Agent** dev + stage pair for agent-driven development, a single **Remote (CDE)** cloud workstation, a stores-only **Local** setup for developing over the VPN, a single-node **Stage**, and production on shared (**Small**) or dedicated, highly-available (**HA**) hardware behind zero-downtime rolling deploys.
 <!-- #ZEROPS_EXTRACT_END:description# -->
 
 <!-- #ZEROPS_EXTRACT_START:features# -->
@@ -33,7 +37,7 @@ Two environments cover the lifecycle: **Development** is a single low-resource s
 - **Zero-downtime deploys** — a readiness check gates traffic on a static core asset; a health check restarts unhealthy containers.
 - **Real cron** — WordPress pseudo-cron is disabled; a platform cron runs `wp cron event run` every 5 minutes on one container.
 - **Hardened & tuned** — security headers, `xmlrpc.php` blocked, no PHP execution under uploads, production OPcache, WP-CLI pinned by checksum.
-- **Email out of the box** — mail is routed to a bundled Mailpit; point it at a real SMTP relay with one env override.
+- **SMTP-ready email** — point `WORDPRESS_SMTP_HOST` at your relay to route mail through it; left unset, WordPress uses PHP's default `mail()` transport.
 <!-- #ZEROPS_EXTRACT_END:features# -->
 
 <!-- #ZEROPS_EXTRACT_START:takeover-guide# -->
@@ -44,7 +48,7 @@ Two environments cover the lifecycle: **Development** is a single low-resource s
 
 ### Configure
 - **Add plugins/themes via Composer, not the dashboard** — the file editor and installer are disabled because the filesystem is rebuilt on every deploy. `composer require wpackagist-plugin/<slug>`, commit, push.
-- **Email** — mail goes to the bundled Mailpit (open its subdomain to read it). For real delivery set `SMTP_HOST_OVERRIDE` / `SMTP_PORT_OVERRIDE` (and `WORDPRESS_SMTP_*` auth) on the `app` service.
+- **Email** — set `SMTP_HOST_OVERRIDE` / `SMTP_PORT_OVERRIDE` (and `WORDPRESS_SMTP_AUTH` / `WORDPRESS_SMTP_USER` / `WORDPRESS_SMTP_PASSWORD`) on the `app` service to route mail through your SMTP relay; left unset, WordPress uses PHP's default `mail()`.
 - **Custom domain** — add it in Zerops, then set `WORDPRESS_URL` to it (it defaults to the Zerops subdomain); WordPress uses it for every absolute URL.
 
 ### Upgrade
@@ -55,10 +59,13 @@ Bump `johnpbloch/wordpress` (and plugins) in `composer.json`, run `composer upda
 ### Architecture
 The `app` service (php-nginx) serves only `public/`; WordPress core is in `public/wp`, content in `public/wp-content`, and the real `wp-config.php` sits at the repo root — above the web root, so it can never be served. State is externalized: `db` (MariaDB) holds content, `storage` (object storage) holds media via `humanmade/s3-uploads`, and `cache` (Valkey) holds the persistent object cache via `redis-cache`. The `object-cache.php` drop-in is baked into the build artifact — copied from the version-matched `redis-cache` plugin during the build — so it ships inside every immutable container and connects to the managed Valkey on boot, with no runtime install step.
 
+### Compared to Bedrock
+If you already run [Bedrock](https://roots.io/bedrock/), the front half looks familiar — Composer-managed core, an isolated web root, configuration from the environment; those are sensible WordPress practices and this recipe applies them too. Where it goes further is everything below that line, wired to the platform rather than left for you to assemble: managed MariaDB, Valkey and object storage; a build-baked Redis object cache; S3 media; health- and readiness-gated zero-downtime deploys; real cron; and tuned OPcache — provisioned and running as one project, across six environments from an AI-agent workstation up to an HA cluster.
+
 ### Environment variables
 - **Wired for you (in the app's `zerops.yaml`):** `WORDPRESS_DB_*` ← `db`, `WORDPRESS_STORAGE_*` ← `storage`, `WORDPRESS_REDIS_*` ← `cache`, `WORDPRESS_URL` ← the subdomain.
 - **Generated secrets (in `import.yaml`):** the eight auth keys/salts and `WORDPRESS_ADMIN_PASSWORD`.
-- **Yours to set:** `WORDPRESS_ADMIN_EMAIL`, and `SMTP_HOST_OVERRIDE`/`SMTP_PORT_OVERRIDE` for a real mail relay.
+- **Yours to set:** `WORDPRESS_ADMIN_EMAIL`, and `SMTP_HOST_OVERRIDE`/`SMTP_PORT_OVERRIDE` to route mail through a real SMTP relay.
 - **Booleans are coerced** — `WORDPRESS_DEBUG` etc. are parsed with `FILTER_VALIDATE_BOOLEAN`, so the string `"false"` is actually false (in plain WordPress it would be truthy and silently turn debug ON).
 
 ### Troubleshooting

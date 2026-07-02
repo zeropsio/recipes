@@ -1,0 +1,48 @@
+# zeropsPreprocessor=on
+
+# Stage — a single non-HA instance built with the production `prod` setup: one app
+# container over single-node stores, for pre-production validation before Small or
+# Highly-available Production.
+
+project:
+  name: wordpress-stage
+  corePackage: LIGHT
+  tags:
+    - wordpress
+    - cms
+    - stage
+
+services:
+  # ---- managed stores (start first) ----
+  - hostname: db
+    type: mariadb:single@10.6
+    priority: 10
+  - hostname: cache
+    type: valkey:single@7.2
+    priority: 10
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 2
+    objectStoragePolicy: public-objects-read
+
+  # ---- single production-built app container ----
+  - hostname: app
+    type: php-nginx@8.4
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/wordpress-app
+    enableSubdomainAccess: true
+    envSecrets:
+      WORDPRESS_TITLE: WordPress on Zerops
+      WORDPRESS_ADMIN_USER: zadmin
+      WORDPRESS_ADMIN_EMAIL: admin@example.com   # change after deploy (Settings → General)
+      WORDPRESS_ADMIN_PASSWORD: <@generateRandomString(<20>)>
+      # Unique auth keys & salts
+      WORDPRESS_AUTH_KEY:         <@generateRandomString(<64>)>
+      WORDPRESS_SECURE_AUTH_KEY:  <@generateRandomString(<64>)>
+      WORDPRESS_LOGGED_IN_KEY:    <@generateRandomString(<64>)>
+      WORDPRESS_NONCE_KEY:        <@generateRandomString(<64>)>
+      WORDPRESS_AUTH_SALT:        <@generateRandomString(<64>)>
+      WORDPRESS_SECURE_AUTH_SALT: <@generateRandomString(<64>)>
+      WORDPRESS_LOGGED_IN_SALT:   <@generateRandomString(<64>)>
+      WORDPRESS_NONCE_SALT:       <@generateRandomString(<64>)>
