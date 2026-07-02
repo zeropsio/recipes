@@ -1,0 +1,49 @@
+# zeropsPreprocessor=on
+project:
+  name: wordpress-production
+  corePackage: SERIOUS
+
+services:
+  - hostname: app
+    type: php-nginx@8.4
+    buildFromGit: https://github.com/zerops-recipe-apps/wordpress-app
+    zeropsSetup: prod
+    enableSubdomainAccess: true
+    minContainers: 2
+    maxContainers: 6
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+    envSecrets:
+      WORDPRESS_TITLE: WordPress on Zerops
+      WORDPRESS_ADMIN_USER: zadmin
+      WORDPRESS_ADMIN_EMAIL: admin@example.com   # change after deploy (Settings → General)
+      WORDPRESS_ADMIN_PASSWORD: <@generateRandomString(<20>)>
+      # Unique auth keys & salts
+      WORDPRESS_AUTH_KEY:         <@generateRandomString(<64>)>
+      WORDPRESS_SECURE_AUTH_KEY:  <@generateRandomString(<64>)>
+      WORDPRESS_LOGGED_IN_KEY:    <@generateRandomString(<64>)>
+      WORDPRESS_NONCE_KEY:        <@generateRandomString(<64>)>
+      WORDPRESS_AUTH_SALT:        <@generateRandomString(<64>)>
+      WORDPRESS_SECURE_AUTH_SALT: <@generateRandomString(<64>)>
+      WORDPRESS_LOGGED_IN_SALT:   <@generateRandomString(<64>)>
+      WORDPRESS_NONCE_SALT:       <@generateRandomString(<64>)>
+
+  - hostname: db
+    type: mariadb:ha@10.6
+    priority: 10
+
+  - hostname: cache
+    type: valkey:ha@7.2
+    profile: staging
+    priority: 10
+
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 25
+    objectStoragePolicy: public-objects-read
+
+  - hostname: mailpit
+    type: go@1
+    buildFromGit: https://github.com/zerops-recipe-apps/mailpit-app
+    enableSubdomainAccess: true
