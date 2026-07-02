@@ -32,6 +32,9 @@ services:
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/wordpress-app
     enableSubdomainAccess: true
+    # Floor RAM at 0.5 GB to cover the first-boot `wp core install` spike.
+    verticalAutoscaling:
+      minRam: 0.5
     envSecrets:
       WORDPRESS_TITLE: WordPress on Zerops
       WORDPRESS_ADMIN_USER: zadmin
