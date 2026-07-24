@@ -1,0 +1,90 @@
+#zeropsPreprocessor=on
+
+# Small-production project for moderate live traffic.
+# BETTER_AUTH_SECRET is a project-level value generated once at
+# import, so every app container verifies sessions against the
+# identical secret without needing its own copy.
+project:
+  name: analog-ssr-better-auth-small-prod
+  envVariables:
+    BETTER_AUTH_SECRET: <@generateRandomString(<32>)>
+
+services:
+  # Two app containers — capacity for concurrent traffic, and a
+  # single container crash no longer drops requests. Both
+  # replicas share one NATS queue group for the signup consumer,
+  # so scaling to two adds capacity without double-processing an
+  # event. Bump verticalAutoscaling.maxRam if monitoring shows
+  # containers nearing the RAM ceiling.
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-better-auth-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  # Set higher priority on db, cache, broker, storage, and search than the app,
+  # so every dependency is ready before the app's first init command or request
+  # runs.
+  #
+  # Single-instance Postgres, used by Better Auth to store accounts, sessions,
+  # and profile fields — restoring from a snapshot means downtime, the cost
+  # trade-off at this scale. Bump verticalAutoscaling.minRam if production write
+  # volume pushes query latency up.
+  - hostname: db
+    type: postgresql:single@18
+    priority: 10
+    profile: oltp-staging
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
+  # Single-instance Valkey — a failure means a brief cache-cold
+  # window while Postgres absorbs the extra profile-read load.
+  # Bump verticalAutoscaling.minRam if the dashboard's hit/miss
+  # counters shift toward more misses under production traffic.
+  - hostname: cache
+    type: valkey:single@7.2
+    priority: 10
+    profile: staging
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
+  # Single-instance NATS — a restart briefly interrupts the
+  # signup/profile-update queue group, and core pub/sub means
+  # nothing published during that gap is queued for replay. Bump
+  # verticalAutoscaling.minRam if production event volume grows
+  # past the current floor.
+  - hostname: broker
+    type: nats:single@2.12
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
+  # Object storage for avatar uploads — reads always go through
+  # a signed, time-limited URL regardless of this service's
+  # bucket policy. Bump objectStorageSize when production
+  # uploads outgrow the current quota.
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Single-node Meilisearch, used by the app for full-text search over user name
+  # and bio fields — a restart briefly pauses indexing of new activity while
+  # the service returns; existing search results are unaffected. Bump
+  # verticalAutoscaling.minRam if production search latency grows with the
+  # indexed dataset.
+  - hostname: search
+    type: meilisearch:single@1.20
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.25
+
