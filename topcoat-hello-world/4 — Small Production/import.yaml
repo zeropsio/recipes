@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
+
+# Small production — two app containers for zero-downtime deploys and basic
+# redundancy. No database in this minimal Topcoat hello world recipe.
+
+project:
+  name: topcoat-hello-world-small-prod
+
+services:
+  # Production Topcoat app. Release binary served on port 8080.
+  # minContainers: 2 — new container passes readinessCheck before old one drains.
+  - hostname: app
+    type: rust@stable
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/topcoat-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25

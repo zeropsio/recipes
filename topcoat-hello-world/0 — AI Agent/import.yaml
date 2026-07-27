@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
+
+# AI agent environment — dev workspace plus a staging service to validate
+# the production build pipeline. No database: Topcoat hello world is a
+# single-service SSR app with in-memory routing only.
+
+project:
+  name: topcoat-hello-world-agent
+
+services:
+  # Development workspace. Zerops deploys full source with Rust pre-installed.
+  # Agent SSHs in and runs 'topcoat dev' (requires topcoat-cli from zerops.yaml
+  # prepareCommands). Subdomain lets the agent verify live output.
+  - hostname: appdev
+    type: rust@stable
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/topcoat-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Staging service — agent deploys via 'zcli push' to test the prod pipeline.
+  # Compiles release binary, binds 0.0.0.0:8080 via HOST/PORT env vars.
+  - hostname: appstage
+    type: rust@stable
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/topcoat-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5

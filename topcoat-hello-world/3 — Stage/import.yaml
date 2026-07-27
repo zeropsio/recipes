@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
+
+# Stage environment — production build pipeline on a single container,
+# cost-conscious scaling. No database in this minimal recipe.
+
+project:
+  name: topcoat-hello-world-stage
+
+services:
+  # Stage app — same prod zerops.yaml as production, lower RAM allocation.
+  # Topcoat listens on PORT (8080) with HOST=0.0.0.0 for Zerops HTTP routing.
+  - hostname: app
+    type: rust@stable
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/topcoat-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
