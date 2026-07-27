@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
+
+# Remote (CDE) environment — cloud dev workspace over SSH/SSHFS plus staging
+# for deployment validation. No database in this minimal recipe.
+
+project:
+  name: topcoat-hello-world-remote
+
+services:
+  # Remote development workspace. Mount via SSHFS from your IDE, then run
+  # 'topcoat dev' inside the container. Ubuntu + rust@stable for compilation.
+  - hostname: appdev
+    type: rust@stable
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/topcoat-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      # minRam: 4  # Uncomment for comfortable IDE-backed Rust compilation
+
+  # Staging service for testing prod builds before merging to mainline.
+  - hostname: appstage
+    type: rust@stable
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/topcoat-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
