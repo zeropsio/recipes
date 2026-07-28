@@ -1,0 +1,89 @@
+#zeropsPreprocessor=on
+
+# AI Agent workspace for building and versioning the app.
+# BETTER_AUTH_SECRET is generated once at import as a
+# project-level value — every service here inherits it
+# automatically instead of each one minting its own.
+project:
+  name: analog-ssr-better-auth-agent
+  envVariables:
+    BETTER_AUTH_SECRET: <@generateRandomString(<32>)>
+
+services:
+  # Two containers: appdev for SSH iteration with hot-reload,
+  # appstage running the compiled Nitro build to verify changes
+  # against a production-shaped target. appdev's RAM floor is
+  # higher because SSH-driven build tooling spikes memory harder
+  # than the compiled server appstage runs.
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-better-auth-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 1
+
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-better-auth-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Set higher priority on db, cache, broker, storage, and
+  # search than the app, so every dependency is ready before the
+  # app's first init command or request runs.
+  #
+  # Deploy single-node PostgreSQL, used by Better Auth to store
+  # user accounts, sessions, and the name/bio profile fields the
+  # dashboard reads and writes. Automatic, encrypted backups are
+  # enabled by default.
+  - hostname: db
+    type: postgresql:single@18
+    priority: 10
+    profile: oltp-hobby
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Spin up Valkey, used by the app as a read-through cache for
+  # profile lookups — a repeat GET /api/profile call within the
+  # same session skips the Postgres round-trip.
+  - hostname: cache
+    type: valkey:single@7.2
+    priority: 10
+    profile: hobby
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Deploy NATS — the app publishes signup and profile-update
+  # events here, and one in-process queue-group worker consumes
+  # them to build the activity feed and keep Meilisearch's index
+  # current. Core NATS pub/sub, no persisted message stream.
+  - hostname: broker
+    type: nats:single@2.12
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Spin up object storage for avatar uploads. The app always
+  # reads avatars back through a time-limited signed URL because
+  # it never assumes the bucket is public, so uploads work under
+  # whatever policy this service is provisioned with.
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Deploy Meilisearch, used by the app for full-text search
+  # over user name and bio fields. The same queue-group worker
+  # that builds the activity feed indexes each signup and
+  # profile-update event, so a user becomes searchable within
+  # seconds instead of needing a separate reindex step.
+  - hostname: search
+    type: meilisearch:single@1.20
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
+

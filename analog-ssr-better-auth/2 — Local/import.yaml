@@ -1,0 +1,79 @@
+#zeropsPreprocessor=on
+
+# Local-development project — the app can run on your own
+# machine while every managed service runs in the cloud.
+# BETTER_AUTH_SECRET is generated once at the project level;
+# read its value from the project's env vars if your local
+# setup needs to match what's deployed here.
+project:
+  name: analog-ssr-better-auth-local
+  envVariables:
+    BETTER_AUTH_SECRET: <@generateRandomString(<32>)>
+
+services:
+  # Single app container in the compiled production shape — no
+  # separate dev container to SSH into at this tier. Run your
+  # own dev server locally against the same managed services for
+  # day-to-day iteration; this container is a live reference
+  # build.
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-better-auth-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Set higher priority on db, cache, broker, storage, and
+  # search than the app, so every dependency is ready before the
+  # app's first init command or request runs.
+  #
+  # Single-node PostgreSQL holding Better Auth's schema —
+  # accounts, sessions, and the profile fields the dashboard
+  # edits. Point your local app here too, because it's the only
+  # database in this project, for identical live data.
+  - hostname: db
+    type: postgresql:single@18
+    priority: 10
+    profile: oltp-hobby
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Valkey read-through cache for profile lookups — whichever
+  # process talks to this database, cached reads skip the round
+  # trip the same way.
+  - hostname: cache
+    type: valkey:single@7.2
+    priority: 10
+    profile: hobby
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # NATS queues signup and profile-update events for the
+  # in-process worker — run your local app against this broker
+  # to see your own test events land in the activity feed here.
+  - hostname: broker
+    type: nats:single@2.12
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Object storage for avatar uploads, reachable the same way
+  # whether the upload comes from your local app or this
+  # deployed instance — always through a signed, time-limited
+  # URL, never a bare public link.
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Meilisearch indexes name/bio fields via the queue-group
+  # worker — signups or edits from your local app land in the
+  # same search index as this deployed instance.
+  - hostname: search
+    type: meilisearch:single@1.20
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
+
