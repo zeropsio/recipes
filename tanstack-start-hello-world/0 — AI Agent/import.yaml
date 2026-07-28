@@ -1,0 +1,22 @@
+# TanStack Start hello world — AI agent environment.
+# Two app services: appdev (dev setup) and appstage (prod Nitro
+# bundle) so the agent can iterate locally and validate SSR output.
+project:
+  name: tanstack-start-hello-world-agent
+
+services:
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/tanstack-start-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/tanstack-start-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
