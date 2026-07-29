@@ -1,0 +1,22 @@
+# TanStack Start hello world — remote (CDE) environment.
+# Identical topology to the AI agent environment — dev plus
+# staged prod SSR — for human developers over SSH or remote IDE.
+project:
+  name: tanstack-start-hello-world-remote
+
+services:
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/tanstack-start-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/tanstack-start-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5

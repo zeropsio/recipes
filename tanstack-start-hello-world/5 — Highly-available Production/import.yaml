@@ -1,0 +1,19 @@
+# TanStack Start hello world — highly-available production environment.
+# Dedicated infrastructure and autoscaling SSR containers for
+# enterprise-grade durability and throughput.
+project:
+  name: tanstack-start-hello-world-ha-prod
+  corePackage: SERIOUS
+
+services:
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/tanstack-start-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    maxContainers: 6
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5

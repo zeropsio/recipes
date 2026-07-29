@@ -1,0 +1,16 @@
+# TanStack Start hello world — small production environment.
+# Two SSR containers behind the project balancer for zero-downtime
+# deploys and moderate traffic.
+project:
+  name: tanstack-start-hello-world-small-prod
+
+services:
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/tanstack-start-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125

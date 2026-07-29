@@ -1,0 +1,14 @@
+# TanStack Start hello world — local development environment.
+# Single prod app service. The developer runs TanStack Start locally
+# and optionally compares against the cloud SSR bundle via subdomain.
+project:
+  name: tanstack-start-hello-world-local
+
+services:
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/tanstack-start-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
