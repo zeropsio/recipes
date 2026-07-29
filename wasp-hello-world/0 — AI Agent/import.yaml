@@ -1,0 +1,49 @@
+#zeropsPreprocessor=on
+
+# Wasp hello world — AI agent environment.
+# Three app services: appdev (Wasp dev), appstage (static client),
+# apistage (Node API) — plus PostgreSQL. Project-level URLs wire the
+# client bundle to the staged API subdomain before first deploy.
+project:
+  name: wasp-hello-world-agent
+  envVariables:
+    REACT_APP_API_URL: https://apistage-${zeropsSubdomainHost}-3001.prg1.zerops.app
+    WASP_SERVER_URL: https://apistage-${zeropsSubdomainHost}-3001.prg1.zerops.app
+    WASP_WEB_CLIENT_URL: https://appstage-${zeropsSubdomainHost}.prg1.zerops.app
+
+services:
+  # Dev workspace: agent SSHs in and runs `wasp start` (client :3000,
+  # server :3001). Full source + Wasp CLI installed at build time.
+  - hostname: appdev
+    type: nodejs@24
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/wasp-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Staged static client — validates the production Vite bundle and
+  # Nginx SPA routing before committing changes.
+  - hostname: appstage
+    type: static
+    zeropsSetup: prod-client
+    buildFromGit: https://github.com/zerops-recipe-apps/wasp-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Staged API — production Wasp server bundle with Prisma migrations.
+  - hostname: apistage
+    type: nodejs@24
+    zeropsSetup: prod-api
+    buildFromGit: https://github.com/zerops-recipe-apps/wasp-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # PostgreSQL for Prisma. Priority 10 starts the database before
+  # API initCommands run migrate deploy.
+  - hostname: db
+    type: postgresql:single@16
+    profile: oltp-staging
+    priority: 10

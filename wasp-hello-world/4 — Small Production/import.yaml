@@ -1,0 +1,37 @@
+#zeropsPreprocessor=on
+
+# Wasp hello world — small production environment.
+# Two client containers (Nginx) and two API containers behind
+# the project balancer for zero-downtime deploys.
+project:
+  name: wasp-hello-world-small-prod
+  envVariables:
+    REACT_APP_API_URL: https://api-${zeropsSubdomainHost}-3001.prg1.zerops.app
+    WASP_SERVER_URL: https://api-${zeropsSubdomainHost}-3001.prg1.zerops.app
+    WASP_WEB_CLIENT_URL: https://client-${zeropsSubdomainHost}.prg1.zerops.app
+
+services:
+  - hostname: client
+    type: static
+    zeropsSetup: prod-client
+    buildFromGit: https://github.com/zerops-recipe-apps/wasp-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
+
+  - hostname: api
+    type: nodejs@24
+    zeropsSetup: prod-api
+    buildFromGit: https://github.com/zerops-recipe-apps/wasp-hello-world-app
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  - hostname: db
+    type: postgresql:single@16
+    profile: oltp-production
+    priority: 10
