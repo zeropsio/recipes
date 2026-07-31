@@ -33,6 +33,10 @@ services:
       cpuMode: DEDICATED
       minRam: 1
       minFreeRamGB: 0.5
+    # Wasp prod-api reads these at runtime for CORS and auth redirects.
+    envVariables:
+      WASP_SERVER_URL: https://api-${zeropsSubdomainHost}-3001.prg1.zerops.app
+      WASP_WEB_CLIENT_URL: https://client-${zeropsSubdomainHost}.prg1.zerops.app
 
   - hostname: db
     type: postgresql:ha@16

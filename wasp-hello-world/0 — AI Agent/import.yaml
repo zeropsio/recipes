@@ -40,6 +40,10 @@ services:
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 0.5
+    # Wasp prod-api reads these at runtime for CORS and auth redirects.
+    envVariables:
+      WASP_SERVER_URL: https://apistage-${zeropsSubdomainHost}-3001.prg1.zerops.app
+      WASP_WEB_CLIENT_URL: https://appstage-${zeropsSubdomainHost}.prg1.zerops.app
 
   # PostgreSQL for Prisma. Priority 10 starts the database before
   # API initCommands run migrate deploy.

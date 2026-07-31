@@ -71,7 +71,7 @@ Client: Zerops `static` (Nginx).
 
 ### Health Check
 
-- API: HTTP `GET /` on port 3001 (readinessCheck in `zerops.yaml`).
+- API: HTTP `GET /auth/me` on port 3001 (readinessCheck in `zerops.yaml`).
 
 ## Database/Storage Requirements
 
