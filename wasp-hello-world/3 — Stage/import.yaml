@@ -13,6 +13,7 @@ project:
 services:
   - hostname: client
     type: static
+    priority: 5
     zeropsSetup: prod-client
     buildFromGit: https://github.com/zerops-recipe-apps/wasp-hello-world-app
     enableSubdomainAccess: true
@@ -22,6 +23,7 @@ services:
 
   - hostname: api
     type: nodejs@24
+    priority: 5
     zeropsSetup: prod-api
     buildFromGit: https://github.com/zerops-recipe-apps/wasp-hello-world-app
     enableSubdomainAccess: true

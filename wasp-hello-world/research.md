@@ -84,8 +84,9 @@ Client: Zerops `static` (Nginx).
 | Service | Type | Purpose | Priority |
 |---------|------|---------|----------|
 | db | postgresql | Prisma datasource | 10 |
-| client / appstage | static | React SPA | 1 |
-| api / apistage | nodejs@24 | Wasp server | 1 |
+| clientdev / apidev | nodejs@24 | Wasp dev workspace (`wasp start`) | 5 |
+| clientstage / client | static | React SPA (prod-client) | 5 |
+| apistage / api | nodejs@24 | Wasp server (prod-api) | 5 |
 
 ## Scaling Considerations
 

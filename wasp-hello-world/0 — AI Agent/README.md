@@ -4,5 +4,5 @@ This is an AI agent environment for [Wasp Hello World (info + deploy)](https://a
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
 **AI agent** environment provides a development space for AI agents to build and version the app.
-It includes a dev service (`appdev`) with the Wasp toolchain, staged static client and API services, and a low-resource PostgreSQL database.
+It includes dev + stage pairs for the Wasp client (`clientdev`, `clientstage`) and API (`apidev`, `apistage`), plus a low-resource PostgreSQL database.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
