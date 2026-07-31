@@ -1,0 +1,39 @@
+#zeropsPreprocessor=on
+
+# Wasp hello world — stage environment.
+# Single client + API pair using production setups on minimal
+# resources — mirrors production configuration before promotion.
+project:
+  name: wasp-hello-world-stage
+  envVariables:
+    REACT_APP_API_URL: https://api-${zeropsSubdomainHost}-3001.prg1.zerops.app
+    WASP_SERVER_URL: https://api-${zeropsSubdomainHost}-3001.prg1.zerops.app
+    WASP_WEB_CLIENT_URL: https://client-${zeropsSubdomainHost}.prg1.zerops.app
+
+services:
+  - hostname: client
+    type: static
+    zeropsSetup: prod-client
+    buildFromGit: https://github.com/zerops-recipe-apps/wasp-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+
+  - hostname: api
+    type: nodejs@24
+    zeropsSetup: prod-api
+    buildFromGit: https://github.com/zerops-recipe-apps/wasp-hello-world-app
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
+    # Wasp prod-api reads these at runtime for CORS and auth redirects.
+    envVariables:
+      WASP_SERVER_URL: https://api-${zeropsSubdomainHost}-3001.prg1.zerops.app
+      WASP_WEB_CLIENT_URL: https://client-${zeropsSubdomainHost}.prg1.zerops.app
+
+  - hostname: db
+    type: postgresql:single@16
+    profile: oltp-staging
+    priority: 10
