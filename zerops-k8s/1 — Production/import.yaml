@@ -1,0 +1,115 @@
+# yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
+#zeropsPreprocessor=on
+# Compact production: redundant data plane and edge, one control plane.
+# This profile intentionally omits the dedicated observability services; the
+# normal Zerops logger/statistics surfaces cover the outer runtime services.
+project:
+  name: zerops-k8s-production
+  corePackage: SERIOUS
+  tags:
+    - zerops-recipe
+    - kubernetes
+    - github-zerops-recipe-apps-zerops-k8s
+    - zerops-k8s-profile-production
+  envVariables:
+    K8S_MANAGED: "true"
+    K8S_PROFILE: production
+    K8S_REPOSITORY: zerops-recipe-apps/zerops-k8s
+    K8S_VERSION: v1.36.2
+    K8S_NODE_IMAGE: zerops-k8s-node:v1.36.2
+    K8S_IMAGE_OBJECT: node-images/zerops-k8s-node-v1.36.2.tar.gz
+    K8S_IMAGE_SHA256_OBJECT: node-images/zerops-k8s-node-v1.36.2.tar.gz.sha256
+    K8S_VRRP_PREFIX_LENGTH: "22"
+    K8S_VRRP_HOST_OCTET: "222"
+    K8S_VRRP_VIRTUAL_ROUTER_ID: "222"
+    K8S_POD_CIDR: 10.244.0.0/16
+    K8S_SERVICE_CIDR: 10.96.0.0/16
+    K8S_ETCD_RETENTION_RECENT: "28"
+    K8S_ETCD_RETENTION_DAILY: "7"
+    K8S_ETCD_RETENTION_WEEKLY: "4"
+    K8S_ETCD_RETENTION_MONTHLY: "3"
+    K8S_LONGHORN_SYSTEM_BACKUP_RETAIN: "8"
+    K8S_BACKUP_QUOTA_GB: "25"
+    K8S_BACKUP_WARN_PERCENT: "70"
+    K8S_BACKUP_FAIL_PERCENT: "95"
+
+services:
+  # Single control plane: this is intentionally not control-plane HA. Generated
+  # kubeadm/encryption credentials live only in Zerops service secrets.
+  - hostname: k8scp1
+    type: docker@26.1.5
+    startWithoutCode: true
+    minContainers: 1
+    maxContainers: 1
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minCpu: 4
+      maxCpu: 4
+      startCpuCoreCount: 4
+      minRam: 8
+      maxRam: 8
+      minDisk: 20
+      maxDisk: 20
+      swapEnabled: false
+
+  # Two fixed workers provide data-plane redundancy. Kubernetes HPA scales
+  # workloads inside the cluster; the optional third node uses explicit resize.
+  - hostname: k8sworker1
+    type: docker@26.1.5
+    startWithoutCode: true
+    minContainers: 1
+    maxContainers: 1
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minCpu: 4
+      maxCpu: 4
+      startCpuCoreCount: 4
+      minRam: 8
+      maxRam: 8
+      minDisk: 50
+      maxDisk: 50
+      swapEnabled: false
+
+  - hostname: k8sworker2
+    type: docker@26.1.5
+    startWithoutCode: true
+    minContainers: 1
+    maxContainers: 1
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minCpu: 4
+      maxCpu: 4
+      startCpuCoreCount: 4
+      minRam: 8
+      maxRam: 8
+      minDisk: 50
+      maxDisk: 50
+      swapEnabled: false
+
+  # Keepalived elects one of two HAProxy edge containers to own a project-local
+  # VRRP VIP. Multicast election avoids static replica addresses, so container
+  # replacement and address changes do not require peer configuration updates.
+  - hostname: k8sedge
+    type: go@1.22
+    startWithoutCode: true
+    enableSubdomainAccess: true
+    minContainers: 2
+    maxContainers: 2
+    verticalAutoscaling:
+      cpuMode: SHARED
+      minCpu: 1
+      maxCpu: 2
+      startCpuCoreCount: 1
+      minRam: 0.5
+      maxRam: 1
+      minDisk: 1
+      maxDisk: 2
+      swapEnabled: false
+
+  # The only outer dependency: private recovery storage for etcd, Longhorn,
+  # and the reproducible node-image cache.
+  - hostname: k8sbackups
+    type: object-storage
+    priority: 10
+    objectStorageSize: 25
+    objectStoragePolicy: private

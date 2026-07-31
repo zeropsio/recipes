@@ -1,0 +1,210 @@
+# yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
+#zeropsPreprocessor=on
+project:
+  name: zerops-k8s
+  corePackage: SERIOUS
+  tags:
+    - zerops-recipe
+    - kubernetes
+    - github-zerops-recipe-apps-zerops-k8s
+    - zerops-k8s-profile-full
+  envVariables:
+    K8S_MANAGED: "true"
+    K8S_PROFILE: full
+    K8S_REPOSITORY: zerops-recipe-apps/zerops-k8s
+    K8S_VERSION: v1.36.2
+    K8S_NODE_IMAGE: zerops-k8s-node:v1.36.2
+    K8S_IMAGE_OBJECT: node-images/zerops-k8s-node-v1.36.2.tar.gz
+    K8S_IMAGE_SHA256_OBJECT: node-images/zerops-k8s-node-v1.36.2.tar.gz.sha256
+    K8S_VRRP_PREFIX_LENGTH: "22"
+    K8S_VRRP_HOST_OCTET: "222"
+    K8S_VRRP_VIRTUAL_ROUTER_ID: "222"
+    K8S_POD_CIDR: 10.244.0.0/16
+    K8S_SERVICE_CIDR: 10.96.0.0/16
+    K8S_ETCD_RETENTION_RECENT: "28"
+    K8S_ETCD_RETENTION_DAILY: "7"
+    K8S_ETCD_RETENTION_WEEKLY: "4"
+    K8S_ETCD_RETENTION_MONTHLY: "3"
+    K8S_LONGHORN_SYSTEM_BACKUP_RETAIN: "8"
+    K8S_BACKUP_QUOTA_GB: "25"
+    K8S_BACKUP_WARN_PERCENT: "70"
+    K8S_BACKUP_FAIL_PERCENT: "95"
+
+services:
+  - hostname: k8scp1
+    type: docker@26.1.5
+    startWithoutCode: true
+    minContainers: 1
+    maxContainers: 1
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minCpu: 4
+      maxCpu: 4
+      startCpuCoreCount: 4
+      minRam: 8
+      maxRam: 8
+      minDisk: 20
+      maxDisk: 20
+      swapEnabled: false
+
+  - hostname: k8scp2
+    type: docker@26.1.5
+    startWithoutCode: true
+    minContainers: 1
+    maxContainers: 1
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minCpu: 4
+      maxCpu: 4
+      startCpuCoreCount: 4
+      minRam: 8
+      maxRam: 8
+      minDisk: 20
+      maxDisk: 20
+      swapEnabled: false
+
+  - hostname: k8scp3
+    type: docker@26.1.5
+    startWithoutCode: true
+    minContainers: 1
+    maxContainers: 1
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minCpu: 4
+      maxCpu: 4
+      startCpuCoreCount: 4
+      minRam: 8
+      maxRam: 8
+      minDisk: 20
+      maxDisk: 20
+      swapEnabled: false
+
+  - hostname: k8sworker1
+    type: docker@26.1.5
+    startWithoutCode: true
+    minContainers: 1
+    maxContainers: 1
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minCpu: 4
+      maxCpu: 4
+      startCpuCoreCount: 4
+      minRam: 12
+      maxRam: 12
+      minDisk: 50
+      maxDisk: 50
+      swapEnabled: false
+
+  - hostname: k8sworker2
+    type: docker@26.1.5
+    startWithoutCode: true
+    minContainers: 1
+    maxContainers: 1
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minCpu: 4
+      maxCpu: 4
+      startCpuCoreCount: 4
+      minRam: 12
+      maxRam: 12
+      minDisk: 50
+      maxDisk: 50
+      swapEnabled: false
+
+  - hostname: k8sworker3
+    type: docker@26.1.5
+    startWithoutCode: true
+    minContainers: 1
+    maxContainers: 1
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minCpu: 4
+      maxCpu: 4
+      startCpuCoreCount: 4
+      minRam: 12
+      maxRam: 12
+      minDisk: 50
+      maxDisk: 50
+      swapEnabled: false
+
+  - hostname: k8sedge
+    type: go@1.22
+    startWithoutCode: true
+    minContainers: 2
+    maxContainers: 2
+    verticalAutoscaling:
+      cpuMode: SHARED
+      minCpu: 1
+      maxCpu: 2
+      startCpuCoreCount: 1
+      minRam: 0.5
+      maxRam: 1
+      minDisk: 1
+      maxDisk: 2
+      swapEnabled: false
+
+  - hostname: k8sbackups
+    type: object-storage
+    priority: 10
+    objectStorageSize: 25
+    objectStoragePolicy: private
+
+  # Zerops' first-class observability services. The workflow also calls the
+  # first-class recipe API so forwarding and credentials are configured by
+  # Zerops when importing into an existing project.
+  - hostname: grafanadb
+    type: postgresql:single@17
+    profile: oltp-hobby
+    priority: 10
+
+  - hostname: prometheusbackups
+    type: object-storage
+    priority: 10
+    objectStorageSize: 5
+    objectStoragePolicy: private
+
+  - hostname: grafana
+    type: alpine@3.21
+    startWithoutCode: true
+    enableSubdomainAccess: true
+    envSecrets:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: <@generateRandomString(<32>)>
+      GF_SECURITY_SECRET_KEY: <@generateRandomString(<32>)>
+
+  - hostname: prometheus
+    type: alpine@3.21
+    startWithoutCode: true
+    enableSubdomainAccess: true
+    maxContainers: 1
+
+  - hostname: elkstorage
+    type: elasticsearch:single@8.16
+    priority: 10
+
+  - hostname: kibana
+    type: ubuntu@24.04
+    buildFromGit: https://github.com/zeropsio/recipe-elk@2a64e642ae4c94ab976af0e270e407a95f80e575
+    zeropsSetup: kibana
+    enableSubdomainAccess: true
+    maxContainers: 1
+    verticalAutoscaling:
+      minRam: 1
+      maxRam: 4
+
+  - hostname: logstash
+    type: ubuntu@24.04
+    buildFromGit: https://github.com/zeropsio/recipe-elk@2a64e642ae4c94ab976af0e270e407a95f80e575
+    zeropsSetup: logstash
+    maxContainers: 1
+    verticalAutoscaling:
+      minRam: 1
+      maxRam: 4
+
+  - hostname: apmserver
+    type: ubuntu@24.04
+    buildFromGit: https://github.com/zeropsio/recipe-elk@2a64e642ae4c94ab976af0e270e407a95f80e575
+    zeropsSetup: apmserver
+    maxContainers: 1
+    envSecrets:
+      SECRET_TOKEN: <@generateRandomString(<32>)>
