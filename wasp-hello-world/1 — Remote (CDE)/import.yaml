@@ -3,15 +3,15 @@
 # Remote (CDE) environment — same dev + stage client/API pairs as
 # the AI agent layout for a human porter coding over SSH or a
 # mounted remote filesystem. Project-level URLs wire the staged
-# client at clientstage and interactive dev at clientdev / apidev.
+# client at appstage and interactive dev at appdev / apidev.
 project:
   name: wasp-hello-world-remote
   envVariables:
     REACT_APP_API_URL: https://apistage-${zeropsSubdomainHost}-3001.prg1.zerops.app
     WASP_SERVER_URL: https://apistage-${zeropsSubdomainHost}-3001.prg1.zerops.app
-    WASP_WEB_CLIENT_URL: https://clientstage-${zeropsSubdomainHost}.prg1.zerops.app
+    WASP_WEB_CLIENT_URL: https://appstage-${zeropsSubdomainHost}.prg1.zerops.app
     DEV_API_URL: https://apidev-${zeropsSubdomainHost}-3001.prg1.zerops.app
-    DEV_FRONTEND_URL: https://clientdev-${zeropsSubdomainHost}-3000.prg1.zerops.app
+    DEV_FRONTEND_URL: https://appdev-${zeropsSubdomainHost}-3000.prg1.zerops.app
 
 services:
   # Wasp API dev + stage pair — the porter codes inside `apidev`
@@ -37,13 +37,13 @@ services:
     # Wasp prod-api reads these at runtime for CORS and auth redirects.
     envVariables:
       WASP_SERVER_URL: https://apistage-${zeropsSubdomainHost}-3001.prg1.zerops.app
-      WASP_WEB_CLIENT_URL: https://clientstage-${zeropsSubdomainHost}.prg1.zerops.app
+      WASP_WEB_CLIENT_URL: https://appstage-${zeropsSubdomainHost}.prg1.zerops.app
 
-  # Wasp client dev + stage pair — `clientdev` runs `wasp start` on
-  # :3000/:3001 for HMR iteration; `clientstage` ships the built bundle
+  # Wasp client dev + stage pair — `appdev` runs `wasp start` on
+  # :3000/:3001 for HMR iteration; `appstage` ships the built bundle
   # on `base: static`. REACT_APP_API_URL bakes apistage into the
   # stage bundle at build time.
-  - hostname: clientdev
+  - hostname: appdev
     type: nodejs@24
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/wasp-hello-world-app
@@ -51,7 +51,7 @@ services:
     verticalAutoscaling:
       minRam: 1
 
-  - hostname: clientstage
+  - hostname: appstage
     type: static
     zeropsSetup: prod-client
     buildFromGit: https://github.com/zerops-recipe-apps/wasp-hello-world-app

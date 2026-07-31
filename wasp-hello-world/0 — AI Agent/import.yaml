@@ -2,16 +2,16 @@
 
 # AI Agent environment — a dev + stage pair for the Wasp client and
 # API from one git repo, plus PostgreSQL. Project-level URLs point
-# the staged static client at clientstage and the dev runtimes at the
-# port-suffixed clientdev / apidev subdomains.
+# the staged static client at appstage and the dev runtimes at the
+# port-suffixed appdev / apidev subdomains.
 project:
   name: wasp-hello-world-agent
   envVariables:
     REACT_APP_API_URL: https://apistage-${zeropsSubdomainHost}-3001.prg1.zerops.app
     WASP_SERVER_URL: https://apistage-${zeropsSubdomainHost}-3001.prg1.zerops.app
-    WASP_WEB_CLIENT_URL: https://clientstage-${zeropsSubdomainHost}.prg1.zerops.app
+    WASP_WEB_CLIENT_URL: https://appstage-${zeropsSubdomainHost}.prg1.zerops.app
     DEV_API_URL: https://apidev-${zeropsSubdomainHost}-3001.prg1.zerops.app
-    DEV_FRONTEND_URL: https://clientdev-${zeropsSubdomainHost}-3000.prg1.zerops.app
+    DEV_FRONTEND_URL: https://appdev-${zeropsSubdomainHost}-3000.prg1.zerops.app
 
 services:
   # Deploy the Wasp API in a dev + stage pair — `apidev` is the
@@ -39,15 +39,15 @@ services:
     # Wasp prod-api reads these at runtime for CORS and auth redirects.
     envVariables:
       WASP_SERVER_URL: https://apistage-${zeropsSubdomainHost}-3001.prg1.zerops.app
-      WASP_WEB_CLIENT_URL: https://clientstage-${zeropsSubdomainHost}.prg1.zerops.app
+      WASP_WEB_CLIENT_URL: https://appstage-${zeropsSubdomainHost}.prg1.zerops.app
 
-  # Deploy the Wasp client in a dev + stage pair — `clientdev` ships
+  # Deploy the Wasp client in a dev + stage pair — `appdev` ships
   # full source with the Wasp CLI for `wasp start` (client :3000,
-  # server :3001); `clientstage` serves the compiled SPA on static
+  # server :3001); `appstage` serves the compiled SPA on static
   # Nginx. REACT_APP_API_URL bakes apistage into the stage bundle at
   # build time so the client points at the staged API without a
   # chicken-and-egg redeploy after apistage mints its subdomain.
-  - hostname: clientdev
+  - hostname: appdev
     type: nodejs@24
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/wasp-hello-world-app
@@ -55,7 +55,7 @@ services:
     verticalAutoscaling:
       minRam: 1
 
-  - hostname: clientstage
+  - hostname: appstage
     type: static
     zeropsSetup: prod-client
     buildFromGit: https://github.com/zerops-recipe-apps/wasp-hello-world-app
