@@ -84,8 +84,9 @@ Client: Zerops `static` (Nginx).
 | Service | Type | Purpose | Priority |
 |---------|------|---------|----------|
 | db | postgresql | Prisma datasource | 10 |
-| client / appstage | static | React SPA | 1 |
-| api / apistage | nodejs@24 | Wasp server | 1 |
+| appdev / apidev | nodejs@24 | Wasp dev workspace (`wasp start`) | 5 |
+| appstage / app | static | React SPA (prod-client) | 5 |
+| apistage / api | nodejs@24 | Wasp server (prod-api) | 5 |
 
 ## Scaling Considerations
 
@@ -112,6 +113,6 @@ Client: Zerops `static` (Nginx).
 
 ## Notes for Terminal Agent
 
-- Closest sibling: `nuxt-ssr-hello-world` (PostgreSQL + nodejs prod) + `nestjs-showcase` (multi-service client/API hostnames).
+- Closest sibling: `nestjs-showcase` (app/api dev-stage pairs + PostgreSQL).
 - Single app repo, three `zerops.yaml` setups: `dev`, `prod-client`, `prod-api`.
 - Use `#zeropsPreprocessor=on` for subdomain URL env vars in `import.yaml`.
