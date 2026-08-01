@@ -159,10 +159,15 @@ git push -u origin main
 
 #### 2.3 Remove `import.yaml` from App Repo
 
-Delete `import.yaml` from the app repo. The service definitions should be moved to `recipes/{recipe-name}/import.yaml`.
+Delete `import.yaml` from the app repo (canonical import lives in the recipe repo). An optional standalone
+`import.yaml` in the app repo is acceptable for one-click deploy demos only — keep it in sync with the recipe pattern.
 
 > **Key principle:** Reuse service definitions across environments, but adjust **scaling configuration** based on
 > environment type (e.g., minimal resources for stage, higher resources and replicas for HA production).
+
+> **Environment variables:** `project.envVariables` in import.yaml is a **value store** (`APP_URL`, `API_URL`) —
+> not app env vars. Map framework keys in `zerops.yaml` (`WASP_SERVER_URL: ${API_URL}`). Never put `envVariables`
+> on service blocks in import.yaml.
 
 #### 2.4 Add Extract Fragments to `README.md`
 
@@ -196,6 +201,20 @@ Perform find-and-replace on these placeholders:
 
 Create and document `import.yaml` for each environment. Remember to adjust scaling/resources appropriately per
 environment.
+
+**Value store env vars:** define generic project keys only:
+
+```yaml
+project:
+  envVariables:
+    APP_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
+    API_URL: https://api-${zeropsSubdomainHost}-3000.prg1.zerops.app
+```
+
+Map to framework keys in the app repo's `zerops.yaml`. Do not use `envVariables` on service blocks.
+
+**Small production Postgres:** use `profile: oltp-hobby` (~0.5 GB) for hello-world / demo recipes — not
+`oltp-production` (~4 GB). Reserve `oltp-production` for HA environments.
 
 ### 5. Register Recipe in Strapi
 

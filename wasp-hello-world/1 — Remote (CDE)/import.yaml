@@ -35,6 +35,7 @@ services:
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 0.5
+      minFreeRamGB: 0.25
 
   # Wasp client dev + stage pair — `appdev` runs `wasp start` on
   # :3000/:3001 for HMR iteration; `appstage` ships the built bundle
@@ -53,7 +54,8 @@ services:
     buildFromGit: https://github.com/zerops-recipe-apps/wasp-hello-world-app
     enableSubdomainAccess: true
     verticalAutoscaling:
-      minRam: 0.5
+      minRam: 0.25
+      minFreeRamGB: 0.125
 
   - hostname: db
     type: postgresql:single@16

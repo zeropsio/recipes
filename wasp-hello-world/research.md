@@ -78,7 +78,7 @@ Project `import.yaml` stores `APP_URL` / `API_URL` only (no per-service `envVari
 
 - **Type:** PostgreSQL (Prisma)
 - **Initialization:** `prisma migrate deploy` via `npm run db-migrate-prod` in `.wasp/out/server`
-- **Profile:** `oltp-hobby` (local/dev/remote/small prod), `oltp-staging` (stage), `oltp-production` (HA prod only)
+- **Profile:** `oltp-hobby` (single-node demo), `oltp-staging` (HA demo only)
 
 ## Service Dependencies
 
@@ -91,9 +91,12 @@ Project `import.yaml` stores `APP_URL` / `API_URL` only (no per-service `envVari
 
 ## Scaling Considerations
 
-- Static client: low RAM, `minContainers: 2` in production.
-- API: SSR-less Express server; 0.25–0.5 GB RAM floor for small prod.
-- HA: `:ha@` PostgreSQL, `corePackage: SERIOUS`, dedicated CPU on API.
+- **Static client** (`prod-client`): 0.25 GB RAM — Nginx serving compiled SPA.
+- **API** (`prod-api`): 0.5 GB RAM + 0.25 GB free headroom — bundled Node/Express + Prisma; 0.25 GB is too tight at runtime.
+- **Dev** (`dev`): 1 GB RAM on `appdev` and `apidev` — `wasp start` runs Vite (:3000) and the Wasp server (:3001) together; Wasp CLI codegen needs headroom (same pattern as nestjs-showcase dev).
+- **PostgreSQL:** `oltp-hobby` for single-node hello-world; `oltp-staging` for HA demo (not `oltp-production` ~4 GB).
+- **Small prod:** `minContainers: 2` on app + api for zero-downtime deploys.
+- **HA:** `:ha@` PostgreSQL, `corePackage: SERIOUS` (required for HA managed services).
 
 ## Maintenance Guide
 

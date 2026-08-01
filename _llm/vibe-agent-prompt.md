@@ -39,6 +39,7 @@ Write in second person ("you"), be concise, and focus on Zerops-specific adaptat
 2. **No testing** — Humans will test; focus on correct configuration
 3. **Respect `.human` markers** — Never modify recipes/apps containing a `.human` file; use them as reference only
 4. **Use research.md** — Base your work on the researcher's output
+5. **Value store env vars** — `import.yaml` project `envVariables` = generic value store (`APP_URL`, `API_URL`); map framework keys in `zerops.yaml`. No `envVariables` on import service blocks. Small prod DB: `oltp-hobby`, not `oltp-production`.
 
 ---
 
@@ -243,16 +244,21 @@ Optional: `knowledge-base` (anywhere, as needed)
 ### Example (good):
 
 ```yaml
+project:
+  envVariables:
+    APP_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
+    API_URL: https://api-${zeropsSubdomainHost}-3000.prg1.zerops.app
+
 services:
   - hostname: db
-    # HA mode provides automatic failover and read replicas
-    # Use postgresql:single@18 for development to reduce costs
-    type: postgresql:ha@18
-    # Use oltp-staging or oltp-hobby for development to reduce costs
-    profile: oltp-production
+    type: postgresql:single@18
+    # oltp-hobby (~0.5 GB) for small prod / demo; oltp-staging for stage; oltp-production for HA only
+    profile: oltp-hobby
     # Higher priority = created first. DB must exist before app starts.
     priority: 10
 ```
+
+Map `APP_URL` / `API_URL` to framework keys in app `zerops.yaml` — not in import service blocks.
 
 ---
 
