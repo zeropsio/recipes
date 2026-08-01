@@ -3,12 +3,15 @@
 # Wasp hello world — small production environment.
 # Two app containers (Nginx) and two API containers behind
 # the project balancer for zero-downtime deploys.
+#
+# Project envVariables are a value store — zerops.yaml maps them:
+#   REACT_APP_API_URL / WASP_SERVER_URL ← ${API_URL}
+#   WASP_WEB_CLIENT_URL                 ← ${APP_URL}
 project:
   name: wasp-hello-world-small-prod
   envVariables:
-    REACT_APP_API_URL: https://api-${zeropsSubdomainHost}-3001.prg1.zerops.app
-    WASP_SERVER_URL: https://api-${zeropsSubdomainHost}-3001.prg1.zerops.app
-    WASP_WEB_CLIENT_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
+    APP_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
+    API_URL: https://api-${zeropsSubdomainHost}-3001.prg1.zerops.app
 
 services:
   - hostname: app
@@ -32,12 +35,9 @@ services:
     verticalAutoscaling:
       minRam: 0.5
       minFreeRamGB: 0.25
-    # Wasp prod-api reads these at runtime for CORS and auth redirects.
-    envVariables:
-      WASP_SERVER_URL: https://api-${zeropsSubdomainHost}-3001.prg1.zerops.app
-      WASP_WEB_CLIENT_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
 
   - hostname: db
     type: postgresql:single@16
-    profile: oltp-production
+    # Small-prod demo workload — hobby (~0.5 GB), not oltp-production (~4 GB).
+    profile: oltp-hobby
     priority: 10

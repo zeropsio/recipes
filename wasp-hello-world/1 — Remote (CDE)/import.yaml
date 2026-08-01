@@ -2,21 +2,22 @@
 
 # Remote (CDE) environment — same dev + stage client/API pairs as
 # the AI agent layout for a human porter coding over SSH or a
-# mounted remote filesystem. Project-level URLs wire the staged
-# client at appstage and interactive dev at appdev / apidev.
+# mounted remote filesystem. Project envVariables are a value store:
+# APP_URL / API_URL → staged subdomains; DEV_* → appdev / apidev.
+# zerops.yaml maps APP_URL → WASP_WEB_CLIENT_URL and API_URL →
+# WASP_SERVER_URL / REACT_APP_API_URL for prod-api / prod-client.
 project:
   name: wasp-hello-world-remote
   envVariables:
-    REACT_APP_API_URL: https://apistage-${zeropsSubdomainHost}-3001.prg1.zerops.app
-    WASP_SERVER_URL: https://apistage-${zeropsSubdomainHost}-3001.prg1.zerops.app
-    WASP_WEB_CLIENT_URL: https://appstage-${zeropsSubdomainHost}.prg1.zerops.app
+    APP_URL: https://appstage-${zeropsSubdomainHost}.prg1.zerops.app
+    API_URL: https://apistage-${zeropsSubdomainHost}-3001.prg1.zerops.app
+    DEV_APP_URL: https://appdev-${zeropsSubdomainHost}-3000.prg1.zerops.app
     DEV_API_URL: https://apidev-${zeropsSubdomainHost}-3001.prg1.zerops.app
-    DEV_FRONTEND_URL: https://appdev-${zeropsSubdomainHost}-3000.prg1.zerops.app
 
 services:
   # Wasp API dev + stage pair — the porter codes inside `apidev`
   # over SSH; `apistage` runs the production build that backs
-  # REACT_APP_API_URL for end-to-end checks against the staged SPA.
+  # API_URL for end-to-end checks against the staged SPA.
   - hostname: apidev
     type: nodejs@24
     priority: 5
@@ -34,15 +35,10 @@ services:
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 0.5
-    # Wasp prod-api reads these at runtime for CORS and auth redirects.
-    envVariables:
-      WASP_SERVER_URL: https://apistage-${zeropsSubdomainHost}-3001.prg1.zerops.app
-      WASP_WEB_CLIENT_URL: https://appstage-${zeropsSubdomainHost}.prg1.zerops.app
 
   # Wasp client dev + stage pair — `appdev` runs `wasp start` on
   # :3000/:3001 for HMR iteration; `appstage` ships the built bundle
-  # on `base: static`. REACT_APP_API_URL bakes apistage into the
-  # stage bundle at build time.
+  # on `base: static`. API_URL bakes apistage into the stage bundle.
   - hostname: appdev
     type: nodejs@24
     zeropsSetup: dev
