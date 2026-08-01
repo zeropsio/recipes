@@ -38,6 +38,6 @@ services:
 
   - hostname: db
     type: postgresql:single@16
-    # Small-prod demo workload — hobby (~0.5 GB), not oltp-production (~4 GB).
+    # Hello-world demo — oltp-hobby (~0.5 GB), not oltp-production (~4 GB).
     profile: oltp-hobby
     priority: 10

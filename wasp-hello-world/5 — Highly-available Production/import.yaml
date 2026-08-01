@@ -1,8 +1,8 @@
 #zeropsPreprocessor=on
 
 # Wasp hello world — highly-available production environment.
-# Dedicated infrastructure, HA PostgreSQL, and scaled client/API
-# containers for enterprise-grade durability.
+# HA PostgreSQL and scaled client/API containers — lightweight
+# demo resources (oltp-staging DB, shared CPU on API).
 #
 # Project envVariables are a value store — zerops.yaml maps them:
 #   REACT_APP_API_URL / WASP_SERVER_URL ← ${API_URL}
@@ -35,11 +35,11 @@ services:
     minContainers: 2
     maxContainers: 6
     verticalAutoscaling:
-      cpuMode: DEDICATED
-      minRam: 1
-      minFreeRamGB: 0.5
+      minRam: 0.5
+      minFreeRamGB: 0.25
 
   - hostname: db
     type: postgresql:ha@16
-    profile: oltp-production
+    # Hello-world HA demo — oltp-staging, not oltp-production (~4 GB).
+    profile: oltp-staging
     priority: 10
