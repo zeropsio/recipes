@@ -22,7 +22,8 @@ services:
     buildFromGit: https://github.com/zerops-recipe-apps/wasp-hello-world-app
     enableSubdomainAccess: true
     verticalAutoscaling:
-      minRam: 0.5
+      minRam: 0.25
+      minFreeRamGB: 0.125
 
   - hostname: api
     type: nodejs@24
@@ -32,6 +33,7 @@ services:
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 0.5
+      minFreeRamGB: 0.25
 
   - hostname: db
     type: postgresql:single@16
