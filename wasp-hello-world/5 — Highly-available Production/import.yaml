@@ -3,13 +3,16 @@
 # Wasp hello world — highly-available production environment.
 # Dedicated infrastructure, HA PostgreSQL, and scaled client/API
 # containers for enterprise-grade durability.
+#
+# Project envVariables are a value store — zerops.yaml maps them:
+#   REACT_APP_API_URL / WASP_SERVER_URL ← ${API_URL}
+#   WASP_WEB_CLIENT_URL                 ← ${APP_URL}
 project:
   name: wasp-hello-world-ha-prod
   corePackage: SERIOUS
   envVariables:
-    REACT_APP_API_URL: https://api-${zeropsSubdomainHost}-3001.prg1.zerops.app
-    WASP_SERVER_URL: https://api-${zeropsSubdomainHost}-3001.prg1.zerops.app
-    WASP_WEB_CLIENT_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
+    APP_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
+    API_URL: https://api-${zeropsSubdomainHost}-3001.prg1.zerops.app
 
 services:
   - hostname: app
@@ -35,10 +38,6 @@ services:
       cpuMode: DEDICATED
       minRam: 1
       minFreeRamGB: 0.5
-    # Wasp prod-api reads these at runtime for CORS and auth redirects.
-    envVariables:
-      WASP_SERVER_URL: https://api-${zeropsSubdomainHost}-3001.prg1.zerops.app
-      WASP_WEB_CLIENT_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
 
   - hostname: db
     type: postgresql:ha@16

@@ -1,15 +1,18 @@
 #zeropsPreprocessor=on
 
 # Wasp hello world — local development environment.
-# Cloud client + API (prod setups) and database. The developer runs
+# Cloud SPA + API (prod setups) and database. The developer runs
 # `wasp start` locally and connects to the Zerops database via
 # `zcli vpn up`.
+#
+# Project envVariables are a value store — zerops.yaml maps them:
+#   REACT_APP_API_URL / WASP_SERVER_URL ← ${API_URL}
+#   WASP_WEB_CLIENT_URL                 ← ${APP_URL}
 project:
   name: wasp-hello-world-local
   envVariables:
-    REACT_APP_API_URL: https://api-${zeropsSubdomainHost}-3001.prg1.zerops.app
-    WASP_SERVER_URL: https://api-${zeropsSubdomainHost}-3001.prg1.zerops.app
-    WASP_WEB_CLIENT_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
+    APP_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
+    API_URL: https://api-${zeropsSubdomainHost}-3001.prg1.zerops.app
 
 services:
   - hostname: app
@@ -29,10 +32,6 @@ services:
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 0.5
-    # Wasp prod-api reads these at runtime for CORS and auth redirects.
-    envVariables:
-      WASP_SERVER_URL: https://api-${zeropsSubdomainHost}-3001.prg1.zerops.app
-      WASP_WEB_CLIENT_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
 
   - hostname: db
     type: postgresql:single@16

@@ -64,10 +64,11 @@ Client: Zerops `static` (Nginx).
 |----------|----------|-------------|
 | `PORT` | API | Server port (default 3001) |
 | `DATABASE_URL` | API | PostgreSQL connection string |
-| `WASP_SERVER_URL` | API | Public API URL |
-| `WASP_WEB_CLIENT_URL` | API | Public client URL (CORS) |
-| `REACT_APP_API_URL` | Client build | API URL embedded in SPA |
+| `APP_URL` | Project import | Public SPA URL — `zerops.yaml` maps to `WASP_WEB_CLIENT_URL` |
+| `API_URL` | Project import | Public API URL — `zerops.yaml` maps to `WASP_SERVER_URL` and `REACT_APP_API_URL` |
 | `NODE_ENV` | API | `production` in prod |
+
+Project `import.yaml` stores `APP_URL` / `API_URL` only (no per-service `envVariables`). Wasp runtime keys are wired in `zerops.yaml`.
 
 ### Health Check
 
@@ -77,7 +78,7 @@ Client: Zerops `static` (Nginx).
 
 - **Type:** PostgreSQL (Prisma)
 - **Initialization:** `prisma migrate deploy` via `npm run db-migrate-prod` in `.wasp/out/server`
-- **Profile:** `oltp-staging` (dev/stage), `oltp-production` (HA prod)
+- **Profile:** `oltp-hobby` (local/dev/remote/small prod), `oltp-staging` (stage), `oltp-production` (HA prod only)
 
 ## Service Dependencies
 
