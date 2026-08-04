@@ -1,0 +1,96 @@
+#zeropsPreprocessor=on
+
+# Highly-available production project. The project's
+# corePackage is SERIOUS here — required for the `:ha`
+# multi-container managed services below; the default LIGHT
+# core only supports single-container infrastructure.
+# BETTER_AUTH_SECRET is a project-level value every container
+# reads identically.
+project:
+  name: analog-ssr-spartan-ha-prod
+  corePackage: SERIOUS
+  envVariables:
+    BETTER_AUTH_SECRET: <@generateRandomString(<32>)>
+
+services:
+  # Dedicated CPU instead of shared — no noisy-neighbor jitter
+  # from other projects' containers on the same physical core,
+  # which matters once uptime SLOs are real. A 0.5 GB
+  # minFreeRamGB spike buffer absorbs production traffic bursts
+  # before they push memory into swap.
+  - hostname: app
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-spartan
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 0.5
+      minFreeRamGB: 0.5
+
+  # Set higher priority on db, cache, broker, storage, and search than the app,
+  # so every dependency is ready before the app's first init command or request
+  # runs.
+  #
+  # Runs highly available, used by Better Auth to store accounts, sessions, and
+  # profile fields, with automatic failover across a replicated Postgres cluster
+  # — the `:ha` variant for production traffic. Managed RAM floor jumps to 1
+  # GB; bump verticalAutoscaling.minRam if query latency creeps past SLO.
+  - hostname: db
+    type: postgresql:ha@18
+    priority: 10
+    profile: oltp-staging
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5
+
+  # Valkey runs highly available here, replicated for automatic
+  # failover, so a node loss doesn't drop cached profile reads.
+  # Zerops forwards the client-facing ports to whichever node is
+  # current primary, so the app's connection string doesn't
+  # change on failover. Managed RAM floor is 1 GB.
+  - hostname: cache
+    type: valkey:ha@7.2
+    priority: 10
+    profile: staging
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5
+
+  # The `:ha` cluster keeps the signup/profile-update queue
+  # group delivering if a node drops — there's no message stream
+  # to replicate here, just pub/sub liveness across the cluster.
+  # Managed RAM floor is 1 GB for the larger cluster.
+  - hostname: broker
+    type: nats:ha@2.12
+    priority: 10
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5
+
+  # Object storage for avatar uploads. Scaling this service
+  # means raising objectStorageSize — there's no container count
+  # or CPU/RAM dial here. Bump the quota when uploads outgrow the
+  # current allocation.
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Single-node Meilisearch, used by the app for full-text search over user name
+  # and bio fields — the managed RAM floor is 1 GB at this tier. Bump
+  # verticalAutoscaling.minRam if production search latency correlates with a
+  # growing index.
+  - hostname: search
+    type: meilisearch:single@1.20
+    priority: 10
+    verticalAutoscaling:
+      cpuMode: DEDICATED
+      minRam: 1
+      minFreeRamGB: 0.5
+

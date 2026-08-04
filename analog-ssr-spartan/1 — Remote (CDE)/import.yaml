@@ -1,0 +1,89 @@
+#zeropsPreprocessor=on
+
+# Remote development workspace for a human porter working
+# from a cloud IDE over SSH. BETTER_AUTH_SECRET is a
+# project-level value, generated once at import — the dev and
+# staging containers both inherit it rather than minting their
+# own independent secret.
+project:
+  name: analog-ssr-spartan-remote
+  envVariables:
+    BETTER_AUTH_SECRET: <@generateRandomString(<32>)>
+
+services:
+  # Two containers: appdev for SSH iteration with hot-reload,
+  # appstage running the compiled Nitro build for a human porter
+  # working from a cloud IDE. appdev's RAM floor is higher
+  # because SSH-driven build tooling spikes memory harder than
+  # the compiled server appstage runs.
+  - hostname: appdev
+    type: nodejs@22
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-spartan
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 1
+
+  - hostname: appstage
+    type: nodejs@22
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-spartan
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+
+  # Set higher priority on db, cache, broker, storage, and
+  # search than the app, so every dependency is ready before the
+  # app's first init command or request runs.
+  #
+  # Single-node PostgreSQL for the human porter's iteration —
+  # Better Auth's schema and the dashboard's profile fields live
+  # here. Snapshots exist because iteration here is expected to
+  # occasionally break something worth restoring from.
+  - hostname: db
+    type: postgresql:single@18
+    priority: 10
+    profile: oltp-hobby
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Valkey caches profile lookups — repeat reads during manual
+  # testing skip the Postgres round-trip, and the dashboard's
+  # hit/miss counters move in real time as you click through the
+  # flow.
+  - hostname: cache
+    type: valkey:single@7.2
+    priority: 10
+    profile: hobby
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # NATS queues signup and profile-update events for the
+  # in-process worker to consume — publish a test event from
+  # the dashboard's queue-demo button and watch the processed
+  # counter and activity feed update.
+  - hostname: broker
+    type: nats:single@2.12
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
+
+  # Object storage for avatar uploads — upload a file from the
+  # dashboard and the app hands back a signed, time-limited URL
+  # to read it, whatever this service's bucket policy is set to.
+  - hostname: storage
+    type: object-storage
+    priority: 10
+    objectStorageSize: 1
+    objectStoragePolicy: private
+
+  # Meilisearch indexes name/bio fields as the queue-group
+  # worker processes each signup or edit — search for a user
+  # right after editing their bio and the new text is already
+  # indexed.
+  - hostname: search
+    type: meilisearch:single@1.20
+    priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
+
