@@ -29,7 +29,8 @@ services:
 
   # HA mode replicates data across multiple nodes — survives a
   # single-node failure without data loss or service interruption.
+  # Hello-world HA demo — oltp-staging, not oltp-production (~4 GB).
   - hostname: db
     type: postgresql:ha@18
-    profile: oltp-production
+    profile: oltp-staging
     priority: 10

@@ -35,7 +35,8 @@ services:
   #
   # Runs highly available, used by Better Auth to store accounts, sessions, and
   # profile fields, with automatic failover across a replicated Postgres cluster
-  # — the `:ha` variant for production traffic. Managed RAM floor jumps to 1
+  # — the `:ha` variant for production traffic. Hello-world HA demo uses
+  # oltp-staging, not oltp-production (~4 GB). Managed RAM floor jumps to 1
   # GB; bump verticalAutoscaling.minRam if query latency creeps past SLO.
   - hostname: db
     type: postgresql:ha@18
@@ -48,6 +49,7 @@ services:
 
   # Valkey runs highly available here, replicated for automatic
   # failover, so a node loss doesn't drop cached profile reads.
+  # Hello-world HA demo — staging profile, not production tier.
   # Zerops forwards the client-facing ports to whichever node is
   # current primary, so the app's connection string doesn't
   # change on failover. Managed RAM floor is 1 GB.

@@ -25,7 +25,10 @@ services:
   # PostgreSQL for app data. Priority 10 starts data services
   # before app containers, preventing connection errors on
   # first boot when the database is not yet ready.
+  # Hello-world / demo scale — oltp-hobby (~0.5 GB), not
+  # oltp-staging or oltp-production (~4 GB). Bump profile when
+  # traffic outgrows hello-world scale.
   - hostname: db
     type: postgresql:single@18
-    profile: oltp-production
+    profile: oltp-hobby
     priority: 10

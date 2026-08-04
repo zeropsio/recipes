@@ -35,7 +35,8 @@ services:
   #
   # Runs highly available, used by Better Auth to store accounts, sessions, and
   # profile fields, with automatic failover across a replicated Postgres cluster
-  # — the `:ha` variant for production traffic. Managed RAM floor jumps to 1
+  # — the `:ha` variant for production traffic. Hello-world HA demo uses
+  # oltp-staging, not oltp-production (~4 GB). Managed RAM floor jumps to 1
   # GB; bump verticalAutoscaling.minRam if query latency creeps past SLO.
   - hostname: db
     type: postgresql:ha@18
