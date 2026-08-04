@@ -23,9 +23,8 @@ services:
       # of shared vCPUs — eliminates noisy-neighbour CPU contention.
       cpuMode: DEDICATED
       minRam: 0.5
-      # 50% free RAM headroom handles Angular SSR rendering bursts
-      # and Node.js memory fragmentation without OOM restarts.
       minFreeRamGB: 0.25
+      minDisk: 2
 
   # HA mode replicates data across multiple nodes — survives a
   # single-node failure without data loss or service interruption.
@@ -34,3 +33,5 @@ services:
     type: postgresql:ha@18
     profile: oltp-staging
     priority: 10
+    verticalAutoscaling:
+      minDisk: 2

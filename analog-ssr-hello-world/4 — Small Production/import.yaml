@@ -1,7 +1,7 @@
 # Analog SSR Hello World — Small Production environment.
-# Production-ready setup for moderate traffic. Two containers
-# run in parallel behind the project balancer for availability
-# during deploys and minor container failures.
+# Demo small prod — one app replica + hobby Postgres (~1 GB RAM,
+# 2 shared cores, 1 GB disk per service). Bump minContainers,
+# minRam, or DB profile when traffic outgrows hello-world scale.
 project:
   name: analog-ssr-hello-world-small-prod
 
@@ -11,24 +11,22 @@ services:
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-hello-world-app
     enableSubdomainAccess: true
-    # Always run at least 2 containers so one stays healthy
-    # while the other restarts or receives a new deploy.
-    minContainers: 2
-    # verticalAutoscaling: Zerops scales RAM automatically within
-    # these bounds. minFreeRamGB reserves headroom for SSR
-    # rendering spikes — without it, V8 GC pressure can trigger
-    # OOM restarts at the minRam ceiling.
+    minContainers: 1
     verticalAutoscaling:
       minRam: 0.25
       minFreeRamGB: 0.125
+      minDisk: 1
 
   # PostgreSQL for app data. Priority 10 starts data services
   # before app containers, preventing connection errors on
   # first boot when the database is not yet ready.
   # Hello-world / demo scale — oltp-hobby (~0.5 GB), not
-  # oltp-staging or oltp-production (~4 GB). Bump profile when
-  # traffic outgrows hello-world scale.
+  # oltp-staging or oltp-production (~4 GB).
   - hostname: db
     type: postgresql:single@18
     profile: oltp-hobby
     priority: 10
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
+      minDisk: 1
