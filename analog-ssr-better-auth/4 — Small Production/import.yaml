@@ -30,26 +30,24 @@ services:
   # so every dependency is ready before the app's first init command or request
   # runs.
   #
-  # Single-instance Postgres, used by Better Auth to store accounts, sessions,
-  # and profile fields — restoring from a snapshot means downtime, the cost
-  # trade-off at this scale. Bump verticalAutoscaling.minRam if production write
-  # volume pushes query latency up.
+  # Single-instance Postgres — hello-world / demo scale uses oltp-hobby
+  # (~0.5 GB), not oltp-staging or oltp-production (~4 GB). Bump
+  # verticalAutoscaling.minRam if production write volume pushes query latency up.
   - hostname: db
     type: postgresql:single@18
     priority: 10
-    profile: oltp-staging
+    profile: oltp-hobby
     verticalAutoscaling:
       minRam: 0.25
       minFreeRamGB: 0.25
 
-  # Single-instance Valkey — a failure means a brief cache-cold
-  # window while Postgres absorbs the extra profile-read load.
-  # Bump verticalAutoscaling.minRam if the dashboard's hit/miss
-  # counters shift toward more misses under production traffic.
+  # Single-instance Valkey — hobby profile keeps cache cost in line with
+  # demo small-prod positioning. Bump verticalAutoscaling.minRam if the
+  # dashboard's hit/miss counters shift toward more misses under production traffic.
   - hostname: cache
     type: valkey:single@7.2
     priority: 10
-    profile: staging
+    profile: hobby
     verticalAutoscaling:
       minRam: 0.25
       minFreeRamGB: 0.25
