@@ -30,7 +30,8 @@ services:
   # PostgreSQL HA replicates data across multiple nodes — no single
   # point of failure. Priority 10 ensures the cluster is ready
   # before app containers start connecting.
+  # Hello-world HA demo — oltp-staging, not oltp-production (~4 GB).
   - hostname: db
     type: postgresql:ha@16
-    profile: oltp-production
+    profile: oltp-staging
     priority: 10
