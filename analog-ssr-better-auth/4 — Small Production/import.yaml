@@ -1,9 +1,6 @@
 #zeropsPreprocessor=on
 
-# Small-production demo — one app replica plus single-node data
-# services on hobby profiles and 1 GB disk floors. Full stack
-# needs more than 2 cores; trim services or bump resources for
-# sustained production traffic.
+# Analog SSR Better Auth — Small Production environment.
 project:
   name: analog-ssr-better-auth-small-prod
   envVariables:
@@ -15,45 +12,20 @@ services:
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-better-auth-app
     enableSubdomainAccess: true
-    minContainers: 1
-    verticalAutoscaling:
-      minRam: 0.25
-      minFreeRamGB: 0.125
-      minDisk: 1
 
-  # Set higher priority on db, cache, broker, storage, and search than the app,
-  # so every dependency is ready before the app's first init command or request
-  # runs.
-  #
-  # Single-instance Postgres — hello-world / demo scale uses oltp-hobby
-  # (~0.5 GB), not oltp-staging or oltp-production (~4 GB).
   - hostname: db
     type: postgresql:single@18
     priority: 10
-    profile: oltp-hobby
-    verticalAutoscaling:
-      minRam: 0.25
-      minFreeRamGB: 0.125
-      minDisk: 1
+    profile: oltp-staging
 
-  # Single-instance Valkey — hobby profile keeps cache cost in line with
-  # demo small-prod positioning.
   - hostname: cache
     type: valkey:single@7.2
     priority: 10
-    profile: hobby
-    verticalAutoscaling:
-      minRam: 0.25
-      minFreeRamGB: 0.125
-      minDisk: 1
+    profile: staging
 
   - hostname: broker
     type: nats:single@2.12
     priority: 10
-    verticalAutoscaling:
-      minRam: 0.25
-      minFreeRamGB: 0.125
-      minDisk: 1
 
   - hostname: storage
     type: object-storage
@@ -64,7 +36,3 @@ services:
   - hostname: search
     type: meilisearch:single@1.20
     priority: 10
-    verticalAutoscaling:
-      minRam: 0.25
-      minFreeRamGB: 0.125
-      minDisk: 1
