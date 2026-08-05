@@ -1,7 +1,5 @@
-# Analog SSR Hello World — Small Production environment.
-# MVP production (~1–10 RPS) — one app replica (0.5 GB floor) plus
-# oltp-staging Postgres. Bump minContainers or profiles when traffic
-# outgrows this band.
+# Entry prod (~5 users) — one app replica plus oltp-staging Postgres.
+# No verticalAutoscaling — profiles and platform defaults only.
 project:
   name: analog-ssr-hello-world-small-prod
 
@@ -12,12 +10,9 @@ services:
     buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-hello-world-app
     enableSubdomainAccess: true
     minContainers: 1
-    verticalAutoscaling:
-      minRam: 0.5
-      minFreeRamGB: 0.25
 
-  # Production Postgres — oltp-staging (not hobby). Profile sets
-  # managed RAM; omit verticalAutoscaling so profile changes apply cleanly.
+  # oltp-staging (not hobby) — profile sets managed RAM; no
+  # verticalAutoscaling so profile changes apply cleanly.
   - hostname: db
     type: postgresql:single@18
     profile: oltp-staging

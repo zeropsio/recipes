@@ -3,5 +3,5 @@ This is a small production environment for [Analog SSR Spartan (info + deploy)](
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
 
-**Small Production** runs one app container (**0.5 GB RAM**) plus **oltp-staging** Postgres and **staging** Valkey (profiles set managed RAM). HA tier scales app replicas and moves data services to `:ha@`.
+**Small Production** — entry prod (~5 users): one app container plus **oltp-staging** Postgres and **staging** Valkey. Profiles set managed-service RAM; no manual autoscaling in yaml. HA tier scales app replicas and moves data services to `:ha@`.
 <!-- #ZEROPS_EXTRACT_END:intro# -->

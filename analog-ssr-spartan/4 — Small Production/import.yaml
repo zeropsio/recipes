@@ -1,8 +1,8 @@
 #zeropsPreprocessor=on
 
-# Small production — MVP band (~1–10 RPS). One app replica (0.5 GB
-# floor), oltp-staging Postgres and staging Valkey. Full-stack demos
-# bill above the hello-world 0.5 GB tier total.
+# Small production — entry prod (~5 users). One app replica,
+# oltp-staging Postgres and staging Valkey. No verticalAutoscaling
+# on any service — profiles and platform defaults only.
 project:
   name: analog-ssr-spartan-small-prod
   envVariables:
@@ -15,9 +15,6 @@ services:
     buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-spartan
     enableSubdomainAccess: true
     minContainers: 1
-    verticalAutoscaling:
-      minRam: 0.5
-      minFreeRamGB: 0.5
 
   - hostname: db
     type: postgresql:single@18
@@ -32,8 +29,6 @@ services:
   - hostname: broker
     type: nats:single@2.12
     priority: 10
-    verticalAutoscaling:
-      minRam: 0.25
 
   - hostname: storage
     type: object-storage
@@ -44,5 +39,3 @@ services:
   - hostname: search
     type: meilisearch:single@1.20
     priority: 10
-    verticalAutoscaling:
-      minRam: 0.25
