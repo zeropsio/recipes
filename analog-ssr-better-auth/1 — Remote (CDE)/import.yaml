@@ -23,6 +23,7 @@ services:
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 1
+      minFreeRamGB: 0.5
 
   - hostname: appstage
     type: nodejs@22
@@ -31,6 +32,7 @@ services:
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 0.5
+      minFreeRamGB: 0.5
 
   # Set higher priority on db, cache, broker, storage, and
   # search than the app, so every dependency is ready before the
@@ -44,8 +46,6 @@ services:
     type: postgresql:single@18
     priority: 10
     profile: oltp-hobby
-    verticalAutoscaling:
-      minRam: 0.25
 
   # Valkey caches profile lookups — repeat reads during manual
   # testing skip the Postgres round-trip, and the dashboard's
@@ -55,8 +55,6 @@ services:
     type: valkey:single@7.2
     priority: 10
     profile: hobby
-    verticalAutoscaling:
-      minRam: 0.25
 
   # NATS queues signup and profile-update events for the
   # in-process worker to consume — publish a test event from
