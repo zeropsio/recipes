@@ -16,10 +16,10 @@ services:
     buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-hello-world-app
     enableSubdomainAccess: true
     minContainers: 2
-    maxContainers: 6
     verticalAutoscaling:
       cpuMode: DEDICATED
       minRam: 0.5
+      minFreeRamGB: 0.25
       minDisk: 2
 
   # HA Postgres — oltp-staging cluster. App tier targets 1 GB RAM

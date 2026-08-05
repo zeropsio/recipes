@@ -12,6 +12,7 @@ services:
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 0.25
+      minFreeRamGB: 0.25
 
   # PostgreSQL for app data. Priority 10 starts data services
   # before app containers, preventing connection errors on

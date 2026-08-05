@@ -16,3 +16,4 @@ services:
     minContainers: 2
     verticalAutoscaling:
       minRam: 0.25
+      minFreeRamGB: 0.25

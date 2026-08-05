@@ -19,6 +19,7 @@ services:
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 0.25
+      minFreeRamGB: 0.25
 
   # Set higher priority on db, cache, broker, storage, and
   # search than the app, so every dependency is ready before the

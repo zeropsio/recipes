@@ -20,8 +20,8 @@ services:
     enableSubdomainAccess: true
     # Always run at least 2 containers for availability and load distribution.
     minContainers: 2
-    maxContainers: 6
     verticalAutoscaling:
       cpuMode: DEDICATED
       minRam: 0.5
+      minFreeRamGB: 0.25
       minDisk: 2

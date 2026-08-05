@@ -17,6 +17,7 @@ services:
     minContainers: 1
     verticalAutoscaling:
       minRam: 0.5
+      minFreeRamGB: 0.5
 
   - hostname: db
     type: postgresql:single@18

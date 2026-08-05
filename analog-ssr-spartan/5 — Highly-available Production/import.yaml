@@ -22,10 +22,10 @@ services:
     buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-spartan
     enableSubdomainAccess: true
     minContainers: 2
-    maxContainers: 6
     verticalAutoscaling:
       cpuMode: DEDICATED
       minRam: 0.5
+      minFreeRamGB: 0.5
       minDisk: 2
 
   # Set higher priority on db, cache, broker, storage, and search than the app,
