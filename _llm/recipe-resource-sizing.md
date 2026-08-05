@@ -16,7 +16,7 @@ still honest production**.
 |-------------|------|
 | Postgres | **`oltp-staging`** (≥500 MiB managed) — never `oltp-hobby` on prod-named envs |
 | Valkey (full-stack) | **`staging`** profile only |
-| App replicas | **`minContainers: 1`** on hello-world HTTP (HA adds replicas) |
+| App replicas | **omit `minContainers`** on Small Production (default 1); **HA uses `minContainers: 2`** |
 | **`verticalAutoscaling`** | **Omit on Small Production** — profiles + platform defaults only |
 | Calculator | Small Production price = **default “from” production price** on recipe pages |
 
@@ -40,6 +40,17 @@ Profile only — **no `verticalAutoscaling`**. Never `minFreeRamGB` on DB.
 
 ---
 
+## `minContainers`
+
+| Tier | HTTP app |
+|------|----------|
+| Stage / local / **Small Production** | **omit** (platform default is 1) |
+| **HA Production** | **`2`** |
+
+Set `minContainers` only when above the default. Do not set `minContainers: 1`.
+
+---
+
 ## When to use `verticalAutoscaling`
 
 | Service | Small Production | HA / dev / agent |
@@ -59,14 +70,14 @@ Omit `maxRam` / `maxContainers` unless documenting a cost ceiling.
 
 | Recipe | App | DB / cache | verticalAutoscaling |
 |--------|-----|------------|---------------------|
-| SSR hello-world | `minContainers: 1` | `oltp-staging` | none |
-| Static hello-world | `minContainers: 1` | — | none |
-| better-auth / spartan | `minContainers: 1` | `oltp-staging` + `staging` Valkey | none |
+| SSR hello-world | platform default (1) | `oltp-staging` | none |
+| Static hello-world | platform default (1) | — | none |
+| better-auth / spartan | platform default (1) | `oltp-staging` + `staging` Valkey | none |
 
 ---
 
 ## Checklist
 
-- [ ] Small prod = ~5 users, `oltp-staging` DB, **no verticalAutoscaling**
+- [ ] Small prod = ~5 users, `oltp-staging` DB, omit `minContainers` and `verticalAutoscaling`
 - [ ] Profile-only managed services; no DB `minFreeRamGB`
 - [ ] README intro matches yaml (refresh Strapi cache after merge)

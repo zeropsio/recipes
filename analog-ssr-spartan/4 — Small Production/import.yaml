@@ -1,8 +1,6 @@
 #zeropsPreprocessor=on
 
-# Small production — entry prod (~5 users). One app replica,
-# oltp-staging Postgres and staging Valkey. No verticalAutoscaling
-# on any service — profiles and platform defaults only.
+# Analog SSR Spartan — Small Production environment.
 project:
   name: analog-ssr-spartan-small-prod
   envVariables:
@@ -14,7 +12,6 @@ services:
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-spartan
     enableSubdomainAccess: true
-    minContainers: 1
 
   - hostname: db
     type: postgresql:single@18

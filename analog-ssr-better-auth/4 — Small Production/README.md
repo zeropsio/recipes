@@ -3,5 +3,5 @@ This is a small production environment for [Analog Ssr Better Auth (info + deplo
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
 
-**Small Production** — entry prod (~5 users): one app container plus **oltp-staging** Postgres and **staging** Valkey. Profiles set managed-service RAM; no manual autoscaling in yaml. HA tier scales app replicas and moves data services to `:ha@`.
+**Small Production** runs one app container plus **oltp-staging** Postgres and **staging** Valkey. HA tier scales app replicas and moves data services to `:ha@`.
 <!-- #ZEROPS_EXTRACT_END:intro# -->

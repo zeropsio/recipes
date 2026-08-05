@@ -163,7 +163,7 @@ Delete `import.yaml` from the app repo (canonical import lives in the recipe rep
 `import.yaml` in the app repo is acceptable for one-click deploy demos only — keep it in sync with the recipe pattern.
 
 > **Key principle:** Reuse service definitions across environments, but adjust **scaling configuration** based on
-> environment type. **Small Production = entry prod (~5 users)** — no `verticalAutoscaling`; profiles + `minContainers` only.
+> environment type. **Small Production = entry prod (~5 users)** — omit `minContainers` and `verticalAutoscaling`; profiles only.
 > See [recipe-resource-sizing.md](./recipe-resource-sizing.md).
 
 > **Environment variables:** `project.envVariables` in import.yaml is a **value store** (`APP_URL`, `API_URL`) —
@@ -214,7 +214,7 @@ project:
 
 Map to framework keys in the app repo's `zerops.yaml`. Do not use `envVariables` on service blocks.
 
-**Small Production** = entry prod (~5 users): `minContainers: 1`, **`profile: oltp-staging`** Postgres, **no `verticalAutoscaling`**.
+**Small Production** = entry prod (~5 users): omit `minContainers`, **`profile: oltp-staging`** Postgres, **no `verticalAutoscaling`**.
 Full rules: [recipe-resource-sizing.md](./recipe-resource-sizing.md).
 
 ### 5. Register Recipe in Strapi

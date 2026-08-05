@@ -1,8 +1,6 @@
 #zeropsPreprocessor=on
 
-# Small production — entry prod (~5 users). One app replica,
-# oltp-staging Postgres and staging Valkey. No verticalAutoscaling
-# on any service — profiles and platform defaults only.
+# Analog SSR Better Auth — Small Production environment.
 project:
   name: analog-ssr-better-auth-small-prod
   envVariables:
@@ -14,7 +12,6 @@ services:
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-better-auth-app
     enableSubdomainAccess: true
-    minContainers: 1
 
   - hostname: db
     type: postgresql:single@18
