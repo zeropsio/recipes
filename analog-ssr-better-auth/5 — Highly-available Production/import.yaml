@@ -15,19 +15,17 @@ project:
 services:
   # Dedicated CPU instead of shared — no noisy-neighbor jitter
   # from other projects' containers on the same physical core,
-  # which matters once uptime SLOs are real. A 0.5 GB
-  # minFreeRamGB spike buffer absorbs production traffic bursts
-  # before they push memory into swap.
+  # which matters once uptime SLOs are real.
   - hostname: app
     type: nodejs@22
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-better-auth-app
     enableSubdomainAccess: true
     minContainers: 2
+    maxContainers: 6
     verticalAutoscaling:
       cpuMode: DEDICATED
       minRam: 0.5
-      minFreeRamGB: 0.5
       minDisk: 2
 
   # Set higher priority on db, cache, broker, storage, and search than the app,
@@ -37,44 +35,31 @@ services:
   # Runs highly available, used by Better Auth to store accounts, sessions, and
   # profile fields, with automatic failover across a replicated Postgres cluster
   # — the `:ha` variant for production traffic. Hello-world HA demo uses
-  # oltp-staging, not oltp-production (~4 GB). Managed RAM floor jumps to 1
-  # GB; bump verticalAutoscaling.minRam if query latency creeps past SLO.
+  # oltp-staging, not oltp-production (~4 GB).
   - hostname: db
     type: postgresql:ha@18
     priority: 10
     profile: oltp-staging
-    verticalAutoscaling:
-      cpuMode: DEDICATED
-      minRam: 1
-      minFreeRamGB: 0.5
-      minDisk: 2
 
   # Valkey runs highly available here, replicated for automatic
   # failover, so a node loss doesn't drop cached profile reads.
   # Zerops forwards the client-facing ports to whichever node is
   # current primary, so the app's connection string doesn't
-  # change on failover. Managed RAM floor is 1 GB.
+  # change on failover.
   - hostname: cache
     type: valkey:ha@7.2
     priority: 10
     profile: staging
-    verticalAutoscaling:
-      cpuMode: DEDICATED
-      minRam: 1
-      minFreeRamGB: 0.5
-      minDisk: 2
 
   # The `:ha` cluster keeps the signup/profile-update queue
   # group delivering if a node drops — there's no message stream
   # to replicate here, just pub/sub liveness across the cluster.
-  # Managed RAM floor is 1 GB for the larger cluster.
   - hostname: broker
     type: nats:ha@2.12
     priority: 10
     verticalAutoscaling:
       cpuMode: DEDICATED
       minRam: 1
-      minFreeRamGB: 0.5
       minDisk: 2
 
   # Object storage for avatar uploads. Scaling this service
@@ -88,15 +73,12 @@ services:
     objectStoragePolicy: private
 
   # Single-node Meilisearch, used by the app for full-text search over user name
-  # and bio fields — the managed RAM floor is 1 GB at this tier. Bump
-  # verticalAutoscaling.minRam if production search latency correlates with a
-  # growing index.
+  # and bio fields. Bump verticalAutoscaling.minRam if production search latency
+  # correlates with a growing index.
   - hostname: search
     type: meilisearch:single@1.20
     priority: 10
     verticalAutoscaling:
       cpuMode: DEDICATED
       minRam: 1
-      minFreeRamGB: 0.5
       minDisk: 2
-

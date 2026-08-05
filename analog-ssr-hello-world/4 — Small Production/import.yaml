@@ -1,7 +1,7 @@
 # Analog SSR Hello World — Small Production environment.
-# Demo small prod — one app replica + hobby Postgres (~1 GB RAM,
-# 2 shared cores, 1 GB disk per service). Bump minContainers,
-# minRam, or DB profile when traffic outgrows hello-world scale.
+# MVP production (~1–10 RPS) — one app replica (0.5 GB floor) plus
+# oltp-staging Postgres. Bump minContainers or profiles when traffic
+# outgrows this band.
 project:
   name: analog-ssr-hello-world-small-prod
 
@@ -13,20 +13,11 @@ services:
     enableSubdomainAccess: true
     minContainers: 1
     verticalAutoscaling:
-      minRam: 0.25
-      minFreeRamGB: 0.125
-      minDisk: 1
+      minRam: 0.5
 
-  # PostgreSQL for app data. Priority 10 starts data services
-  # before app containers, preventing connection errors on
-  # first boot when the database is not yet ready.
-  # Hello-world / demo scale — oltp-hobby (~0.5 GB), not
-  # oltp-staging or oltp-production (~4 GB).
+  # Production Postgres — oltp-staging (not hobby). Profile sets
+  # managed RAM; omit verticalAutoscaling so profile changes apply cleanly.
   - hostname: db
     type: postgresql:single@18
-    profile: oltp-hobby
+    profile: oltp-staging
     priority: 10
-    verticalAutoscaling:
-      minRam: 0.25
-      minFreeRamGB: 0.125
-      minDisk: 1

@@ -16,22 +16,15 @@ services:
     buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-hello-world-app
     enableSubdomainAccess: true
     minContainers: 2
-    # verticalAutoscaling: all three parameters — cpuMode, minRam,
-    # and minFreeRamGB — MUST be nested under verticalAutoscaling.
+    maxContainers: 6
     verticalAutoscaling:
-      # DEDICATED: each container gets exclusive CPU cores instead
-      # of shared vCPUs — eliminates noisy-neighbour CPU contention.
       cpuMode: DEDICATED
       minRam: 0.5
-      minFreeRamGB: 0.25
       minDisk: 2
 
-  # HA mode replicates data across multiple nodes — survives a
-  # single-node failure without data loss or service interruption.
-  # Hello-world HA demo — oltp-staging, not oltp-production (~4 GB).
+  # HA Postgres — oltp-staging cluster. App tier targets 1 GB RAM
+  # total (2 × 0.5 GB); db adds HA nodes on top of that floor.
   - hostname: db
     type: postgresql:ha@18
     profile: oltp-staging
     priority: 10
-    verticalAutoscaling:
-      minDisk: 2

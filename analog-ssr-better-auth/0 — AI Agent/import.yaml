@@ -43,8 +43,6 @@ services:
     type: postgresql:single@18
     priority: 10
     profile: oltp-hobby
-    verticalAutoscaling:
-      minRam: 0.25
 
   # Spin up Valkey, used by the app as a read-through cache for
   # profile lookups — a repeat GET /api/profile call within the
@@ -53,8 +51,6 @@ services:
     type: valkey:single@7.2
     priority: 10
     profile: hobby
-    verticalAutoscaling:
-      minRam: 0.25
 
   # Deploy NATS — the app publishes signup and profile-update
   # events here, and one in-process queue-group worker consumes

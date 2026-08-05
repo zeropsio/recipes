@@ -44,8 +44,6 @@ services:
     type: postgresql:single@18
     priority: 10
     profile: oltp-hobby
-    verticalAutoscaling:
-      minRam: 0.25
 
   # Valkey caches profile lookups — repeat reads during manual
   # testing skip the Postgres round-trip, and the dashboard's
@@ -55,8 +53,6 @@ services:
     type: valkey:single@7.2
     priority: 10
     profile: hobby
-    verticalAutoscaling:
-      minRam: 0.25
 
   # NATS queues signup and profile-update events for the
   # in-process worker to consume — publish a test event from

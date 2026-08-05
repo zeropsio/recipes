@@ -22,7 +22,6 @@ services:
       # minRam: 4
       # minFreeRamGB: 2
       minRam: 0.5
-      minFreeRamGB: 0.25
 
   # appstage: production-mode container. Developers push builds
   # here to verify the prod pipeline before shipping.
@@ -33,7 +32,6 @@ services:
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 0.5
-      minFreeRamGB: 0.25
 
   # PostgreSQL for app data. Priority 10 starts data services
   # before app containers, preventing connection errors on

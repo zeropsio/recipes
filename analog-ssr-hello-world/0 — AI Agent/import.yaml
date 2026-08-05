@@ -22,7 +22,6 @@ services:
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 0.5
-      minFreeRamGB: 0.25
 
   # appstage: production-mode container for staging previews.
   # AI agents push prod builds here to verify before finalising
@@ -34,7 +33,6 @@ services:
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 0.5
-      minFreeRamGB: 0.25
 
   # PostgreSQL for app data. Priority 10 starts data services
   # before app containers, preventing connection errors on

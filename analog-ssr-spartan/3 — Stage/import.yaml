@@ -10,19 +10,15 @@ project:
     BETTER_AUTH_SECRET: <@generateRandomString(<32>)>
 
 services:
-  # Single app container with a 0.25 GB minFreeRamGB spike
-  # buffer now reserved — rehearsal traffic bursts get absorbed
-  # before they push memory into swap. Bump
-  # verticalAutoscaling.minRam if a QA load run pushes steady-
-  # state usage against that floor.
+  # Single app container — bump verticalAutoscaling.minRam if a QA
+  # load run pushes steady-state usage against that floor.
   - hostname: app
     type: nodejs@22
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-spartan
     enableSubdomainAccess: true
     verticalAutoscaling:
-      minRam: 0.5
-      minFreeRamGB: 0.25
+      minRam: 0.25
 
   # Set higher priority on db, cache, broker, storage, and
   # search than the app, so every dependency is ready before the
@@ -30,41 +26,31 @@ services:
   #
   # Single-instance Postgres — restoring from a snapshot means
   # downtime, an acceptable trade-off for rehearsal-grade stage
-  # data. Bump verticalAutoscaling.minRam if query latency creeps
-  # up under a sustained QA run.
+  # data. Bump profile or minRam if query latency creeps up under
+  # a sustained QA run.
   - hostname: db
     type: postgresql:single@18
     priority: 10
     profile: oltp-hobby
-    verticalAutoscaling:
-      minRam: 0.25
-      minFreeRamGB: 0.25
 
   # Single-instance Valkey, used by the app as a read-through cache for profile
   # lookups — no replica, so restoring after a failure means a brief
-  # cache-cold period while Postgres absorbs the extra reads. Bump
-  # verticalAutoscaling.minRam if the dashboard's hit/miss counters shift toward
-  # more misses under a sustained QA run.
+  # cache-cold period while Postgres absorbs the extra reads.
   - hostname: cache
     type: valkey:single@7.2
     priority: 10
     profile: hobby
-    verticalAutoscaling:
-      minRam: 0.25
-      minFreeRamGB: 0.25
 
   # Single-instance NATS, used by the app to publish signup and profile-update
   # events for the in-process queue-group worker — a restart briefly
   # interrupts publishing and consuming until it's back; core pub/sub keeps
   # nothing queued for later replay, so events published during that gap don't
-  # arrive. Bump verticalAutoscaling.minRam if a QA load test grows event volume
-  # past the current floor.
+  # arrive.
   - hostname: broker
     type: nats:single@2.12
     priority: 10
     verticalAutoscaling:
       minRam: 0.25
-      minFreeRamGB: 0.25
 
   # Object storage for avatar uploads — reads always go through
   # a signed, time-limited URL, so QA uploads work regardless of
@@ -79,12 +65,9 @@ services:
   # Single-node Meilisearch, used by the app for full-text search over user name
   # and bio fields — a restart briefly pauses indexing while the service comes
   # back up; existing search results aren't affected, only new activity during
-  # that window. Bump verticalAutoscaling.minRam if search latency grows with a
-  # larger QA dataset.
+  # that window.
   - hostname: search
     type: meilisearch:single@1.20
     priority: 10
     verticalAutoscaling:
       minRam: 0.25
-      minFreeRamGB: 0.25
-

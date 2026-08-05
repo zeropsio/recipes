@@ -3,5 +3,5 @@ This is a small production environment for [Analog Ssr Better Auth (info + deplo
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
 
-**Small Production** demo runs one app container plus hobby-profile Postgres, Valkey, NATS, and Meilisearch (0.25 GB RAM and 1 GB disk floors) — cheapest full-stack Analog small prod; bump resources when traffic grows.
+**Small Production** runs one app container (**0.5 GB RAM**) plus **oltp-staging** Postgres and **staging** Valkey (profiles set managed RAM). HA tier scales app replicas and moves data services to `:ha@`.
 <!-- #ZEROPS_EXTRACT_END:intro# -->

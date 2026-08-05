@@ -1,6 +1,6 @@
 # Analog Hello World — Stage environment.
 # Pre-production testing with the same build pipeline as production.
-# Single container, lower scaling — keeps costs down for validation.
+# Single container (~1 core · 0.5 GB RAM) — low cost validation.
 project:
   name: analog-static-hello-world-stage
 
@@ -15,3 +15,5 @@ services:
     # code and zerops.yaml from this public repo automatically.
     buildFromGit: https://github.com/zerops-recipe-apps/analog-static-hello-world-app
     enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5

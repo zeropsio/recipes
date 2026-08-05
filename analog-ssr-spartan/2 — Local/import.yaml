@@ -36,8 +36,6 @@ services:
     type: postgresql:single@18
     priority: 10
     profile: oltp-hobby
-    verticalAutoscaling:
-      minRam: 0.25
 
   # Valkey read-through cache for profile lookups — whichever
   # process talks to this database, cached reads skip the round
@@ -46,8 +44,6 @@ services:
     type: valkey:single@7.2
     priority: 10
     profile: hobby
-    verticalAutoscaling:
-      minRam: 0.25
 
   # NATS queues signup and profile-update events for the
   # in-process worker — run your local app against this broker

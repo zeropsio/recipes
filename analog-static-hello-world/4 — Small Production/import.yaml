@@ -1,6 +1,6 @@
 # Analog Hello World — Small Production environment.
-# Two static containers (~0.5 GB RAM, 2 shared cores, 1 GB disk
-# each) — no database. Bump minRam if Nginx workers need headroom.
+# Two static containers (0.5 GB RAM total — 0.25 GB each, 2 shared cores,
+# 1 GB disk each) — no database.
 project:
   name: analog-static-hello-world-small-prod
 
@@ -16,5 +16,3 @@ services:
     minContainers: 2
     verticalAutoscaling:
       minRam: 0.25
-      minFreeRamGB: 0.125
-      minDisk: 1

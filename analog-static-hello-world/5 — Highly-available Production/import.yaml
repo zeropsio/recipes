@@ -20,11 +20,8 @@ services:
     enableSubdomainAccess: true
     # Always run at least 2 containers for availability and load distribution.
     minContainers: 2
-    # Zerops auto-scales RAM (and CPU when DEDICATED) within these bounds.
-    # DEDICATED cpuMode reserves CPU cores exclusively for this service —
-    # eliminates noisy-neighbour effects under sustained traffic.
+    maxContainers: 6
     verticalAutoscaling:
       cpuMode: DEDICATED
       minRam: 0.5
-      minFreeRamGB: 0.25
       minDisk: 2
