@@ -33,6 +33,11 @@ services:
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/wordpress-app
     enableSubdomainAccess: true
+    # Dev workstation: pin a single container (dev uses SSHFS) and floor RAM at 1 GB
+    # to absorb the first-boot `wp core install` spike plus on-container composer/wp-cli.
+    maxContainers: 1
+    verticalAutoscaling:
+      minRam: 1
     envSecrets:
       WORDPRESS_TITLE: WordPress on Zerops
       WORDPRESS_ADMIN_USER: zadmin

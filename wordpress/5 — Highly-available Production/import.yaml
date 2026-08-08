@@ -24,6 +24,9 @@ services:
     maxContainers: 6
     verticalAutoscaling:
       cpuMode: DEDICATED
+      # Floor RAM at 0.5 GB per container to cover the first-boot `wp core install`
+      # spike (both min containers boot cold); steady-state scales up from here.
+      minRam: 0.5
     envSecrets:
       WORDPRESS_TITLE: WordPress on Zerops
       WORDPRESS_ADMIN_USER: zadmin
