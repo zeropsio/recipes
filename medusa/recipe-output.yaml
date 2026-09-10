@@ -29,6 +29,7 @@ strapi_fields:
 ready_for_testing: true
 notes:
   - Monorepo: backend/ (medusa setup) + nextstore/ (nextstore setup) in medusa-showcase.
+  - Import YAMLs live only under recipes/medusa/ — not in the app repo.
   - Both services buildFromGit the same repo; zeropsSetup selects the setup in root zerops.yml.
   - nodejs@24 for medusa and nextstore. Project RELOAD_SECRET for publishable-key reload.
   - Hostnames must stay medusa / nextstore for CHANNEL_PUBLISHABLE_KEY and internal URLs.
