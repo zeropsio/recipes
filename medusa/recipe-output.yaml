@@ -16,10 +16,9 @@ files_created:
   - recipes/medusa/4 — Small Production/README.md
   - recipes/medusa/5 — Highly-available Production/import.yaml
   - recipes/medusa/5 — Highly-available Production/README.md
-apps_created: []
-apps_existing:
-  - https://github.com/zeropsio/recipe-medusa
-  - https://github.com/zeropsio/recipe-medusa-nextstore
+apps_created:
+  - https://github.com/zerops-recipe-apps/medusa-showcase
+apps_existing: []
 strapi_fields:
   recipe_name: Medusa
   slug: medusa
@@ -29,13 +28,8 @@ strapi_fields:
   internal_type: example
 ready_for_testing: true
 notes:
-  - App repos already exist; do not scaffold zerops-recipe-apps/medusa-hello-world-app.
-  - buildFromGit is zeropsio/recipe-medusa and zeropsio/recipe-medusa-nextstore (not zerops-recipe-apps).
-  - No setup: dev — all six envs use zeropsSetup medusa + nextstore. Hostnames must stay medusa / nextstore for CHANNEL_PUBLISHABLE_KEY.
-  - Small Production sets app minRam (1 GB / 0.5 GB) — Medusa OOMs at the Node platform default. Documented in research.md.
-  - Valkey: valkey:single@7.2 / valkey:ha@7.2 with hobby|staging profiles. Meilisearch: meilisearch@1.10 (no HA type).
-  - Cover uses cover-nextjs.svg until recipe-shared-assets ships a Medusa SVG.
-  - Old GUI buttons medusa-next-devel / medusa-next-prod are a different Strapi slug — create recipe_source medusa for the six-env page.
-  - Backend REDIS_URL should use ${redis_connectionString} (new Valkey requires a password).
-  - Deploy proof pending — no zerops_* MCP in this session. Strapi recipe record must exist before one-click URLs work.
-  - Analog storefront stays a separate recipe; ANALOG_STORE_URL is an empty CORS slot.
+  - Monorepo: backend/ (medusa setup) + nextstore/ (nextstore setup) in medusa-showcase.
+  - Both services buildFromGit the same repo; zeropsSetup selects the setup in root zerops.yml.
+  - nodejs@24 for medusa and nextstore. Project RELOAD_SECRET for publishable-key reload.
+  - Hostnames must stay medusa / nextstore for CHANNEL_PUBLISHABLE_KEY and internal URLs.
+  - Legacy zeropsio/recipe-medusa + recipe-medusa-nextstore repos superseded by medusa-showcase.

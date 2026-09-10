@@ -1,7 +1,7 @@
 # Medusa Recipe
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-Medusa v2.19 commerce backend and admin plus the official Next.js storefront on [Zerops](https://zerops.io). PostgreSQL, Valkey, Meilisearch, and MinIO ship with the project; first deploy migrates, seeds B2C + B2B channels, and writes a publishable key the storefront reads at runtime.
+Medusa v2.19 commerce backend, admin, and Next.js storefront in one monorepo ([zerops-recipe-apps/medusa-showcase](https://github.com/zerops-recipe-apps/medusa-showcase)) on [Zerops](https://zerops.io). PostgreSQL, Valkey, Meilisearch, and MinIO ship with the project; first deploy migrates, seeds B2C + B2B channels, and writes a publishable key the storefront reads at runtime.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 
 ⬇️ **Full recipe page and deploy with one-click**

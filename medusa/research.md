@@ -31,27 +31,27 @@
 
 ### Build Commands
 
-Backend (`zeropsio/recipe-medusa`):
+Monorepo [`zerops-recipe-apps/medusa-showcase`](https://github.com/zerops-recipe-apps/medusa-showcase) — root `zerops.yml` with `medusa` and `nextstore` setups.
+
+Backend (`backend/`):
 
 ```bash
-yarn
-yarn build
+cd backend && yarn && yarn build
 ```
 
-Storefront (`zeropsio/recipe-medusa-nextstore`):
+Storefront (`nextstore/`):
 
 ```bash
-corepack enable   # prepareCommands
-yarn
-yarn build
+corepack enable   # prepareCommands on nextstore setup
+cd nextstore && yarn && yarn build
 ```
 
 ### Build Output
 
 | Service | Deploy paths |
 |---------|----------------|
-| `medusa` | `.medusa/server/~`, `tsconfig.json`, `package.json`, `node_modules`, `src/scripts/seed-files` |
-| `nextstore` | `.next`, `package.json`, `next.config.js`, `yarn.lock`, `.yarnrc.yml`, `node_modules`, `public` |
+| `medusa` | `backend/.medusa/server/~`, `backend/tsconfig.json`, `backend/package.json`, `backend/node_modules`, `backend/src/scripts/seed-files` |
+| `nextstore` | `nextstore/.next`, `nextstore/package.json`, `nextstore/next.config.js`, `nextstore/yarn.lock`, `nextstore/.yarnrc.yml`, `nextstore/node_modules`, `nextstore/public` |
 
 ### Caching Recommendations
 
@@ -149,14 +149,13 @@ This is a **showcase** (two app repos + four data services), not a hello-world. 
 
 - https://docs.medusajs.com/ — Medusa v2
 - https://docs.medusajs.com/resources/integrations — official add-ons
-- https://github.com/zeropsio/recipe-medusa — backend + admin
-- https://github.com/zeropsio/recipe-medusa-nextstore — Next.js storefront
+- https://github.com/zerops-recipe-apps/medusa-showcase — monorepo (`backend/` + `nextstore/`)
 - https://docs.zerops.io/references/import-yaml/type-list — service types
 
 ## Notes for Terminal Agent
 
 - Closest siblings: `nestjs-showcase` (multi-service + Valkey + Meilisearch + MinIO) and `analog-ssr-better-auth` (Small Production profiles, HA `:ha@` + `SERIOUS`).
-- Canonical `buildFromGit` stays `zeropsio/recipe-medusa` and `zeropsio/recipe-medusa-nextstore` — not `zerops-recipe-apps/medusa-hello-world-app`.
+- Canonical `buildFromGit` is `zerops-recipe-apps/medusa-showcase` for both medusa and nextstore services (same repo, different `zeropsSetup`).
 - Use `#zeropsPreprocessor=on` for `${zeropsSubdomainHost}` and `<@generateRandomString(...)>`.
 - Old GUI buttons (`medusa-next-devel` / `medusa-next-prod`) are a different Strapi slug. This folder is `medusa` (six environments).
 - Cover SVG: `cover-nextjs.svg` until a Medusa-specific asset exists in recipe-shared-assets.

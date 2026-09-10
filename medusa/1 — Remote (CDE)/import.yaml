@@ -37,6 +37,7 @@ project:
     GITHUB_CLIENT_ID: ""
     GITHUB_CLIENT_SECRET: ""
     POSTHOG_EVENTS_API_KEY: ""
+    RELOAD_SECRET: <@generateRandomString(<16>)>
 
 services:
   - hostname: db
@@ -64,10 +65,10 @@ services:
   # so SSH inspection and `yarn` scripts do not OOM. There is no
   # `setup: dev` in the backend repo.
   - hostname: medusa
-    type: nodejs@22
-    priority: 5
+    type: nodejs@24
+    priority: 6
     zeropsSetup: medusa
-    buildFromGit: https://github.com/zeropsio/recipe-medusa
+    buildFromGit: https://github.com/zerops-recipe-apps/medusa-showcase
     enableSubdomainAccess: true
     envSecrets:
       SUPERADMIN_EMAIL: admin@example.com
@@ -77,13 +78,11 @@ services:
       minFreeRamGB: 0.5
 
   - hostname: nextstore
-    type: nodejs@22
+    type: nodejs@24
     priority: 5
     zeropsSetup: nextstore
-    buildFromGit: https://github.com/zeropsio/recipe-medusa-nextstore
+    buildFromGit: https://github.com/zerops-recipe-apps/medusa-showcase
     enableSubdomainAccess: true
-    envSecrets:
-      REVALIDATE_SECRET: <@generateRandomString(<16>)>
     verticalAutoscaling:
       minRam: 0.5
       minFreeRamGB: 0.25
