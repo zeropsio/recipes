@@ -79,7 +79,7 @@ services:
     minContainers: 2
     envSecrets:
       SUPERADMIN_EMAIL: admin@example.com
-      SUPERADMIN_PASSWORD: s4lt_<@generateRandomString(<16>)>
+      SUPERADMIN_PASSWORD: <@generateRandomString(<20>)>
     verticalAutoscaling:
       minRam: 1
       minFreeRamGB: 0.5
