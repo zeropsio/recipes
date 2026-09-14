@@ -1,18 +1,17 @@
 #zeropsPreprocessor=on
 # yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
 
-# Small Production — entry prod (~5 users). Postgres oltp-staging
-# and Valkey staging (not hobby). Omit minContainers (default 1).
-# App verticalAutoscaling is a documented exception: Medusa admin
-# OOMs at the Node platform default (0.25 GB); floors come from
-# research.md § Scaling.
+# Remote (CDE) environment — same production setups as the agent
+# project so a human porter can SSH into `medusa` or `nextstore`
+# without a local data plane. Hostnames stay `medusa` / `nextstore`
+# for ${medusa_CHANNEL_PUBLISHABLE_KEY}.
 #
 # Project envVariables are a value store. Each app's zerops.yml maps:
 #   APP_URL  → STOREFRONT_URL / NEXT_PUBLIC_BASE_URL / CORS
 #   API_URL  → BACKEND_URL / ADMIN_CORS / MEDUSA_BACKEND_URL
 #   SEARCH_URL → NEXT_PUBLIC_SEARCH_ENDPOINT
 project:
-  name: medusa-small-prod
+  name: medusa-showcase-remote
   envVariables:
     APP_URL: https://nextstore-${zeropsSubdomainHost}-8000.prg1.zerops.app
     API_URL: https://medusa-${zeropsSubdomainHost}-9000.prg1.zerops.app
@@ -43,12 +42,12 @@ project:
 services:
   - hostname: db
     type: postgresql:single@17
-    profile: oltp-staging
+    profile: oltp-hobby
     priority: 10
 
   - hostname: redis
     type: valkey:single@7.2
-    profile: staging
+    profile: hobby
     priority: 10
 
   - hostname: search
@@ -62,7 +61,9 @@ services:
     objectStoragePolicy: public-read
     priority: 10
 
-  # Framework floor — not a hello-world platform default.
+  # Production Medusa runtime with enough RAM for the admin + API
+  # so SSH inspection and `yarn` scripts do not OOM. There is no
+  # `setup: dev` in the backend repo.
   - hostname: medusa
     type: nodejs@24
     priority: 6

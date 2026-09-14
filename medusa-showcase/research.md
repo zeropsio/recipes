@@ -157,5 +157,5 @@ This is a **showcase** (two app repos + four data services), not a hello-world. 
 - Closest siblings: `nestjs-showcase` (multi-service + Valkey + Meilisearch + MinIO) and `analog-ssr-better-auth` (Small Production profiles, HA `:ha@` + `SERIOUS`).
 - Canonical `buildFromGit` is `zerops-recipe-apps/medusa-showcase` for both medusa and nextstore services (same repo, different `zeropsSetup`).
 - Use `#zeropsPreprocessor=on` for `${zeropsSubdomainHost}` and `<@generateRandomString(...)>`.
-- Old GUI buttons (`medusa-next-devel` / `medusa-next-prod`) are a different Strapi slug. This folder is `medusa` (six environments).
+- Old GUI buttons (`medusa-next-devel` / `medusa-next-prod`) are a different Strapi slug. This folder / CMS slug is `medusa-showcase` (six environments).
 - Cover SVG: `cover-nextjs.svg` until a Medusa-specific asset exists in recipe-shared-assets.
