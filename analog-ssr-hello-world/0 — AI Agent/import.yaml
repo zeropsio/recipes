@@ -11,7 +11,7 @@ services:
   # deploys full source and keeps the container idle (zsc noop)
   # so the agent can SSH in and run 'npm run dev' directly.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     # zeropsSetup selects which setup block from zerops.yaml to use.
     zeropsSetup: dev
     # buildFromGit: Zerops pulls the source code and zerops.yaml
@@ -28,7 +28,7 @@ services:
   # AI agents push prod builds here to verify before finalising
   # the recipe configuration.
   - hostname: appstage
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-hello-world-app
     enableSubdomainAccess: true

@@ -13,7 +13,7 @@ services:
   # os: ubuntu (set in zerops.yaml) provides git, curl, and a
   # richer toolset for interactive work compared to Alpine.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: dev
     # Zerops pulls source and zerops.yaml from this public repo.
     buildFromGit: https://github.com/zerops-recipe-apps/sveltekit-ssr-hello-world-app
@@ -27,7 +27,7 @@ services:
   # appstage: prod setup - validate production builds from the
   # remote environment before promoting to a real staging server.
   - hostname: appstage
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/sveltekit-ssr-hello-world-app
     enableSubdomainAccess: true

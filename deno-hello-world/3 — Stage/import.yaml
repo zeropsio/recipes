@@ -12,7 +12,7 @@ services:
   # and deploy them. Subdomain access provides a public
   # HTTPS URL for pre-production testing.
   - hostname: app
-    type: deno@2.0.0
+    type: deno@latest
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/deno-hello-world-app
     enableSubdomainAccess: true

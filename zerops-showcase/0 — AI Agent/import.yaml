@@ -12,7 +12,7 @@ services:
   # Agents SSH in and start the dev server directly.
   # Subdomain access provides a public HTTPS URL for testing.
   - hostname: appdev
-    type: bun@1.2
+    type: bun@1.3
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/showcase-recipe-app
     enableSubdomainAccess: true
@@ -25,7 +25,7 @@ services:
   # source and zerops.yaml from 'buildFromGit', using the 'prod' setup
   # to build optimized artifacts and deploy minimal footprint.
   - hostname: appstage
-    type: bun@1.2
+    type: bun@1.3
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/showcase-recipe-app
     enableSubdomainAccess: true

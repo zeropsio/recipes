@@ -12,7 +12,7 @@ services:
   # container to verify the production build (TypeScript compilation, dependency
   # pruning) deploys cleanly before tagging a release.
   - hostname: app
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-minimal-app
     enableSubdomainAccess: true

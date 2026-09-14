@@ -12,7 +12,7 @@ services:
   # via SSH. The dev setup keeps the container idle so the agent
   # controls execution.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     # 'dev' selects the dev setup from zerops.yaml — deploys full
     # source tree for SSH-based development.
     zeropsSetup: dev
@@ -29,7 +29,7 @@ services:
   # that the production build and migration work end-to-end before
   # committing the recipe.
   - hostname: appstage
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/angular-ssr-hello-world-app
     enableSubdomainAccess: true

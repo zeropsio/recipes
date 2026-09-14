@@ -11,7 +11,7 @@ services:
   # full source code deployed, container stays idle (zsc noop)
   # so the developer starts the dev server manually.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/solidstart-ssr-hello-world-app
     enableSubdomainAccess: true
@@ -25,7 +25,7 @@ services:
   # Staging — validates the prod Nitro bundle before promoting
   # to production. Same config as the prod environment.
   - hostname: appstage
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/solidstart-ssr-hello-world-app
     enableSubdomainAccess: true

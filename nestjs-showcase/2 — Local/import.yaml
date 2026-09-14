@@ -19,7 +19,7 @@ services:
   # before requests land. Subdomain access is on for browser walks
   # and curl smoke-tests — disable it once you have a custom domain.
   - hostname: api
-    type: nodejs@22
+    type: nodejs@24
     priority: 5
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
@@ -46,7 +46,7 @@ services:
   # job results back into valkey for the api's queue-state endpoint
   # to surface.
   - hostname: worker
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
     verticalAutoscaling:

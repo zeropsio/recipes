@@ -13,7 +13,7 @@ services:
   # if one fails, the other continues to serve traffic while
   # a replacement starts.
   - hostname: app
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     # Zerops pulls source and zerops.yaml from this public repo.
     buildFromGit: https://github.com/zerops-recipe-apps/sveltekit-ssr-hello-world-app

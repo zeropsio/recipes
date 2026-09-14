@@ -19,7 +19,7 @@ services:
   # verticalAutoscaling.minRam when stage QA pushes response
   # latency past your stage SLO.
   - hostname: api
-    type: nodejs@22
+    type: nodejs@24
     priority: 5
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
@@ -47,7 +47,7 @@ services:
   # swap path during stage rehearsal queue-load tests so latency
   # stays predictable.
   - hostname: worker
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
     verticalAutoscaling:

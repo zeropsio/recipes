@@ -9,7 +9,7 @@ services:
   # Dev service: the agent writes code, pushes via zcli, and
   # SSHes in to run the framework dev server interactively.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     # zeropsSetup selects the 'dev' block from zerops.yaml —
     # deploys full source, starts with zsc noop so the agent
     # drives the process manually.
@@ -26,7 +26,7 @@ services:
   # Stage service: prod build of the same code — the agent
   # validates the production SSR bundle before committing.
   - hostname: appstage
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/nuxt-ssr-hello-world-app
     enableSubdomainAccess: true

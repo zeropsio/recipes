@@ -11,7 +11,7 @@ services:
   # IDE tools (VS Code Remote, JetBrains Gateway) can mount this
   # container over SSH for a full remote development experience.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/react-router-ssr-hello-world-app
     # Subdomain gives the developer a public HTTPS URL to preview
@@ -27,7 +27,7 @@ services:
   # appstage: verifies the prod build pipeline works before
   # submitting code for review or merging.
   - hostname: appstage
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/react-router-ssr-hello-world-app
     enableSubdomainAccess: true

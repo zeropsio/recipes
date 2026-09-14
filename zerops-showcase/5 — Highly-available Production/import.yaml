@@ -16,7 +16,7 @@ services:
   # minContainers: 2 ensures zero-downtime deploys and load distribution.
   # Dedicated CPU cores prevent noisy-neighbor performance degradation.
   - hostname: app
-    type: bun@1.2
+    type: bun@1.3
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/showcase-recipe-app
     enableSubdomainAccess: true

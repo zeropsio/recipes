@@ -11,7 +11,7 @@ services:
   # at runtime (nodejs@22) so you can run 'npx nuxi dev'
   # interactively without installing anything locally.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     # 'dev' setup: deploys full source tree, keeps the
     # container alive for SSH access. Start the dev server
     # manually: 'npx nuxi dev --host 0.0.0.0'.

@@ -11,7 +11,7 @@ services:
   # a shared stage or production. Deploy from your local machine with
   # `zcli push` - no separate dev service needed here.
   - hostname: app
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     # buildFromGit pulls source code and zerops.yaml from this public
     # repository and triggers the first build automatically.

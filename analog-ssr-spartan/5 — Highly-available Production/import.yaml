@@ -17,7 +17,7 @@ services:
   # from other projects' containers on the same physical core,
   # which matters once uptime SLOs are real.
   - hostname: app
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-spartan
     enableSubdomainAccess: true

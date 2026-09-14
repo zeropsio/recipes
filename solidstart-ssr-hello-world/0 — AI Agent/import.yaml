@@ -11,7 +11,7 @@ services:
   # full source code deployed, zsc noop keeps the container
   # idle so the agent controls when to start the dev server.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     # 'dev' setup deploys full source + runs npm install.
     # No prod build — agent drives the dev server manually.
     zeropsSetup: dev
@@ -28,7 +28,7 @@ services:
   # Staging — validates the prod build (SSR + Nitro bundle)
   # before any production deploy. Uses the 'prod' setup.
   - hostname: appstage
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/solidstart-ssr-hello-world-app
     enableSubdomainAccess: true
