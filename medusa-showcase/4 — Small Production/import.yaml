@@ -1,17 +1,18 @@
 #zeropsPreprocessor=on
 # yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
 
-# Stage environment — same topology as Small Production on cheaper
-# data profiles (hobby Postgres + hobby Valkey). One container per
-# app; app RAM stays at the Medusa / Next.js floors so QA does not
-# OOM while still costing less than oltp-staging entry prod.
+# Small Production — entry prod (~5 users). Postgres oltp-staging
+# and Valkey staging (not hobby). Omit minContainers (default 1).
+# App verticalAutoscaling is a documented exception: Medusa admin
+# OOMs at the Node platform default (0.25 GB); floors come from
+# research.md § Scaling.
 #
 # Project envVariables are a value store. Each app's zerops.yml maps:
 #   APP_URL  → STOREFRONT_URL / NEXT_PUBLIC_BASE_URL / CORS
 #   API_URL  → BACKEND_URL / ADMIN_CORS / MEDUSA_BACKEND_URL
 #   SEARCH_URL → NEXT_PUBLIC_SEARCH_ENDPOINT
 project:
-  name: medusa-stage
+  name: medusa-showcase-small-prod
   envVariables:
     APP_URL: https://nextstore-${zeropsSubdomainHost}-8000.prg1.zerops.app
     API_URL: https://medusa-${zeropsSubdomainHost}-9000.prg1.zerops.app
@@ -42,13 +43,12 @@ project:
 services:
   - hostname: db
     type: postgresql:single@17
-    # Rehearsal — oltp-hobby (~0.5 GB), lighter than small prod.
-    profile: oltp-hobby
+    profile: oltp-staging
     priority: 10
 
   - hostname: redis
     type: valkey:single@7.2
-    profile: hobby
+    profile: staging
     priority: 10
 
   - hostname: search
@@ -62,6 +62,7 @@ services:
     objectStoragePolicy: public-read
     priority: 10
 
+  # Framework floor — not a hello-world platform default.
   - hostname: medusa
     type: nodejs@24
     priority: 6

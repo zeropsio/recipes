@@ -1,16 +1,17 @@
 #zeropsPreprocessor=on
 # yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
 
-# Local environment — staged production apps plus the managed data
-# plane. Point a laptop `yarn develop` at db / redis / search /
-# storage over zCLI VPN, or use the subdomain apps as the preview.
+# Stage environment — same topology as Small Production on cheaper
+# data profiles (hobby Postgres + hobby Valkey). One container per
+# app; app RAM stays at the Medusa / Next.js floors so QA does not
+# OOM while still costing less than oltp-staging entry prod.
 #
 # Project envVariables are a value store. Each app's zerops.yml maps:
 #   APP_URL  → STOREFRONT_URL / NEXT_PUBLIC_BASE_URL / CORS
 #   API_URL  → BACKEND_URL / ADMIN_CORS / MEDUSA_BACKEND_URL
 #   SEARCH_URL → NEXT_PUBLIC_SEARCH_ENDPOINT
 project:
-  name: medusa-local
+  name: medusa-showcase-stage
   envVariables:
     APP_URL: https://nextstore-${zeropsSubdomainHost}-8000.prg1.zerops.app
     API_URL: https://medusa-${zeropsSubdomainHost}-9000.prg1.zerops.app
@@ -41,6 +42,7 @@ project:
 services:
   - hostname: db
     type: postgresql:single@17
+    # Rehearsal — oltp-hobby (~0.5 GB), lighter than small prod.
     profile: oltp-hobby
     priority: 10
 
