@@ -24,7 +24,7 @@ services:
   # swap; subdomain access is on so you can curl the API from outside
   # the project network.
   - hostname: apidev
-    type: nodejs@22
+    type: nodejs@24
     priority: 5
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
@@ -33,7 +33,7 @@ services:
       minRam: 1
 
   - hostname: apistage
-    type: nodejs@22
+    type: nodejs@24
     priority: 5
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
@@ -71,14 +71,14 @@ services:
   # broker subjects and writes results back into valkey for the
   # queue-state endpoint to surface.
   - hostname: workerdev
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
     verticalAutoscaling:
       minRam: 1
 
   - hostname: workerstage
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
     verticalAutoscaling:

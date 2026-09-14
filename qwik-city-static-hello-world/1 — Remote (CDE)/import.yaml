@@ -13,7 +13,7 @@ services:
   # 'npm run dev' to start the Qwik dev server on port 5173.
   # type: nodejs@22 so Node.js is available at runtime.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
 
     # 'dev' setup: installs deps and deploys the full source tree
     # so the workspace is ready immediately on first SSH connection.

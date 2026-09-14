@@ -16,7 +16,7 @@ services:
   - hostname: appdev
     # nodejs@22 (not static) — the agent needs the Node.js
     # runtime at runtime to execute npm/Vite commands via SSH.
-    type: nodejs@22
+    type: nodejs@24
     # Zerops pulls the source code and zerops.yaml from this
     # public repo to trigger the build/deploy pipeline.
     buildFromGit: https://github.com/zerops-recipe-apps/react-router-static-hello-world-app

@@ -13,7 +13,7 @@ services:
   # `zsc noop --silent` as the start command - container stays idle
   # until the developer starts the server via SSH.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: dev
     # buildFromGit pulls source code and zerops.yaml from this public
     # repository and triggers the first build automatically.
@@ -32,7 +32,7 @@ services:
   # Staging service: receives production builds pushed from appdev
   # for integration testing before promotion to a real stage/prod.
   - hostname: appstage
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/nextjs-ssr-hello-world-app
     enableSubdomainAccess: true

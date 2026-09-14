@@ -13,7 +13,7 @@ services:
   # deploys full source; the agent runs 'npm run dev' to start a
   # live-reload server, or edits files and pushes to appstage.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: dev
     # Zerops pulls source code and zerops.yaml from this public repo
     # and runs the build/deploy pipeline automatically on import.

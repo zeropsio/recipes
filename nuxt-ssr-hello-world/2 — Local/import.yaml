@@ -9,7 +9,7 @@ services:
   # App service with prod setup — validates the Nitro SSR
   # bundle against the cloud database before pushing to main.
   - hostname: app
-    type: nodejs@22
+    type: nodejs@24
     # zeropsSetup: prod — uses the production build pipeline.
     # Local development runs separately on the developer's
     # machine; this service acts as a staging validator.

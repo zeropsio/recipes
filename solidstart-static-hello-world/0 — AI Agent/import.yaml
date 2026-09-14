@@ -10,7 +10,7 @@ services:
   # type: nodejs@22 gives the agent Node.js at runtime to run
   # 'npm run dev' (vinxi dev server) and other build tools.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     # 'dev' setup from zerops.yaml: deploys full source tree with
     # node_modules pre-installed; agent starts dev server via SSH.
     zeropsSetup: dev

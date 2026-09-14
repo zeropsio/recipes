@@ -10,7 +10,7 @@ services:
   # the 'prod' zeropsSetup to bundle TypeScript and deploy minimal artifacts.
   # Run 'zcli push' from your local machine to trigger a deploy.
   - hostname: app
-    type: bun@1.2
+    type: bun@1.3
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
     enableSubdomainAccess: true  # Preview deployed app via public HTTPS subdomain

@@ -18,7 +18,7 @@ services:
     # nodejs@22 runtime — the agent needs Node.js available via SSH
     # to run 'npm run dev' or other Vite CLI commands. Static runtime
     # (Nginx-only) would not provide this.
-    type: nodejs@22
+    type: nodejs@24
     # 'dev' setup from zerops.yaml — deploys full source with deps
     # installed so the agent can start the Vite dev server immediately.
     zeropsSetup: dev

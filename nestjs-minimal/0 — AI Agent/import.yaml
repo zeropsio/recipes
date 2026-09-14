@@ -15,7 +15,7 @@ services:
   # for hot-reload. Subdomain provides a public URL for the agent to verify
   # dashboard output and health endpoints.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-minimal-app
     enableSubdomainAccess: true
@@ -27,7 +27,7 @@ services:
   # compiled JS with `node dist/main.js` to validate the production build before
   # finishing the task.
   - hostname: appstage
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-minimal-app
     enableSubdomainAccess: true

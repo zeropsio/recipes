@@ -12,7 +12,7 @@ services:
   # and runs 'npm run dev' or pushes builds from inside the container.
   # type: nodejs@22 so Node.js is available at runtime for dev commands.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
 
     # 'dev' setup from zerops.yaml: installs deps and deploys the full
     # source tree so the agent has a ready workspace on first boot.

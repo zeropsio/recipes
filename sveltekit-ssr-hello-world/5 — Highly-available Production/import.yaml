@@ -18,7 +18,7 @@ services:
   # instead of sharing them with other tenants - consistent latency
   # under load without noisy-neighbor interference.
   - hostname: app
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     # Zerops pulls source and zerops.yaml from this public repo.
     buildFromGit: https://github.com/zerops-recipe-apps/sveltekit-ssr-hello-world-app

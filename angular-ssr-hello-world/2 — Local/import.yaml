@@ -10,7 +10,7 @@ services:
   # The developer runs 'ng serve' locally against the same cloud DB,
   # pointed at it via 'zcli vpn up'.
   - hostname: app
-    type: nodejs@22
+    type: nodejs@24
     # 'prod' setup builds the optimized SSR bundle used for deployment
     # validation from the developer's local machine via 'zcli push'.
     zeropsSetup: prod

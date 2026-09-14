@@ -11,7 +11,7 @@ services:
   # nodejs@22 keeps Node.js available at runtime so the
   # developer can run 'npm run dev' or other npm scripts.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     # 'dev' setup from zerops.yaml — Zerops installs deps and
     # deploys full source so the workspace is ready on login.
     zeropsSetup: dev

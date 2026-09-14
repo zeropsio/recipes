@@ -12,7 +12,7 @@ services:
   # and migration path. Developers push via zcli push for staging checks
   # while running npm run dev locally against the cloud database.
   - hostname: app
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     # buildFromGit: Zerops pulls source code and zerops.yaml from this
     # public repository and triggers the first build automatically.

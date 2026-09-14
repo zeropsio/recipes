@@ -13,7 +13,7 @@ services:
   # Single app container — bump verticalAutoscaling.minRam if a QA
   # load run pushes steady-state usage against that floor.
   - hostname: app
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-spartan
     enableSubdomainAccess: true

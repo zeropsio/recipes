@@ -18,7 +18,7 @@ services:
   # the build pipeline and deployment work correctly before pushing
   # to a shared staging environment.
   - hostname: app
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     # buildFromGit pulls source code and zerops.yaml from this public
     # repo and triggers the first build automatically on import.

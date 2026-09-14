@@ -11,7 +11,7 @@ services:
   # for 'npx nuxi dev', package installs, or any other
   # Node.js tooling the agent needs via SSH.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     # 'dev' setup: deploys full source tree and keeps the
     # container alive with zsc noop — agent starts the dev
     # server manually via SSH ('npx nuxi dev --host 0.0.0.0').

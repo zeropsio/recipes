@@ -15,7 +15,7 @@ services:
   # devDependencies like TypeScript, ts-node, and @nestjs/cli) so the full
   # NestJS toolchain is available on the container for hot-reload development.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-minimal-app
     enableSubdomainAccess: true
@@ -26,7 +26,7 @@ services:
   # pipeline (npm ci + nest build + prune) so you can validate that compiled
   # output and production dependencies deploy correctly before merging.
   - hostname: appstage
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-minimal-app
     enableSubdomainAccess: true

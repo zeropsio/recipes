@@ -11,7 +11,7 @@ services:
   # Increase minRam to 4 GB (commented out) if the Angular compiler
   # or Language Server feels slow during active development.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: dev
     # Zerops pulls source code and zerops.yaml from this public
     # repo and triggers the build pipeline automatically.
@@ -26,7 +26,7 @@ services:
   # Stage service: prod build target for verifying SSR output and
   # migrations before the developer pushes to a real environment.
   - hostname: appstage
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/angular-ssr-hello-world-app
     enableSubdomainAccess: true

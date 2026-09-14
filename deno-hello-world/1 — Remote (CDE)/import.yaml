@@ -17,7 +17,7 @@ services:
   # verticalAutoscaling:
   #   minRam: 4
   - hostname: appdev
-    type: deno@2.0.0
+    type: deno@latest
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/deno-hello-world-app
     enableSubdomainAccess: true
@@ -30,7 +30,7 @@ services:
   # self-contained binaries. Subdomain provides a public
   # HTTPS URL to test your changes before promoting them.
   - hostname: appstage
-    type: deno@2.0.0
+    type: deno@latest
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/deno-hello-world-app
     enableSubdomainAccess: true

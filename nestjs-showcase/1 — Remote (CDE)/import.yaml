@@ -21,7 +21,7 @@ services:
   # production build that backs API_URL for end-to-end checks against
   # the porter's SPA.
   - hostname: apidev
-    type: nodejs@22
+    type: nodejs@24
     priority: 5
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
@@ -30,7 +30,7 @@ services:
       minRam: 1
 
   - hostname: apistage
-    type: nodejs@22
+    type: nodejs@24
     priority: 5
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
@@ -65,14 +65,14 @@ services:
   # `showcase/jobs` subject hierarchy under the workers queue group.
   # No HTTP surface on either slot, so no subdomain access.
   - hostname: workerdev
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
     verticalAutoscaling:
       minRam: 1
 
   - hostname: workerstage
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
     verticalAutoscaling:

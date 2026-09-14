@@ -11,7 +11,7 @@ services:
   # Dev service: AI agents write and push code here. zeropsSetup: dev
   # deploys full source with zsc noop start — agent drives the workflow.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: dev
     # buildFromGit: Zerops pulls source code and zerops.yaml from this
     # public repository and triggers the first build automatically.
@@ -25,7 +25,7 @@ services:
   # Stage service: runs the prod setup so agents can verify the full
   # production build path (SSR compile + migration) before finishing.
   - hostname: appstage
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/qwik-city-ssr-hello-world-app
     enableSubdomainAccess: true

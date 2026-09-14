@@ -11,7 +11,7 @@ services:
   # prod build pipeline works correctly while the developer
   # iterates locally against the shared database.
   - hostname: app
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-hello-world-app
     enableSubdomainAccess: true

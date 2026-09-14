@@ -9,7 +9,7 @@ services:
   # Vite's dev server. Uses nodejs@22 (not static) so Node.js is
   # available at runtime for the development workflow.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     # 'dev' setup deploys full source + node_modules — workspace ready
     # the moment you SSH in. No 'npm install' needed before coding.
     zeropsSetup: dev

@@ -10,7 +10,7 @@ services:
   # and keeping the service available if one container is replaced during a deploy.
   # Zerops autoscales vertically within the bounds set below.
   - hostname: app
-    type: bun@1.2
+    type: bun@1.3
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
     enableSubdomainAccess: true  # Zerops subdomain — map your custom domain in the UI

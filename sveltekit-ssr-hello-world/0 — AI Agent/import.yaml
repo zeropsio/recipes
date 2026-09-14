@@ -13,7 +13,7 @@ services:
   # can SSH in, inspect files, and run the SvelteKit dev server.
   # zeropsSetup selects which setup block in zerops.yaml to use.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: dev
     # buildFromGit: Zerops pulls the source code and zerops.yaml
     # from this public repo and runs the build pipeline immediately.
@@ -27,7 +27,7 @@ services:
   # appstage: prod setup - builds the optimized SSR artifact.
   # The AI agent pushes source from appdev to validate prod builds.
   - hostname: appstage
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/sveltekit-ssr-hello-world-app
     enableSubdomainAccess: true
