@@ -17,7 +17,7 @@ services:
   # setup deploys full source and starts zsc noop - developer runs
   # `npm run dev` manually for hot-reload.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: dev
     # buildFromGit pulls source code and zerops.yaml from this public
     # repo and triggers the first build automatically on import.
@@ -34,7 +34,7 @@ services:
   # Staging service: push the prod setup here to verify the optimized
   # build, readiness check, and migration all work before merging.
   - hostname: appstage
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/astro-ssr-hello-world-app
     enableSubdomainAccess: true

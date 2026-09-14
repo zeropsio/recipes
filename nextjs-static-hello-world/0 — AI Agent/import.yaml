@@ -17,7 +17,7 @@ services:
   - hostname: appdev
     # nodejs@22 (not static) — the dev setup needs Node.js
     # at runtime to run 'npm run dev' via SSH.
-    type: nodejs@22
+    type: nodejs@24
     # 'dev' setup: deploys full source + node_modules,
     # starts with 'zsc noop --silent' so the agent drives
     # the dev server manually.

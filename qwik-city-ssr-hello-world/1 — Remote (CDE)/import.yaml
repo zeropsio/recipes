@@ -12,7 +12,7 @@ services:
   # Compatible with VS Code Remote SSH, JetBrains Gateway, and similar
   # IDE remote development extensions.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: dev
     # buildFromGit: Zerops pulls source code and zerops.yaml from this
     # public repository and triggers the first build automatically.
@@ -28,7 +28,7 @@ services:
   # Stage service: validates the production build path before pushing
   # to a real production environment.
   - hostname: appstage
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/qwik-city-ssr-hello-world-app
     enableSubdomainAccess: true

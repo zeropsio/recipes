@@ -16,7 +16,7 @@ services:
   # higher because SSH-driven build tooling spikes memory harder
   # than the compiled server appstage runs.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-spartan
     enableSubdomainAccess: true
@@ -25,7 +25,7 @@ services:
       minFreeRamGB: 0.5
 
   - hostname: appstage
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-spartan
     enableSubdomainAccess: true

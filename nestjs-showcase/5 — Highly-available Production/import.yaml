@@ -21,7 +21,7 @@ services:
   # verticalAutoscaling.maxRam when monitoring shows containers
   # approaching the current ceiling.
   - hostname: api
-    type: nodejs@22
+    type: nodejs@24
     priority: 5
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-api
@@ -54,7 +54,7 @@ services:
   # deploys. Bump verticalAutoscaling.maxRam if heavy production
   # jobs push container memory past the current ceiling.
   - hostname: worker
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-worker
     minContainers: 2

@@ -17,7 +17,7 @@ services:
   # readinessCheck prevents traffic reaching containers that are still running
   # TypeORM migrations.
   - hostname: app
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-minimal-app
     enableSubdomainAccess: true

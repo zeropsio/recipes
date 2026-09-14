@@ -8,7 +8,7 @@ project:
 
 services:
   - hostname: app
-    type: nodejs@22
+    type: nodejs@24
     # 'prod' setup: builds the Nitro node-server bundle (.output/),
     # runs the migration via initCommands, starts the SSR server.
     # Same pipeline as production — no staging-specific shortcuts.

@@ -10,7 +10,7 @@ services:
   # IDE (e.g. VS Code Remote SSH), edits files in place, and
   # runs npm run dev over SSH.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: dev
     # buildFromGit: Zerops pulls source and zerops.yaml from
     # this public repository to bootstrap the initial deploy.
@@ -24,7 +24,7 @@ services:
   # Stage service: validates the prod Nitro bundle before pushing
   # to the main branch — same prod config as production.
   - hostname: appstage
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/nuxt-ssr-hello-world-app
     enableSubdomainAccess: true

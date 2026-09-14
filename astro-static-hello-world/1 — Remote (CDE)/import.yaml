@@ -12,7 +12,7 @@ services:
   # IDE like VS Code Remote or JetBrains Gateway) to edit files
   # and run 'npm run dev' for a live-reload Astro dev server.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: dev
     # Zerops pulls source code and zerops.yaml from this public repo
     # and runs the build/deploy pipeline automatically on import.

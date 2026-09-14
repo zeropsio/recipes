@@ -12,7 +12,7 @@ services:
   # CI triggers deploys; readinessCheck gates traffic until the health endpoint
   # responds.
   - hostname: app
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-minimal-app
     enableSubdomainAccess: true

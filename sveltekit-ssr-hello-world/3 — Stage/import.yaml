@@ -12,7 +12,7 @@ services:
   # app: prod setup - same build pipeline and config as production.
   # Single container keeps resource usage low for staging workloads.
   - hostname: app
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     # Zerops pulls source and zerops.yaml from this public repo.
     buildFromGit: https://github.com/zerops-recipe-apps/sveltekit-ssr-hello-world-app

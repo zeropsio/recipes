@@ -17,7 +17,7 @@ services:
   # minFreeRamGB reserves headroom for traffic spikes
   # and runtime GC cycles above the minRam baseline.
   - hostname: app
-    type: deno@2.0.0
+    type: deno@latest
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/deno-hello-world-app
     enableSubdomainAccess: true

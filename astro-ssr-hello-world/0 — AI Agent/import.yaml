@@ -17,7 +17,7 @@ services:
   # starts zsc noop, giving the agent an SSH workspace with the
   # database already migrated.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     # zeropsSetup selects which setup block from zerops.yaml to use.
     zeropsSetup: dev
     # buildFromGit pulls source code and zerops.yaml from this public
@@ -33,7 +33,7 @@ services:
   # Staging service: AI agent pushes the prod setup here to verify
   # the optimized build and readiness check pass before handing off.
   - hostname: appstage
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/astro-ssr-hello-world-app
     enableSubdomainAccess: true

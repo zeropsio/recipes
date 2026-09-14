@@ -11,7 +11,7 @@ services:
   # dev server, and pushes the production build to appstage for
   # validation. zeropsSetup selects which setup from zerops.yaml to use.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: dev
     # buildFromGit pulls source code and zerops.yaml from this public
     # repository and triggers the first build automatically.
@@ -27,7 +27,7 @@ services:
   # Runs the compiled standalone server so the AI agent can verify
   # the production configuration before shipping.
   - hostname: appstage
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/nextjs-ssr-hello-world-app
     enableSubdomainAccess: true

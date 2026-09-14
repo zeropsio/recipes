@@ -12,7 +12,7 @@ services:
   # app: prod setup - validates the production build works in Zerops.
   # The developer runs `npm run dev` locally against the cloud DB.
   - hostname: app
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     # Zerops pulls source and zerops.yaml from this public repo.
     buildFromGit: https://github.com/zerops-recipe-apps/sveltekit-ssr-hello-world-app

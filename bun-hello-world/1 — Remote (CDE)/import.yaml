@@ -18,7 +18,7 @@ services:
   # verticalAutoscaling:
   #   minRam: 4
   - hostname: appdev
-    type: bun@1.2
+    type: bun@1.3
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
     enableSubdomainAccess: true
@@ -29,7 +29,7 @@ services:
   # build before merging to your main branch. 'prod' zeropsSetup bundles TypeScript into
   # standalone artifacts — no node_modules needed at runtime.
   - hostname: appstage
-    type: bun@1.2
+    type: bun@1.3
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/bun-hello-world-app
     enableSubdomainAccess: true  # Public HTTPS URL for staging review

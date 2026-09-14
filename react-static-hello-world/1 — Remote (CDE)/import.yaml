@@ -13,7 +13,7 @@ services:
   - hostname: appdev
     # nodejs@22 (not static) — the developer needs Node.js at runtime
     # to run the Vite dev server and other npm scripts via SSH.
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: dev
     # Zerops pulls source code and zerops.yaml from this public repo,
     # then triggers the build/deploy pipeline automatically.

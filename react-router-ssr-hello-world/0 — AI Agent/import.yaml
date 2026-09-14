@@ -11,7 +11,7 @@ services:
   # and runs the 'dev' setup - deploys full source so the agent
   # can SSH in and run the dev server directly.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/react-router-ssr-hello-world-app
     # Subdomain gives the agent a public HTTPS URL to test the
@@ -23,7 +23,7 @@ services:
   # appstage: runs the prod build to verify the full pipeline
   # before the recipe is considered ready.
   - hostname: appstage
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/react-router-ssr-hello-world-app
     enableSubdomainAccess: true

@@ -16,7 +16,7 @@ services:
   # type: nodejs@22 (not static) so Node.js is available at runtime
   # for running Angular CLI and ng serve.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
 
     # Selects the 'dev' setup from zerops.yaml in the source repo.
     # The dev setup installs dependencies and deploys the full
