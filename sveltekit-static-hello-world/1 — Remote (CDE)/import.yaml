@@ -8,7 +8,7 @@ project:
 services:
   # appdev: developer connects here via SSH or mounts the
   # filesystem with an IDE (e.g. VS Code Remote SSH, SSHFS).
-  # nodejs@22 keeps Node.js available at runtime so the
+  # nodejs@24 keeps Node.js available at runtime so the
   # developer can run 'npm run dev' or other npm scripts.
   - hostname: appdev
     type: nodejs@24

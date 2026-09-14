@@ -12,7 +12,7 @@ services:
   # setup from zerops.yaml, which deploys the full source tree with
   # deps pre-installed.
   - hostname: appdev
-    # nodejs@22 (not static) — the agent needs Node.js at runtime
+    # nodejs@24 (not static) — the agent needs Node.js at runtime
     # to execute scripts and run the Vite dev server via SSH.
     type: nodejs@24
     zeropsSetup: dev

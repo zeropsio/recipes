@@ -11,7 +11,7 @@ project:
 services:
   # Development workspace — the AI agent writes code here via SSH
   # and runs 'npm start' (ng serve) to iterate on changes.
-  # type: nodejs@22 (not static) so Node.js is available at runtime
+  # type: nodejs@24 (not static) so Node.js is available at runtime
   # for running Angular CLI commands.
   - hostname: appdev
     type: nodejs@24

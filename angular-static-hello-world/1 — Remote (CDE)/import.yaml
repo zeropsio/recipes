@@ -13,7 +13,7 @@ services:
   # Development workspace — developer connects via SSH or mounts the
   # filesystem with an IDE plugin (e.g. VS Code Remote - SSH) and
   # runs 'npm start' (ng serve) to work on the app directly in Zerops.
-  # type: nodejs@22 (not static) so Node.js is available at runtime
+  # type: nodejs@24 (not static) so Node.js is available at runtime
   # for running Angular CLI and ng serve.
   - hostname: appdev
     type: nodejs@24

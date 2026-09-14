@@ -10,7 +10,7 @@ services:
 
   # Development workspace — the AI agent SSHes in, edits source files,
   # and runs 'npm run dev' or pushes builds from inside the container.
-  # type: nodejs@22 so Node.js is available at runtime for dev commands.
+  # type: nodejs@24 so Node.js is available at runtime for dev commands.
   - hostname: appdev
     type: nodejs@24
 

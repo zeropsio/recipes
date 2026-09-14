@@ -15,7 +15,7 @@ services:
   # Uses the 'dev' setup from zerops.yaml: source and
   # node_modules deployed; developer starts the dev server.
   - hostname: appdev
-    # nodejs@22 (not static) — the developer needs the Node.js
+    # nodejs@24 (not static) — the developer needs the Node.js
     # runtime to run Vite's dev server and CLI tools via SSH.
     type: nodejs@24
     # Zerops pulls the source code and zerops.yaml from this
