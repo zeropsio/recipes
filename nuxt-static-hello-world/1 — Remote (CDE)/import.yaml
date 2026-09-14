@@ -8,7 +8,7 @@ project:
 services:
   # Dev service — mount this container in your IDE via
   # SSHFS to edit files remotely. Node.js is available
-  # at runtime (nodejs@22) so you can run 'npx nuxi dev'
+  # at runtime (nodejs@24) so you can run 'npx nuxi dev'
   # interactively without installing anything locally.
   - hostname: appdev
     type: nodejs@24

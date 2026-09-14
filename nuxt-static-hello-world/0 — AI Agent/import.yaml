@@ -7,7 +7,7 @@ project:
 
 services:
   # Dev service — the agent's primary workspace.
-  # Uses nodejs@22 so Node.js is available at runtime
+  # Uses nodejs@24 so Node.js is available at runtime
   # for 'npx nuxi dev', package installs, or any other
   # Node.js tooling the agent needs via SSH.
   - hostname: appdev

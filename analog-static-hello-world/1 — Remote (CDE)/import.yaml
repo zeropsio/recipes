@@ -6,7 +6,7 @@ project:
 
 services:
   # Dev service — developer SSHes in and runs 'npm start' to start
-  # Vite's dev server. Uses nodejs@22 (not static) so Node.js is
+  # Vite's dev server. Uses nodejs@24 (not static) so Node.js is
   # available at runtime for the development workflow.
   - hostname: appdev
     type: nodejs@24

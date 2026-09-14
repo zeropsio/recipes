@@ -3,7 +3,7 @@
 # app, plus a staging service for testing compiled builds.
 #
 # Two services:
-#   appdev   — nodejs@22 runtime with source code; the agent edits
+#   appdev   — nodejs@24 runtime with source code; the agent edits
 #              files and runs 'npm run dev' via SSH.
 #   appstage — static (Nginx) service that serves compiled builds for
 #              visual validation after each push.
@@ -15,7 +15,7 @@ services:
   # appdev: development workspace for the AI agent.
   # The agent SSHs in, edits source, and pushes builds here.
   - hostname: appdev
-    # nodejs@22 runtime — the agent needs Node.js available via SSH
+    # nodejs@24 runtime — the agent needs Node.js available via SSH
     # to run 'npm run dev' or other Vite CLI commands. Static runtime
     # (Nginx-only) would not provide this.
     type: nodejs@24

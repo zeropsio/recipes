@@ -14,7 +14,7 @@ services:
     # 'prod' setup: Zerops pulls source, runs 'npm ci' and the
     # Qwik build pipeline in a temporary build container, then
     # deploys compiled HTML/CSS/JS to this Nginx runtime container.
-    # Build base: nodejs@22 — Run base: static (Nginx).
+    # Build base: nodejs@24 — Run base: static (Nginx).
     zeropsSetup: prod
 
     # Zerops pulls source code and zerops.yaml from this public repo

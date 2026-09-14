@@ -8,7 +8,7 @@ project:
 
 services:
   # Development workspace — developer mounts or SSHs into this
-  # service and edits files directly. type: nodejs@22 gives the
+  # service and edits files directly. type: nodejs@24 gives the
   # developer Node.js at runtime to run 'npm run dev' (vinxi
   # dev server) and other framework CLI tools via the terminal.
   - hostname: appdev

@@ -14,7 +14,7 @@ services:
   # has npm, npx, and all framework tooling available via
   # SSH or IDE remote mount (e.g., VS Code Remote SSH).
   - hostname: appdev
-    # nodejs@22 (not static) — the dev setup needs Node.js
+    # nodejs@24 (not static) — the dev setup needs Node.js
     # at runtime to run 'npm run dev' via SSH.
     type: nodejs@24
     # 'dev' setup: deploys full source + node_modules,

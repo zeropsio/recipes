@@ -5,7 +5,7 @@
 # to edit files as if they were local.
 #
 # Two services:
-#   appdev   — nodejs@22 runtime; developer SSHs in or mounts via IDE.
+#   appdev   — nodejs@24 runtime; developer SSHs in or mounts via IDE.
 #   appstage — static (Nginx) service for testing compiled builds.
 
 project:
@@ -16,7 +16,7 @@ services:
   # Mount via SSHFS or use an IDE with SSH remote support (VS Code,
   # JetBrains) to edit files directly in the Zerops container.
   - hostname: appdev
-    # nodejs@22 runtime — developer needs Node.js available via SSH
+    # nodejs@24 runtime — developer needs Node.js available via SSH
     # to run 'npm run dev' and other Vite CLI commands. Static runtime
     # (Nginx-only) would not provide this.
     type: nodejs@24

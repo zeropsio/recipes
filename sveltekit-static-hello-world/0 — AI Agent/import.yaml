@@ -7,10 +7,10 @@ project:
 
 services:
   # appdev: the agent works here via SSH — installs deps,
-  # edits files, runs dev server. Uses nodejs@22 so Node.js
+  # edits files, runs dev server. Uses nodejs@24 so Node.js
   # tools are available at runtime (not static/Nginx).
   - hostname: appdev
-    # nodejs@22 runtime — agent needs npm/node via SSH.
+    # nodejs@24 runtime — agent needs npm/node via SSH.
     # The dev zeropsSetup keeps Node.js at runtime via
     # 'zsc noop --silent'; agent starts their own dev server.
     type: nodejs@24

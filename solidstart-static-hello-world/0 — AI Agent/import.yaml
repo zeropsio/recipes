@@ -7,7 +7,7 @@ project:
 
 services:
   # Development workspace — the AI agent works here via SSH.
-  # type: nodejs@22 gives the agent Node.js at runtime to run
+  # type: nodejs@24 gives the agent Node.js at runtime to run
   # 'npm run dev' (vinxi dev server) and other build tools.
   - hostname: appdev
     type: nodejs@24

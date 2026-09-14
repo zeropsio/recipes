@@ -11,7 +11,7 @@ services:
   # Mount this service in your IDE via SSH for a full remote development
   # experience: edit files, run 'npm run dev', and see changes instantly.
   - hostname: appdev
-    # nodejs@22 (not static) — the developer needs Node.js at runtime
+    # nodejs@24 (not static) — the developer needs Node.js at runtime
     # to run the Vite dev server and other npm scripts via SSH.
     type: nodejs@24
     zeropsSetup: dev

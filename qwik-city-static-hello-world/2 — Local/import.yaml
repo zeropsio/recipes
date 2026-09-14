@@ -17,7 +17,7 @@ services:
 
     # 'prod' setup: runs the Qwik build pipeline in a temporary
     # build container, then deploys compiled HTML/CSS/JS to Nginx.
-    # The build container uses nodejs@22; the runtime uses static (Nginx).
+    # The build container uses nodejs@24; the runtime uses static (Nginx).
     zeropsSetup: prod
 
     # Zerops pulls source code and zerops.yaml from this public repo
