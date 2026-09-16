@@ -1,0 +1,39 @@
+# recipe-output.yaml
+recipe_created: medusa-b2b
+files_created:
+  - recipes/medusa-b2b/README.md
+  - recipes/medusa-b2b/research.md
+  - recipes/medusa-b2b/recipe-output.yaml
+  - recipes/medusa-b2b/0 — AI Agent/import.yaml
+  - recipes/medusa-b2b/0 — AI Agent/README.md
+  - recipes/medusa-b2b/1 — Remote (CDE)/import.yaml
+  - recipes/medusa-b2b/1 — Remote (CDE)/README.md
+  - recipes/medusa-b2b/2 — Local/import.yaml
+  - recipes/medusa-b2b/2 — Local/README.md
+  - recipes/medusa-b2b/3 — Stage/import.yaml
+  - recipes/medusa-b2b/3 — Stage/README.md
+  - recipes/medusa-b2b/4 — Small Production/import.yaml
+  - recipes/medusa-b2b/4 — Small Production/README.md
+  - recipes/medusa-b2b/5 — Highly-available Production/import.yaml
+  - recipes/medusa-b2b/5 — Highly-available Production/README.md
+apps_created: []
+apps_existing:
+  - https://github.com/zerops-recipe-apps/medusa-b2b
+strapi_fields:
+  recipe_name: Medusa B2B
+  slug: medusa-b2b
+  recipe_source: medusa-b2b
+  categories: [framework]
+  languages_frameworks: [Medusa, Next.js, TypeScript, Node.js]
+  internal_type: example
+ready_for_testing: true
+notes:
+  - Closest sibling: medusa-showcase. This recipe drops Meilisearch and seeds official B2B company / quote / approval instead of B2C + B2B channels.
+  - Monorepo: backend/ (medusa setup) + nextstore/ (nextstore setup) in zerops-recipe-apps/medusa-b2b.
+  - Canonical import YAMLs live in zeropsio/recipes/medusa-b2b. The app repo keeps an optional copy under .zerops-recipe/.
+  - Both services buildFromGit the same repo; zeropsSetup selects the setup in root zerops.yml.
+  - nodejs@24 for medusa and nextstore. Project RELOAD_SECRET for publishable-key reload.
+  - Hostnames must stay medusa / nextstore for CHANNEL_PUBLISHABLE_KEY and internal URLs. No idle setup: dev — do not invent medusadev.
+  - Small Production keeps app verticalAutoscaling (1 GB / 0.5 GB) — Medusa admin OOMs at the Node platform default.
+  - Cover SVG reuses cover-nextjs.svg (storefront is Next.js 15). A Medusa-specific cover can be added later.
+  - Humans must create the Strapi recipe record (slug medusa-b2b) and refresh GitHub cache after merge.
