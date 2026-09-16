@@ -1,0 +1,66 @@
+#zeropsPreprocessor=on
+# yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
+
+# Remote (CDE) environment — same production setups as the agent
+# project so a human porter can SSH into `medusa` or `nextstore`
+# without a local data plane. Hostnames stay `medusa` / `nextstore`
+# for ${medusa_CHANNEL_PUBLISHABLE_KEY}.
+#
+# Project envVariables are a value store. Each app's zerops.yml maps:
+#   APP_URL  → STOREFRONT_URL / NEXT_PUBLIC_BASE_URL / CORS
+#   API_URL  → BACKEND_URL / ADMIN_CORS / MEDUSA_BACKEND_URL
+project:
+  name: medusa-dtc-remote
+  envVariables:
+    APP_URL: https://nextstore-${zeropsSubdomainHost}-8000.prg1.zerops.app
+    API_URL: https://medusa-${zeropsSubdomainHost}-9000.prg1.zerops.app
+    STRIPE_PUBLISHABLE_KEY: ""
+  envSecrets:
+    COOKIE_SECRET: <@generateRandomString(<32>)>
+    JWT_SECRET: <@generateRandomString(<32>)>
+    STRIPE_API_KEY: ""
+    STRIPE_WEBHOOK_SECRET: ""
+    RELOAD_SECRET: <@generateRandomString(<16>)>
+
+services:
+  - hostname: db
+    type: postgresql:single@17
+    profile: oltp-hobby
+    priority: 10
+
+  - hostname: redis
+    type: valkey:single@7.2
+    profile: hobby
+    priority: 10
+
+  - hostname: storage
+    type: object-storage
+    objectStorageSize: 2
+    objectStoragePolicy: public-read
+    priority: 10
+
+  # Production Medusa runtime with enough RAM for the admin + API
+  # so SSH inspection and `yarn` scripts do not OOM. There is no
+  # `setup: dev` in the backend repo.
+  - hostname: medusa
+    type: nodejs@24
+    priority: 6
+    zeropsSetup: medusa
+    buildFromGit: https://github.com/zerops-recipe-apps/medusa-dtc
+    enableSubdomainAccess: true
+    envSecrets:
+      SUPERADMIN_EMAIL: admin@example.com
+      SUPERADMIN_PASSWORD: <@generateRandomString(<20>)>
+    verticalAutoscaling:
+      minRam: 1
+      minFreeRamGB: 0.5
+
+  - hostname: nextstore
+    type: nodejs@24
+    priority: 5
+    zeropsSetup: nextstore
+    buildFromGit: https://github.com/zerops-recipe-apps/medusa-dtc
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
