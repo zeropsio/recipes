@@ -1,0 +1,70 @@
+#zeropsPreprocessor=on
+# yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
+
+# Highly-available production — SERIOUS core required for `:ha@`
+# managed services. Demo DB stays oltp-staging (not oltp-production
+# ~4 GB). Shared CPU on the apps keeps the HA demo below
+# dedicated-core showcase cost.
+#
+# Project envVariables are a value store. Each app's zerops.yml maps:
+#   APP_URL  → STOREFRONT_URL / NEXT_PUBLIC_BASE_URL / CORS
+#   API_URL  → BACKEND_URL / ADMIN_CORS / MEDUSA_BACKEND_URL
+project:
+  name: medusa-dtc-ha-prod
+  corePackage: SERIOUS
+  envVariables:
+    APP_URL: https://nextstore-${zeropsSubdomainHost}-8000.prg1.zerops.app
+    API_URL: https://medusa-${zeropsSubdomainHost}-9000.prg1.zerops.app
+    STRIPE_PUBLISHABLE_KEY: ""
+  envSecrets:
+    COOKIE_SECRET: <@generateRandomString(<32>)>
+    JWT_SECRET: <@generateRandomString(<32>)>
+    STRIPE_API_KEY: ""
+    STRIPE_WEBHOOK_SECRET: ""
+    RELOAD_SECRET: <@generateRandomString(<16>)>
+
+services:
+  - hostname: db
+    type: postgresql:ha@17
+    profile: oltp-staging
+    priority: 10
+
+  # HA Valkey — 3-node cluster; client ports stay on hostname
+  # `redis` through failover. Profile only (no duplicate autoscaling).
+  - hostname: redis
+    type: valkey:ha@7.2
+    profile: staging
+    priority: 10
+
+  - hostname: storage
+    type: object-storage
+    objectStorageSize: 10
+    objectStoragePolicy: public-read
+    priority: 10
+
+  # Two backend replicas so rolling deploys keep /health and /app
+  # up. Shared CPU; RAM stays at the Medusa floor.
+  - hostname: medusa
+    type: nodejs@24
+    priority: 6
+    zeropsSetup: medusa
+    buildFromGit: https://github.com/zerops-recipe-apps/medusa-dtc
+    enableSubdomainAccess: true
+    minContainers: 2
+    envSecrets:
+      SUPERADMIN_EMAIL: admin@example.com
+      SUPERADMIN_PASSWORD: <@generateRandomString(<20>)>
+    verticalAutoscaling:
+      minRam: 1
+      minFreeRamGB: 0.5
+
+  - hostname: nextstore
+    type: nodejs@24
+    priority: 5
+    zeropsSetup: nextstore
+    buildFromGit: https://github.com/zerops-recipe-apps/medusa-dtc
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
