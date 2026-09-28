@@ -24,16 +24,12 @@ strapi_fields:
   slug: medusa-b2b
   recipe_source: medusa-b2b
   categories: [framework]
-  languages_frameworks: [Medusa, Next.js, TypeScript, Node.js]
+  languages_frameworks: [Medusa, TypeScript, Node.js]
   internal_type: example
 ready_for_testing: true
 notes:
-  - Closest sibling: medusa-showcase. This recipe drops Meilisearch and seeds official B2B company / quote / approval instead of B2C + B2B channels.
-  - Monorepo: backend/ (medusa setup) + nextstore/ (nextstore setup) in zerops-recipe-apps/medusa-b2b.
-  - Canonical import YAMLs live in zeropsio/recipes/medusa-b2b. The app repo keeps an optional copy under .zerops-recipe/.
-  - Both services buildFromGit the same repo; zeropsSetup selects the setup in root zerops.yml.
-  - nodejs@24 for medusa and nextstore. Project RELOAD_SECRET for publishable-key reload.
-  - Hostnames must stay medusa / nextstore for CHANNEL_PUBLISHABLE_KEY and internal URLs. No idle setup: dev — do not invent medusadev.
-  - Small Production keeps app verticalAutoscaling (1 GB / 0.5 GB) — Medusa admin OOMs at the Node platform default.
-  - Cover SVG reuses cover-nextjs.svg (storefront is Next.js 15). A Medusa-specific cover can be added later.
-  - Humans must create the Strapi recipe record (slug medusa-b2b) and refresh GitHub cache after merge.
+  - Recipe imports Medusa only (db, redis, search, storage, optional mailpit). nextstore/ stays in the app repo for local compose.
+  - Setups are only `dev` and `prod`. medusadev → dev; medusastage / medusa → prod.
+  - Project vault (not envVariables/envSecrets). Identity maps omitted in zerops.yml. No run.start.
+  - Meilisearch 1.10 + Mailpit on Agent/Remote/Local. SMTP vault empty on stage/prod.
+  - Humans: Strapi slug medusa-b2b, refresh cache, optional Medusa community FAQ.

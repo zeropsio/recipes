@@ -1,7 +1,7 @@
 # Medusa B2B Recipe
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-Medusa v2.21 B2B backend, admin, and Next.js storefront in one monorepo ([zerops-recipe-apps/medusa-b2b](https://github.com/zerops-recipe-apps/medusa-b2b)) on [Zerops](https://zerops.io). PostgreSQL, Valkey, and MinIO ship with the project; first deploy migrates, seeds a company with admin + employee spend limits, and writes a publishable key the storefront reads at runtime.
+Medusa v2.21 B2B backend and admin ([zerops-recipe-apps/medusa-b2b](https://github.com/zerops-recipe-apps/medusa-b2b)) on [Zerops](https://zerops.io). PostgreSQL, Valkey, Meilisearch, and MinIO ship with the project; Agent / Remote / Local also get Mailpit. First deploy migrates, seeds a B2B company, and writes a publishable key. The Next.js storefront is not imported.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 
 ⬇️ **Full recipe page and deploy with one-click**
@@ -9,8 +9,6 @@ Medusa v2.21 B2B backend, admin, and Next.js storefront in one monorepo ([zerops
 [![Deploy on Zerops](https://github.com/zeropsio/recipe-shared-assets/blob/main/deploy-button/light/deploy-button.svg)](https://app.zerops.io/recipes/medusa-b2b?environment=small-production)
 
 ![cover](https://github.com/zeropsio/recipe-shared-assets/blob/main/covers/svg/cover-nextjs.svg)
-
-Offered in examples for the whole development lifecycle — from environments for AI agents like [Claude Code](https://www.anthropic.com/claude-code) or [opencode](https://opencode.ai) through environments for remote (CDE) or local development of each developer to stage and productions of all sizes.
 
 - **AI agent** [[info]](/0%20—%20AI%20Agent) — [[deploy with one click]](https://app.zerops.io/recipes/medusa-b2b?environment=ai-agent)
 - **Remote (CDE)** [[info]](/1%20—%20Remote%20(CDE)) — [[deploy with one click]](https://app.zerops.io/recipes/medusa-b2b?environment=remote-cde)
@@ -21,6 +19,6 @@ Offered in examples for the whole development lifecycle — from environments fo
 
 ---
 
-For more advanced examples see all [Medusa recipes](https://app.zerops.io/recipes?lf=medusa) on Zerops.
+For more examples see all [Medusa recipes](https://app.zerops.io/recipes?lf=medusa) on Zerops.
 
 Need help setting your project up? Join [Zerops Discord community](https://discord.gg/zeropsio).

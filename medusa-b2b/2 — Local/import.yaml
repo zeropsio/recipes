@@ -1,25 +1,43 @@
 #zeropsPreprocessor=on
 # yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
 
-# Local environment — staged production apps plus the managed data
-# plane. Point a laptop `yarn develop` at db / redis / storage over
-# zCLI VPN, or use the subdomain apps as the preview.
-#
-# Project envVariables are a value store. Each app's zerops.yml maps:
-#   APP_URL  → STOREFRONT_URL / NEXT_PUBLIC_BASE_URL / CORS
-#   API_URL  → BACKEND_URL / ADMIN_CORS / MEDUSA_BACKEND_URL
+# Local — production Medusa (`zeropsSetup: prod`) plus the managed
+# data plane and Mailpit. Point a laptop storefront at API_URL over
+# zCLI VPN, or use the subdomain admin as the preview.
 project:
   name: medusa-b2b-local
-  envVariables:
-    APP_URL: https://nextstore-${zeropsSubdomainHost}-8000.prg1.zerops.app
+  vault:
+    APP_URL: http://localhost:8000
     API_URL: https://medusa-${zeropsSubdomainHost}-9000.prg1.zerops.app
+    DEV_APP_URL: http://localhost:8000
+    DEV_API_URL: https://medusa-${zeropsSubdomainHost}-9000.prg1.zerops.app
+    SEARCH_URL: https://search-${zeropsSubdomainHost}-7700.prg1.zerops.app
+    SMTP_HOST: mailpit
+    SMTP_PORT: "1025"
+    SMTP_FROM: medusa@localhost
+    SMTP_SECURE: "false"
     STRIPE_PUBLISHABLE_KEY: ""
-  envSecrets:
-    COOKIE_SECRET: <@generateRandomString(<32>)>
-    JWT_SECRET: <@generateRandomString(<32>)>
-    STRIPE_API_KEY: ""
-    STRIPE_WEBHOOK_SECRET: ""
-    RELOAD_SECRET: <@generateRandomString(<16>)>
+    COOKIE_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
+    JWT_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
+    SMTP_USER:
+      value: ""
+      sensitive: true
+    SMTP_PASS:
+      value: ""
+      sensitive: true
+    STRIPE_API_KEY:
+      value: ""
+      sensitive: true
+    STRIPE_WEBHOOK_SECRET:
+      value: ""
+      sensitive: true
+    CHANNEL_PUBLISHABLE_KEY:
+      value: ""
+      sensitive: true
 
 services:
   - hostname: db
@@ -32,31 +50,34 @@ services:
     profile: hobby
     priority: 10
 
+  - hostname: search
+    type: meilisearch@1.10
+    enableSubdomainAccess: true
+    priority: 10
+
   - hostname: storage
     type: object-storage
     objectStorageSize: 2
     objectStoragePolicy: public-read
     priority: 10
 
+  - hostname: mailpit
+    type: go@1
+    buildFromGit: https://github.com/zerops-recipe-apps/mailpit-app
+    enableSubdomainAccess: true
+    priority: 10
+
   - hostname: medusa
     type: nodejs@24
     priority: 6
-    zeropsSetup: medusa
+    zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/medusa-b2b
     enableSubdomainAccess: true
-    envSecrets:
+    vault:
       SUPERADMIN_EMAIL: admin@example.com
-      SUPERADMIN_PASSWORD: <@generateRandomString(<20>)>
+      SUPERADMIN_PASSWORD:
+        value: <@generateRandomString(<20>)>
+        sensitive: true
     verticalAutoscaling:
       minRam: 1
       minFreeRamGB: 0.5
-
-  - hostname: nextstore
-    type: nodejs@24
-    priority: 5
-    zeropsSetup: nextstore
-    buildFromGit: https://github.com/zerops-recipe-apps/medusa-b2b
-    enableSubdomainAccess: true
-    verticalAutoscaling:
-      minRam: 0.5
-      minFreeRamGB: 0.25

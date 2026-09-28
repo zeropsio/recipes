@@ -2,10 +2,10 @@
 
 ## Overview
 
-- **Software:** Medusa v2.21.0 B2B backend + official Next.js 15 storefront
+- **Software:** Medusa v2.21.0 B2B backend + admin (storefront in-repo, not imported)
 - **Type:** framework (headless B2B commerce; TypeScript)
 - **Official Site:** https://medusajs.com/
-- **Zerops Runtime:** `nodejs@24` (both apps), `postgresql:single@17` / `postgresql:ha@17`, `valkey@7.2` (`:single@` / `:ha@`), `object-storage`
+- **Zerops Runtime:** `nodejs@24`, `postgresql@17`, `valkey@7.2`, `meilisearch@1.10`, `object-storage`
 
 ## Zerops Compatibility Assessment
 
@@ -13,86 +13,53 @@
 
 - [x] Stateless HTTP (catalog, sessions, and workflows live in Postgres + Valkey)
 - [x] Supported runtime (`nodejs@24`; Medusa 2.21 wants Node `^20.19.0` or `>=22.12.0`)
-- [x] Binds to a fixed port (backend `9000`, storefront `8000`)
-- [x] Health endpoint (`GET /health` on the backend; `GET /api/health` on the storefront)
+- [x] Binds to a fixed port (backend `9000`)
+- [x] Health endpoint (`GET /health`)
 
 ### Potential Issues
 
-- Local / Stage / Small / HA use hostnames `medusa` / `nextstore` (`zeropsSetup: medusa` / `nextstore`). AI Agent / Remote use `medusadev` + `nextstoredev` (idle `*-dev` setups, `zsc noop`) and `medusastage` + `nextstorestage` (prod `*-stage` setups). Stage storefront reads `${medusastage_CHANNEL_PUBLISHABLE_KEY}`.
-- Backend is Yarn **1.22** (classic lockfile). Storefront is Yarn **Berry 3.2.3** via Corepack.
-- New Valkey services require a password. `zerops.yml` must use `${redis_connectionString}`, not `redis://${redis_hostname}:6379`.
-- Admin CORS is the backend origin (`API_URL`), not the storefront. Store CORS is `APP_URL`.
-- First-deploy `initCommands` (`zsc execOnce`) migrate + sync-links per `${appVersionId}`; superadmin, seed, and publishable key run once per service lifetime.
-- Combined API+admin: keep `admin.path` at `/app`. `GET /` redirects there. Do not set `path: "/"`.
-- No Meilisearch in this recipe.
+- Setups are only **`dev`** and **`prod`**. `medusadev` → `dev`. `medusastage` / `medusa` → `prod`. There is no `stage` setup.
+- The Next.js storefront is **not imported**. Mate spinning “Medusa” gets the backend. Compose a storefront locally or via a later recipe.
+- `dev` deploys `./` (full repo) so a git-connected workspace cannot wipe `nextstore/` on push. `prod` may flatten `.medusa/server`.
+- Do not add Nx / Turbo — Yarn 1 backend + Yarn 3 Berry storefront, no shared graph.
+- Vault keys inject as-is. Do not write `STRIPE_API_KEY: ${STRIPE_API_KEY}`.
+- `run.start` is omitted — platform default.
+- Admin CORS is the backend origin (`API_URL`). Store CORS is `APP_URL` (localhost storefront).
+- Keep `admin.path` at `/app`.
 
 ## Build Configuration
 
 ### Build Commands
 
-Monorepo [`zerops-recipe-apps/medusa-b2b`](https://github.com/zerops-recipe-apps/medusa-b2b) — root `zerops.yml` with `medusa` / `nextstore` (Local–HA), `medusa-stage` / `nextstore-stage` and idle `medusa-dev` / `nextstore-dev` (AI Agent / Remote).
-
-Backend (`backend/`):
-
 ```bash
-cd backend && yarn && yarn build
-```
-
-Storefront (`nextstore/`):
-
-```bash
-corepack enable   # prepareCommands on nextstore setup
-cd nextstore && yarn && yarn build
+cd backend && yarn && yarn build   # prod
+cd backend && yarn                 # dev workspace
 ```
 
 ### Build Output
 
-| Service | Deploy paths |
-|---------|----------------|
-| `medusa` | `backend/.medusa/server/~`, `backend/~node_modules` (package.json/tsconfig overlaid into `.medusa/server`) |
-| `nextstore` | `nextstore/.next`, `nextstore/package.json`, `nextstore/next.config.js`, `nextstore/yarn.lock`, `nextstore/.yarnrc.yml`, `nextstore/node_modules`, `nextstore/public` |
-
-### Caching Recommendations
-
-- Backend: `node_modules`
-- Storefront: `node_modules` only — do not cache `.next` (Zerops restore can hit `EACCES`)
+| Setup | Deploy paths |
+|-------|----------------|
+| `prod` | `backend/.medusa/server/~`, `backend/~node_modules` |
+| `dev` | `./` (whole repo) |
 
 ## Runtime Configuration
 
-### Start Command
+No `start` key. Vault injects `JWT_SECRET`, `COOKIE_SECRET`, `SMTP_*`, `STRIPE_*`, `SUPERADMIN_*`.
 
-```bash
-# Backend
-yarn start          # port 9000, admin at /app
-
-# Storefront
-./node_modules/.bin/next start -p 8000
-```
-
-### Environment Variables
-
-Project `import.yaml` is a **value store**. Apps map keys in each `zerops.yml`.
-
-| Value store | Required | Mapped in |
-|-------------|----------|-----------|
-| `APP_URL` | yes | Medusa `STOREFRONT_URL` / CORS; Next `NEXT_PUBLIC_BASE_URL` |
-| `API_URL` | yes | Medusa `BACKEND_URL` / `ADMIN_CORS`; Next `MEDUSA_BACKEND_URL` |
-| `COOKIE_SECRET` / `JWT_SECRET` | yes (secrets) | Medusa session / JWT |
-| `STRIPE_*` | optional | Empty key disables Stripe |
-| `RELOAD_SECRET` | yes (secret) | nextstore `/api/internal/reload-env` |
-
-No `envVariables` on import **service** blocks. Superadmin stays `envSecrets` on `medusa`.
+`zerops.yml` remaps `API_URL` → `BACKEND_URL`, `APP_URL` → `STOREFRONT_URL`, and computes `DATABASE_URL`, `REDIS_URL`, `MINIO_*`, `MEILISEARCH_*`.
 
 ### Health Check
 
-- Backend: HTTP `GET /health` on port 9000 (readiness + healthCheck)
-- Storefront: HTTP `GET /api/health` on port 8000 (readiness + healthCheck)
+HTTP `GET /health` on port 9000.
 
 ## Database/Storage Requirements
 
-- **PostgreSQL 17** — Medusa modules + links + B2B company/quote/approval. `oltp-hobby` on agent / remote / local / stage; **`oltp-staging` on Small Production and HA demo**.
-- **Valkey 7.2** — sessions, Caching Module, event bus, workflow engine, locking (one URL). `profile: hobby` on rehearsal tiers; **`profile: staging` on Small Production and HA**.
-- **Object storage (MinIO)** — product images, `public-read`, `forcePathStyle: true` in Medusa file-s3. 2 GB on non-HA; 10 GB on HA.
+- **PostgreSQL 17** — `oltp-hobby` rehearsal; **`oltp-staging` Small Production + HA demo**
+- **Valkey 7.2** — `hobby` rehearsal; **`staging` Small Production + HA**
+- **Meilisearch 1.10** — product index; no HA type
+- **Object storage** — 2 GB non-HA; 10 GB HA
+- **Mailpit** — Agent / Remote / Local only
 
 ## Service Dependencies
 
@@ -100,54 +67,41 @@ No `envVariables` on import **service** blocks. Superadmin stays `envSecrets` on
 |----------|------|---------|----------|
 | db | postgresql | Medusa datasource | 10 |
 | redis | valkey | Cache, events, workflows, locks, sessions | 10 |
+| search | meilisearch | Product index | 10 |
 | storage | object-storage | Product media | 10 |
-| medusa | nodejs@24 | Admin + Store / Admin API (`setup: medusa`) | 6 |
-| nextstore | nodejs@24 | Official Next.js B2B storefront (`setup: nextstore`) | 5 |
-
-`nextstore` reads `${medusa_CHANNEL_PUBLISHABLE_KEY}` after seed. On AI Agent / Remote the same key lives on hostname `medusastage` (`${medusastage_CHANNEL_PUBLISHABLE_KEY}`).
+| mailpit | go@1 (mailpit-app) | SMTP catcher (dev envs) | 10 |
+| medusa / medusastage | nodejs@24 | `zeropsSetup: prod` | 6 |
+| medusadev | nodejs@24 | `zeropsSetup: dev` | 5 |
 
 ## Scaling Considerations
 
-Floors from the app `zerops.yml` setups (production `yarn start` / `next start` — not `medusa develop`).
-
 | Setup | minRam | minFreeRamGB | Rationale |
 |-------|--------|--------------|-----------|
-| `medusa` | **1 GB** | **0.5 GB** | Admin UI + Store API + B2B modules + workflow engine + Redis clients. Platform default 0.25 GB OOMs on first boot (proven on the Medusa showcase). |
-| `nextstore` | **0.5 GB** | **0.25 GB** | Next.js 15 SSR storefront (`next start -p 8000`). |
-| PostgreSQL | profile only | — | `oltp-hobby` rehearsal; `oltp-staging` Small Production + HA demo. Never `minFreeRamGB` on DB. |
-| Valkey | profile only | — | `hobby` rehearsal; `staging` Small Production + HA. No duplicate `verticalAutoscaling`. |
+| `prod` | **1 GB** | **0.5 GB** | Admin + API + B2B + workflows. 0.25 GB OOMs. |
+| `dev` | **1 GB** | — | SSH workspace + `yarn dev`. |
+| PostgreSQL / Valkey | profile only | — | Never `minFreeRamGB` on DB. |
 
-**Cost ladder**
-
-- **Stage:** hobby Postgres + hobby Valkey + one container per app (1 + 0.5 GB floors) + 2 GB storage.
-- **Small Production:** `oltp-staging` + Valkey `staging` + **same app floors** (required — omitting `verticalAutoscaling` would drop Medusa to the Node default and OOM). Omit `minContainers` (default 1).
-- **HA:** `corePackage: SERIOUS`, `postgresql:ha@17` + `valkey:ha@7.2` (`oltp-staging` / `staging`), `minContainers: 2` on both HTTP apps, shared CPU, 10 GB storage.
-
-This is a **showcase** (two apps + three data services), not a hello-world. Small Production still sets app `minRam` because the framework floor is above the platform default.
+**Cost ladder:** Stage (hobby) < Small Production (`oltp-staging` + same 1 GB floor, no `minContainers`) < HA (`:ha@`, `minContainers: 2`, 10 GB storage).
 
 ## Maintenance Guide
 
-### Upgrades
+- Pin `@medusajs/*` to **2.21.0**.
+- `yarn migrate` + `yarn syncLinks` after upgrades (`${appVersionId}`).
+- Re-index: `yarn addInitialSearchDocuments`.
 
-- Pin every `@medusajs/*` package to **2.21.0**. Bump backend and storefront together.
-- Re-run `yarn migrate` + `yarn syncLinks` after Medusa upgrades (already keyed by `${appVersionId}`).
+## Recipe detail / FAQ
 
-### Data Migrations
-
-- Schema: `zsc execOnce ${appVersionId}_migration -- yarn migrate`
-- Links: `zsc execOnce ${appVersionId}_links -- yarn syncLinks`
-- Demo seed / superadmin / publishable key: once per service lifetime
+See the app README FAQ fragment: why no storefront service, setup vs hostname, search, mail, vault passthrough, `dev` deploy of `./`. Community FAQ with Medusa voices is still open.
 
 ## References
 
-- https://docs.medusajs.com/ — Medusa v2
-- https://github.com/medusajs/b2b-starter — official B2B starter
-- https://github.com/zerops-recipe-apps/medusa-b2b — monorepo (`backend/` + `nextstore/`)
-- https://docs.zerops.io/references/import-yaml/type-list — service types
+- https://docs.medusajs.com/
+- https://github.com/medusajs/b2b-starter
+- https://github.com/zerops-recipe-apps/medusa-b2b
+- https://docs.zerops.io/references/import-yaml/type-list
 
 ## Notes for Terminal Agent
 
-- Closest sibling: `medusa-showcase` (same flatten/init; this recipe drops Meilisearch).
-- Canonical `buildFromGit` is `zerops-recipe-apps/medusa-b2b` for both services (same repo, different `zeropsSetup`).
-- Canonical import YAMLs live in `zeropsio/recipes/medusa-b2b`. The app repo keeps an optional copy under `.zerops-recipe/`.
-- Use `#zeropsPreprocessor=on` for `${zeropsSubdomainHost}` and `<@generateRandomString(...)>`.
+- Closest sibling: `medusa-showcase`. This recipe is **backend-only** in import.yaml.
+- Canonical `buildFromGit` is `zerops-recipe-apps/medusa-b2b`.
+- Use `#zeropsPreprocessor=on` and project **vault**.

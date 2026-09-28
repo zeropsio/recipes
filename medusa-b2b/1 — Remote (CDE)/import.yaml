@@ -1,32 +1,44 @@
 #zeropsPreprocessor=on
 # yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
 
-# Remote (CDE) environment — same `*dev` + `*stage` pair as the
-# agent project so a porter SSHs into medusadev / nextstoredev
-# without a local data plane. APP_URL / API_URL are staged
-# subdomains; DEV_* are the interactive runtimes.
-#
-# Project envVariables are a value store. Each app's zerops.yml maps:
-#   APP_URL  → STOREFRONT_URL / NEXT_PUBLIC_BASE_URL / CORS
-#   API_URL  → BACKEND_URL / ADMIN_CORS / MEDUSA_BACKEND_URL
-#   DEV_APP_URL / DEV_API_URL → workspace CORS + `yarn dev` URLs
+# Remote (CDE) — same Medusa-only pair as the agent project.
+# `medusadev` uses `dev`; `medusastage` uses `prod`. Mailpit for SMTP.
 project:
   name: medusa-b2b-remote
-  envVariables:
-    APP_URL: https://nextstorestage-${zeropsSubdomainHost}-8000.prg1.zerops.app
+  vault:
+    APP_URL: http://localhost:8000
     API_URL: https://medusastage-${zeropsSubdomainHost}-9000.prg1.zerops.app
-    DEV_APP_URL: https://nextstoredev-${zeropsSubdomainHost}-8000.prg1.zerops.app
+    DEV_APP_URL: http://localhost:8000
     DEV_API_URL: https://medusadev-${zeropsSubdomainHost}-9000.prg1.zerops.app
+    SEARCH_URL: https://search-${zeropsSubdomainHost}-7700.prg1.zerops.app
+    SMTP_HOST: mailpit
+    SMTP_PORT: "1025"
+    SMTP_FROM: medusa@localhost
+    SMTP_SECURE: "false"
     STRIPE_PUBLISHABLE_KEY: ""
-  envSecrets:
-    COOKIE_SECRET: <@generateRandomString(<32>)>
-    JWT_SECRET: <@generateRandomString(<32>)>
-    STRIPE_API_KEY: ""
-    STRIPE_WEBHOOK_SECRET: ""
-    RELOAD_SECRET: <@generateRandomString(<16>)>
+    COOKIE_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
+    JWT_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
+    SMTP_USER:
+      value: ""
+      sensitive: true
+    SMTP_PASS:
+      value: ""
+      sensitive: true
+    STRIPE_API_KEY:
+      value: ""
+      sensitive: true
+    STRIPE_WEBHOOK_SECRET:
+      value: ""
+      sensitive: true
+    CHANNEL_PUBLISHABLE_KEY:
+      value: ""
+      sensitive: true
 
 services:
-  # Shared hobby data plane — both *dev and *stage connect here.
   - hostname: db
     type: postgresql:single@17
     profile: oltp-hobby
@@ -37,16 +49,27 @@ services:
     profile: hobby
     priority: 10
 
+  - hostname: search
+    type: meilisearch@1.10
+    enableSubdomainAccess: true
+    priority: 10
+
   - hostname: storage
     type: object-storage
     objectStorageSize: 2
     objectStoragePolicy: public-read
     priority: 10
 
+  - hostname: mailpit
+    type: go@1
+    buildFromGit: https://github.com/zerops-recipe-apps/mailpit-app
+    enableSubdomainAccess: true
+    priority: 10
+
   - hostname: medusadev
     type: nodejs@24
     priority: 5
-    zeropsSetup: medusa-dev
+    zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/medusa-b2b
     enableSubdomainAccess: true
     verticalAutoscaling:
@@ -55,31 +78,14 @@ services:
   - hostname: medusastage
     type: nodejs@24
     priority: 6
-    zeropsSetup: medusa-stage
+    zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/medusa-b2b
     enableSubdomainAccess: true
-    envSecrets:
+    vault:
       SUPERADMIN_EMAIL: admin@example.com
-      SUPERADMIN_PASSWORD: <@generateRandomString(<20>)>
+      SUPERADMIN_PASSWORD:
+        value: <@generateRandomString(<20>)>
+        sensitive: true
     verticalAutoscaling:
       minRam: 1
       minFreeRamGB: 0.5
-
-  - hostname: nextstoredev
-    type: nodejs@24
-    priority: 5
-    zeropsSetup: nextstore-dev
-    buildFromGit: https://github.com/zerops-recipe-apps/medusa-b2b
-    enableSubdomainAccess: true
-    verticalAutoscaling:
-      minRam: 1
-
-  - hostname: nextstorestage
-    type: nodejs@24
-    priority: 5
-    zeropsSetup: nextstore-stage
-    buildFromGit: https://github.com/zerops-recipe-apps/medusa-b2b
-    enableSubdomainAccess: true
-    verticalAutoscaling:
-      minRam: 0.5
-      minFreeRamGB: 0.25
