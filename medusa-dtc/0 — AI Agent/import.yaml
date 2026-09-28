@@ -1,19 +1,22 @@
 #zeropsPreprocessor=on
 # yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
 
-# AI Agent environment — production Medusa + Next.js setups plus
-# hobby data services. The app repo has no idle `setup: dev`;
-# hostnames stay `medusa` / `nextstore` so the storefront can read
-# ${medusa_CHANNEL_PUBLISHABLE_KEY} after seed.
+# AI Agent environment — `*dev` workspaces (idle) plus `*stage`
+# deploy targets. APP_URL / API_URL point at staged subdomains;
+# DEV_* at the interactive medusadev / nextstoredev runtimes.
+# Shared hobby data plane (one db / redis / storage).
 #
 # Project envVariables are a value store. Each app's zerops.yml maps:
 #   APP_URL  → STOREFRONT_URL / NEXT_PUBLIC_BASE_URL / CORS
 #   API_URL  → BACKEND_URL / ADMIN_CORS / MEDUSA_BACKEND_URL
+#   DEV_APP_URL / DEV_API_URL → workspace CORS + `yarn dev` URLs
 project:
   name: medusa-dtc-agent
   envVariables:
-    APP_URL: https://nextstore-${zeropsSubdomainHost}-8000.prg1.zerops.app
-    API_URL: https://medusa-${zeropsSubdomainHost}-9000.prg1.zerops.app
+    APP_URL: https://nextstorestage-${zeropsSubdomainHost}-8000.prg1.zerops.app
+    API_URL: https://medusastage-${zeropsSubdomainHost}-9000.prg1.zerops.app
+    DEV_APP_URL: https://nextstoredev-${zeropsSubdomainHost}-8000.prg1.zerops.app
+    DEV_API_URL: https://medusadev-${zeropsSubdomainHost}-9000.prg1.zerops.app
     STRIPE_PUBLISHABLE_KEY: ""
   envSecrets:
     COOKIE_SECRET: <@generateRandomString(<32>)>
@@ -23,37 +26,36 @@ project:
     RELOAD_SECRET: <@generateRandomString(<16>)>
 
 services:
-  # Data plane first so Medusa migrate / seed can connect on boot.
+  # Shared hobby data plane — both *dev and *stage connect here.
   - hostname: db
     type: postgresql:single@17
     profile: oltp-hobby
     priority: 10
 
-  # Hobby Valkey — sessions, Caching Module, event bus, workflow
-  # engine, and locking share this one instance. Profile only;
-  # do not duplicate RAM in verticalAutoscaling.
   - hostname: redis
     type: valkey:single@7.2
     profile: hobby
     priority: 10
 
-  # Public-read MinIO — product images are requested from the
-  # storefront and admin without signed URLs. 2 GB covers the seed
-  # catalog; bump objectStorageSize when uploads grow.
   - hostname: storage
     type: object-storage
     objectStorageSize: 2
     objectStoragePolicy: public-read
     priority: 10
 
-  # Medusa admin + Store / Admin API. 1 GB + 0.5 GB free is the
-  # proven floor (admin UI + Store API). Superadmin is a service
-  # secret so it is not in the project value store. zeropsSetup
-  # must match `- setup: medusa` in medusa-dtc/zerops.yml.
-  - hostname: medusa
+  - hostname: medusadev
+    type: nodejs@24
+    priority: 5
+    zeropsSetup: medusa-dev
+    buildFromGit: https://github.com/zerops-recipe-apps/medusa-dtc
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 1
+
+  - hostname: medusastage
     type: nodejs@24
     priority: 6
-    zeropsSetup: medusa
+    zeropsSetup: medusa-stage
     buildFromGit: https://github.com/zerops-recipe-apps/medusa-dtc
     enableSubdomainAccess: true
     envSecrets:
@@ -63,12 +65,19 @@ services:
       minRam: 1
       minFreeRamGB: 0.5
 
-  # Official Next.js DTC storefront. 0.5 GB + 0.25 GB free is the SSR
-  # floor. RELOAD_SECRET is a project envSecret (medusa init POSTs reload-env).
-  - hostname: nextstore
+  - hostname: nextstoredev
     type: nodejs@24
     priority: 5
-    zeropsSetup: nextstore
+    zeropsSetup: nextstore-dev
+    buildFromGit: https://github.com/zerops-recipe-apps/medusa-dtc
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 1
+
+  - hostname: nextstorestage
+    type: nodejs@24
+    priority: 5
+    zeropsSetup: nextstore-stage
     buildFromGit: https://github.com/zerops-recipe-apps/medusa-dtc
     enableSubdomainAccess: true
     verticalAutoscaling:

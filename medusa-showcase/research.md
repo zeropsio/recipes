@@ -18,7 +18,7 @@
 
 ### Potential Issues
 
-- App repos ship **only** `setup: medusa` and `setup: nextstore` — no idle `setup: dev`. Agent / Remote / Local / Stage all run the production setups. Do not invent `medusadev` hostnames; the storefront reads `${medusa_CHANNEL_PUBLISHABLE_KEY}` from hostname `medusa`.
+- Local / Stage / Small / HA use hostnames `medusa` / `nextstore` (`zeropsSetup: medusa` / `nextstore`). AI Agent / Remote use `medusadev` + `nextstoredev` (idle `*-dev` setups, `zsc noop`) and `medusastage` + `nextstorestage` (prod `*-stage` setups). Stage storefront reads `${medusastage_CHANNEL_PUBLISHABLE_KEY}`.
 - Backend is Yarn **1.22** (classic lockfile). Storefront is Yarn **Berry 3.2.3** via Corepack. Do not switch either repo to npm.
 - New Valkey services require a password. `zerops.yml` must use `${redis_connectionString}`, not `redis://${redis_hostname}:6379`.
 - In-repo Meilisearch module (`src/modules/meilisearch/`). Do **not** add `@rokmohar/medusa-plugin-meilisearch` (breaks on 2.19).
@@ -31,7 +31,7 @@
 
 ### Build Commands
 
-Monorepo [`zerops-recipe-apps/medusa-showcase`](https://github.com/zerops-recipe-apps/medusa-showcase) — root `zerops.yml` with `medusa` and `nextstore` setups.
+Monorepo [`zerops-recipe-apps/medusa-showcase`](https://github.com/zerops-recipe-apps/medusa-showcase) — root `zerops.yml` with `medusa` / `nextstore` (Local–HA), `medusa-stage` / `nextstore-stage` and idle `medusa-dev` / `nextstore-dev` (AI Agent / Remote).
 
 Backend (`backend/`):
 
@@ -108,8 +108,10 @@ No `envVariables` on import **service** blocks. Superadmin and revalidate tokens
 | storage | object-storage | Product media | 10 |
 | medusa | nodejs@22 | Admin + Store / Admin API (`setup: medusa`) | 5 |
 | nextstore | nodejs@22 | Official Next.js storefront (`setup: nextstore`) | 5 |
+| medusadev / medusastage | nodejs@24 | AI Agent / Remote only (`medusa-dev` / `medusa-stage`) | 5 / 6 |
+| nextstoredev / nextstorestage | nodejs@24 | AI Agent / Remote only (`nextstore-dev` / `nextstore-stage`) | 5 |
 
-`nextstore` reads the B2C publishable key from `medusa` after seed (`CHANNEL_PUBLISHABLE_KEY`).
+`nextstore` reads `${medusa_CHANNEL_PUBLISHABLE_KEY}` after seed. On AI Agent / Remote the same key lives on hostname `medusastage`.
 
 ## Scaling Considerations
 
