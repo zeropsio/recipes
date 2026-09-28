@@ -1,19 +1,22 @@
 #zeropsPreprocessor=on
 # yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
 
-# Remote (CDE) environment — same production setups as the agent
-# project so a human porter can SSH into `medusa` or `nextstore`
-# without a local data plane. Hostnames stay `medusa` / `nextstore`
-# for ${medusa_CHANNEL_PUBLISHABLE_KEY}.
+# Remote (CDE) environment — same `*dev` + `*stage` pair as the
+# agent project so a porter SSHs into medusadev / nextstoredev
+# without a local data plane. APP_URL / API_URL are staged
+# subdomains; DEV_* are the interactive runtimes.
 #
 # Project envVariables are a value store. Each app's zerops.yml maps:
 #   APP_URL  → STOREFRONT_URL / NEXT_PUBLIC_BASE_URL / CORS
 #   API_URL  → BACKEND_URL / ADMIN_CORS / MEDUSA_BACKEND_URL
+#   DEV_APP_URL / DEV_API_URL → workspace CORS + `yarn dev` URLs
 project:
   name: medusa-dtc-remote
   envVariables:
-    APP_URL: https://nextstore-${zeropsSubdomainHost}-8000.prg1.zerops.app
-    API_URL: https://medusa-${zeropsSubdomainHost}-9000.prg1.zerops.app
+    APP_URL: https://nextstorestage-${zeropsSubdomainHost}-8000.prg1.zerops.app
+    API_URL: https://medusastage-${zeropsSubdomainHost}-9000.prg1.zerops.app
+    DEV_APP_URL: https://nextstoredev-${zeropsSubdomainHost}-8000.prg1.zerops.app
+    DEV_API_URL: https://medusadev-${zeropsSubdomainHost}-9000.prg1.zerops.app
     STRIPE_PUBLISHABLE_KEY: ""
   envSecrets:
     COOKIE_SECRET: <@generateRandomString(<32>)>
@@ -23,6 +26,7 @@ project:
     RELOAD_SECRET: <@generateRandomString(<16>)>
 
 services:
+  # Shared hobby data plane — both *dev and *stage connect here.
   - hostname: db
     type: postgresql:single@17
     profile: oltp-hobby
@@ -39,13 +43,19 @@ services:
     objectStoragePolicy: public-read
     priority: 10
 
-  # Production Medusa runtime with enough RAM for the admin + API
-  # so SSH inspection and `yarn` scripts do not OOM. There is no
-  # `setup: dev` in the backend repo.
-  - hostname: medusa
+  - hostname: medusadev
+    type: nodejs@24
+    priority: 5
+    zeropsSetup: medusa-dev
+    buildFromGit: https://github.com/zerops-recipe-apps/medusa-dtc
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 1
+
+  - hostname: medusastage
     type: nodejs@24
     priority: 6
-    zeropsSetup: medusa
+    zeropsSetup: medusa-stage
     buildFromGit: https://github.com/zerops-recipe-apps/medusa-dtc
     enableSubdomainAccess: true
     envSecrets:
@@ -55,10 +65,19 @@ services:
       minRam: 1
       minFreeRamGB: 0.5
 
-  - hostname: nextstore
+  - hostname: nextstoredev
     type: nodejs@24
     priority: 5
-    zeropsSetup: nextstore
+    zeropsSetup: nextstore-dev
+    buildFromGit: https://github.com/zerops-recipe-apps/medusa-dtc
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 1
+
+  - hostname: nextstorestage
+    type: nodejs@24
+    priority: 5
+    zeropsSetup: nextstore-stage
     buildFromGit: https://github.com/zerops-recipe-apps/medusa-dtc
     enableSubdomainAccess: true
     verticalAutoscaling:
