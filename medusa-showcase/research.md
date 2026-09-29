@@ -18,7 +18,7 @@
 
 ### Potential Issues
 
-- Local / Stage / Small / HA use hostnames `medusa` / `nextstore` (`zeropsSetup: medusa` / `nextstore`). AI Agent / Remote use `medusadev` + `nextstoredev` (idle `*-dev` setups, deploy `./`, no start) and `medusastage` + `nextstorestage` (same `medusa` / `nextstore` setups). Storefront reads project vault `CHANNEL_PUBLISHABLE_KEY`; `MEDUSA_HOST` / `NEXTSTORE_HOST` keep internal URLs hostname-agnostic.
+- Local / Stage / Small / HA use hostnames `medusa` / `nextstore` (`zeropsSetup: prod` / `nextstore`). AI Agent / Remote use `medusadev` + `nextstoredev` (idle `*-dev` setups, deploy `./`, no start) and `medusastage` + `nextstorestage` (same `prod` setup). Storefront reads project vault `CHANNEL_PUBLISHABLE_KEY`; `MEDUSA_HOST` / `NEXTSTORE_HOST` keep internal URLs hostname-agnostic.
 - Backend is Yarn **1.22** (classic lockfile). Storefront is Yarn **Berry 3.2.3** via Corepack. Do not switch either repo to npm.
 - New Valkey services require a password. `zerops.yml` must use `${redis_connectionString}`, not `redis://${redis_hostname}:6379`.
 - In-repo Meilisearch module (`src/modules/meilisearch/`). Do **not** add `@rokmohar/medusa-plugin-meilisearch` (breaks on 2.19).

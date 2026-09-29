@@ -19,7 +19,7 @@ files_created:
 apps_created: []
 apps_existing:
   - https://github.com/zerops-recipe-apps/medusa-showcase
-  - https://github.com/zerops-recipe-apps/medusa-showcase-nextstore
+  - https://github.com/zerops-recipe-apps/medusa-showcase-frontend
 strapi_fields:
   recipe_name: Medusa Showcase
   slug: medusa-showcase
@@ -29,7 +29,7 @@ strapi_fields:
   internal_type: example
 ready_for_testing: true
 notes:
-  - Split repos medusa-showcase + medusa-showcase-nextstore. Imports also in app .zerops-recipe/.
+  - Split repos medusa-showcase + medusa-showcase-frontend. Imports also in app .zerops-recipe/.
   - Setups `dev` / `prod` only. OAuth/PostHog vault keys on showcase imports where needed.
   - Meilisearch in-repo module (no @rokmohar plugin). Mailpit on Agent/Remote/Local.
   - Hostnames medusa/nextstore (prod) vs medusadev/nextstoredev (dev). ANALOG_STORE_URL separate recipe.
