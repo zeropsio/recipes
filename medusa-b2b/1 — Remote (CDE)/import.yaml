@@ -1,16 +1,16 @@
 #zeropsPreprocessor=on
 # yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
 
-# Remote (CDE) — same Medusa-only pair as the agent project.
-# `medusadev` uses `dev`; `medusastage` uses `prod`. Mailpit for SMTP.
 project:
   name: medusa-b2b-remote
   vault:
-    APP_URL: http://localhost:8000
+    APP_URL: https://nextstorestage-${zeropsSubdomainHost}-8000.prg1.zerops.app
     API_URL: https://medusastage-${zeropsSubdomainHost}-9000.prg1.zerops.app
-    DEV_APP_URL: http://localhost:8000
+    DEV_APP_URL: https://nextstoredev-${zeropsSubdomainHost}-8000.prg1.zerops.app
     DEV_API_URL: https://medusadev-${zeropsSubdomainHost}-9000.prg1.zerops.app
     SEARCH_URL: https://search-${zeropsSubdomainHost}-7700.prg1.zerops.app
+    MEDUSA_HOST: medusastage
+    NEXTSTORE_HOST: nextstorestage
     SMTP_HOST: mailpit
     SMTP_PORT: "1025"
     SMTP_FROM: medusa@localhost
@@ -34,6 +34,9 @@ project:
     STRIPE_WEBHOOK_SECRET:
       value: ""
       sensitive: true
+    RELOAD_SECRET:
+      value: <@generateRandomString(<16>)>
+      sensitive: true
     CHANNEL_PUBLISHABLE_KEY:
       value: ""
       sensitive: true
@@ -43,44 +46,39 @@ services:
     type: postgresql:single@17
     profile: oltp-hobby
     priority: 10
-
   - hostname: redis
     type: valkey:single@7.2
     profile: hobby
     priority: 10
-
   - hostname: search
     type: meilisearch@1.10
     enableSubdomainAccess: true
     priority: 10
-
   - hostname: storage
     type: object-storage
     objectStorageSize: 2
     objectStoragePolicy: public-read
     priority: 10
-
   - hostname: mailpit
     type: go@1
     buildFromGit: https://github.com/zerops-recipe-apps/mailpit-app
     enableSubdomainAccess: true
     priority: 10
-
   - hostname: medusadev
     type: nodejs@24
-    priority: 5
+    priority: 6
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/medusa-b2b
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 1
-
   - hostname: medusastage
     type: nodejs@24
     priority: 6
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/medusa-b2b
     enableSubdomainAccess: true
+    envIsolation: service service@nextstorestage service@nextstoredev
     vault:
       SUPERADMIN_EMAIL: admin@example.com
       SUPERADMIN_PASSWORD:
@@ -89,3 +87,20 @@ services:
     verticalAutoscaling:
       minRam: 1
       minFreeRamGB: 0.5
+  - hostname: nextstoredev
+    type: nodejs@24
+    priority: 5
+    zeropsSetup: dev
+    buildFromGit: https://github.com/zerops-recipe-apps/medusa-b2b-nextstore
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 1
+  - hostname: nextstorestage
+    type: nodejs@24
+    priority: 5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/medusa-b2b-nextstore
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25

@@ -17,8 +17,9 @@ files_created:
   - recipes/medusa-showcase/5 — Highly-available Production/import.yaml
   - recipes/medusa-showcase/5 — Highly-available Production/README.md
 apps_created:
+  - https://github.com/zerops-recipe-apps/medusa-showcase-nextstore
+apps_existing:
   - https://github.com/zerops-recipe-apps/medusa-showcase
-apps_existing: []
 strapi_fields:
   recipe_name: Medusa Showcase
   slug: medusa-showcase
@@ -28,10 +29,8 @@ strapi_fields:
   internal_type: example
 ready_for_testing: true
 notes:
-  - Monorepo: backend/ (medusa setup) + nextstore/ (nextstore setup) in medusa-showcase.
-  - Import YAMLs live only under recipes/medusa-showcase/ — not in the app repo.
-  - Both services buildFromGit the same repo; zeropsSetup selects the setup in root zerops.yml.
-  - nodejs@24 for medusa and nextstore. Project RELOAD_SECRET for publishable-key reload.
-  - Hostnames must stay medusa / nextstore for CHANNEL_PUBLISHABLE_KEY and internal URLs.
-  - Legacy zeropsio/recipe-medusa + recipe-medusa-nextstore repos superseded by medusa-showcase.
-  - Folder / Strapi slug / recipe_source must stay medusa-showcase (matches CMS).
+  - Split repos medusa-showcase + medusa-showcase-nextstore. Imports also in app .zerops-recipe/.
+  - Setups `dev` / `prod` only. OAuth/PostHog vault keys on showcase imports where needed.
+  - Meilisearch in-repo module (no @rokmohar plugin). Mailpit on Agent/Remote/Local.
+  - Hostnames medusa/nextstore (prod) vs medusadev/nextstoredev (dev). ANALOG_STORE_URL separate recipe.
+  - Legacy recipe-medusa repos superseded. Folder slug must stay medusa-showcase.

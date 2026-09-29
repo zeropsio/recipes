@@ -5,7 +5,7 @@
 - **Software:** Medusa v2.21.0 DTC backend + official Next.js 15 storefront
 - **Type:** framework (headless DTC commerce; TypeScript)
 - **Official Site:** https://medusajs.com/
-- **Zerops Runtime:** `nodejs@24` (both apps), `postgresql:single@17` / `postgresql:ha@17`, `valkey@7.2` (`:single@` / `:ha@`), `object-storage`
+- **Zerops Runtime:** `nodejs@24`, `postgresql@17`, `valkey@7.2`, `meilisearch@1.10`, `object-storage`
 
 ## Zerops Compatibility Assessment
 
@@ -18,19 +18,19 @@
 
 ### Potential Issues
 
-- Local / Stage / Small / HA use hostnames `medusa` / `nextstore` (`zeropsSetup: medusa` / `nextstore`). AI Agent / Remote use `medusadev` + `nextstoredev` (idle `*-dev` setups, `zsc noop`) and `medusastage` + `nextstorestage` (prod `*-stage` setups). Stage storefront reads `${medusastage_CHANNEL_PUBLISHABLE_KEY}`.
+- Only **`dev`** and **`prod`** setups exist. Local / Stage / Small / HA: `medusa` + `nextstore` on `zeropsSetup: prod`. Agent / Remote: `medusadev` + `nextstoredev` (`dev`) and `medusastage` + `nextstorestage` (`prod`). Backend `buildFromGit`: medusa-dtc; storefront: medusa-dtc-nextstore.
 - Backend is Yarn **1.22** (classic lockfile). Storefront is Yarn **Berry 3.2.3** via Corepack.
 - New Valkey services require a password. `zerops.yml` must use `${redis_connectionString}`, not `redis://${redis_hostname}:6379`.
 - Admin CORS is the backend origin (`API_URL`), not the storefront. Store CORS is `APP_URL`.
 - First-deploy `initCommands` (`zsc execOnce`) migrate + sync-links per `${appVersionId}`; superadmin, seed, and publishable key run once per service lifetime.
 - Combined API+admin: keep `admin.path` at `/app`. `GET /` redirects there. Do not set `path: "/"`.
-- No Meilisearch in this recipe.
+- Meilisearch `search` service ships in import.yaml; backend indexes when `MEILISEARCH_*` is set.
 
 ## Build Configuration
 
 ### Build Commands
 
-Monorepo [`zerops-recipe-apps/medusa-dtc`](https://github.com/zerops-recipe-apps/medusa-dtc) — root `zerops.yml` with `medusa` / `nextstore` (Local–HA), `medusa-stage` / `nextstore-stage` and idle `medusa-dev` / `nextstore-dev` (AI Agent / Remote).
+Split repos [`medusa-dtc`](https://github.com/zerops-recipe-apps/medusa-dtc) + [`medusa-dtc-nextstore`](https://github.com/zerops-recipe-apps/medusa-dtc-nextstore). Each repo root `zerops.yml` exposes only `dev` and `prod`. No Turbo/Nx.
 
 Backend (`backend/`):
 
@@ -100,11 +100,14 @@ No `envVariables` on import **service** blocks. Superadmin stays `envSecrets` on
 |----------|------|---------|----------|
 | db | postgresql | Medusa datasource | 10 |
 | redis | valkey | Cache, events, workflows, locks, sessions | 10 |
+| search | meilisearch | Product index | 10 |
 | storage | object-storage | Product media | 10 |
-| medusa | nodejs@24 | Admin + Store / Admin API (`setup: medusa`) | 6 |
-| nextstore | nodejs@24 | Official Next.js DTC storefront (`setup: nextstore`) | 5 |
+| mailpit | go@1 | SMTP catcher (Agent / Remote / Local) | 10 |
+| medusa / medusastage | nodejs@24 | Backend (`zeropsSetup: prod`) | 6 |
+| nextstore / nextstorestage | nodejs@24 | Storefront (`zeropsSetup: prod`) | 5 |
+| medusadev / nextstoredev | nodejs@24 | Workspaces (`zeropsSetup: dev`) | 5 |
 
-`nextstore` reads `${medusa_CHANNEL_PUBLISHABLE_KEY}` after seed. On AI Agent / Remote the same key lives on hostname `medusastage` (`${medusastage_CHANNEL_PUBLISHABLE_KEY}`).
+Project vault `CHANNEL_PUBLISHABLE_KEY` after seed; `RELOAD_SECRET` triggers nextstore reload.
 
 ## Scaling Considerations
 
@@ -112,8 +115,8 @@ Floors from the app `zerops.yml` setups (production `yarn start` / `next start` 
 
 | Setup | minRam | minFreeRamGB | Rationale |
 |-------|--------|--------------|-----------|
-| `medusa` | **1 GB** | **0.5 GB** | Admin UI + Store API + workflow engine + Redis clients. Platform default 0.25 GB OOMs on first boot (proven on the Medusa showcase). |
-| `nextstore` | **0.5 GB** | **0.25 GB** | Next.js 15 SSR storefront (`next start -p 8000`). |
+| `prod` (backend) | **1 GB** | **0.5 GB** | Admin UI + Store API + workflow engine. Platform default 0.25 GB OOMs on first boot. |
+| `prod` (storefront) | **0.5 GB** | **0.25 GB** | Next.js 15 SSR on port 8000. |
 | PostgreSQL | profile only | — | `oltp-hobby` rehearsal; `oltp-staging` Small Production + HA demo. Never `minFreeRamGB` on DB. |
 | Valkey | profile only | — | `hobby` rehearsal; `staging` Small Production + HA. No duplicate `verticalAutoscaling`. |
 
@@ -147,7 +150,7 @@ This is a **showcase** (two apps + three data services), not a hello-world. Smal
 
 ## Notes for Terminal Agent
 
-- Closest sibling: `medusa-b2b` (same flatten/init and topology; this recipe seeds the official DTC retail catalog instead of B2B company / quote / approval).
+- Closest sibling: `medusa-showcase` (same flatten/init; this recipe drops Meilisearch).
 - Canonical `buildFromGit` is `zerops-recipe-apps/medusa-dtc` for both services (same repo, different `zeropsSetup`).
 - Canonical import YAMLs live in `zeropsio/recipes/medusa-dtc`. This folder is the optional paste-import copy.
 - Use `#zeropsPreprocessor=on` for `${zeropsSubdomainHost}` and `<@generateRandomString(...)>`.

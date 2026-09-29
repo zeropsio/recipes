@@ -2,7 +2,7 @@
 
 ## Overview
 
-- **Software:** Medusa v2.21.0 B2B backend + admin (storefront in-repo, not imported)
+- **Software:** Medusa v2.21.0 B2B backend + admin; storefront in [medusa-b2b-nextstore](https://github.com/zerops-recipe-apps/medusa-b2b-nextstore)
 - **Type:** framework (headless B2B commerce; TypeScript)
 - **Official Site:** https://medusajs.com/
 - **Zerops Runtime:** `nodejs@24`, `postgresql@17`, `valkey@7.2`, `meilisearch@1.10`, `object-storage`
@@ -19,7 +19,7 @@
 ### Potential Issues
 
 - Setups are only **`dev`** and **`prod`**. `medusadev` → `dev`. `medusastage` / `medusa` → `prod`. There is no `stage` setup.
-- The Next.js storefront is **not imported**. Mate spinning “Medusa” gets the backend. Compose a storefront locally or via a later recipe.
+- Storefront is a **separate** `buildFromGit` (`medusa-b2b-nextstore`). Omit `nextstore*` services for backend-only (Mate / ZCP). Monorepo `nextstore/` is local compose only.
 - `dev` deploys `./` (full repo) so a git-connected workspace cannot wipe `nextstore/` on push. `prod` may flatten `.medusa/server`.
 - Do not add Nx / Turbo — Yarn 1 backend + Yarn 3 Berry storefront, no shared graph.
 - Vault keys inject as-is. Do not write `STRIPE_API_KEY: ${STRIPE_API_KEY}`.
@@ -71,7 +71,8 @@ HTTP `GET /health` on port 9000.
 | storage | object-storage | Product media | 10 |
 | mailpit | go@1 (mailpit-app) | SMTP catcher (dev envs) | 10 |
 | medusa / medusastage | nodejs@24 | `zeropsSetup: prod` | 6 |
-| medusadev | nodejs@24 | `zeropsSetup: dev` | 5 |
+| nextstore / nextstorestage | nodejs@24 | `zeropsSetup: prod` | 5 |
+| medusadev / nextstoredev | nodejs@24 | `zeropsSetup: dev` | 5 |
 
 ## Scaling Considerations
 
@@ -102,6 +103,6 @@ See the app README FAQ fragment: why no storefront service, setup vs hostname, s
 
 ## Notes for Terminal Agent
 
-- Closest sibling: `medusa-showcase`. This recipe is **backend-only** in import.yaml.
+- Closest sibling: `medusa-dtc`. Full-stack import by default; composability = omit nextstore services.
 - Canonical `buildFromGit` is `zerops-recipe-apps/medusa-b2b`.
 - Use `#zeropsPreprocessor=on` and project **vault**.
