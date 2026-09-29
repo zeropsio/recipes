@@ -16,10 +16,10 @@ files_created:
   - recipes/medusa-dtc/4 — Small Production/README.md
   - recipes/medusa-dtc/5 — Highly-available Production/import.yaml
   - recipes/medusa-dtc/5 — Highly-available Production/README.md
-apps_created:
-  - https://github.com/zerops-recipe-apps/medusa-dtc-nextstore
+apps_created: []
 apps_existing:
   - https://github.com/zerops-recipe-apps/medusa-dtc
+  - https://github.com/zerops-recipe-apps/medusa-dtc-nextstore
 strapi_fields:
   recipe_name: Medusa DTC
   slug: medusa-dtc
