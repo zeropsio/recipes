@@ -2,23 +2,23 @@
 
 ## Overview
 
-- **Software:** Medusa v2.19.0 backend + Next.js 16 storefront ([medusa-showcase-nextstore](https://github.com/zerops-recipe-apps/medusa-showcase-nextstore))
+- **Software:** Medusa v2.19.0 backend + official Next.js 15 storefront
 - **Type:** framework (headless commerce; TypeScript)
 - **Official Site:** https://medusajs.com/
-- **Zerops Runtime:** `nodejs@24` (both apps), `postgresql:single@17` / `postgresql:ha@17`, `valkey@7.2` (`:single@` / `:ha@`), `meilisearch@1.10`, `object-storage`
+- **Zerops Runtime:** `nodejs@22` (both apps), `postgresql:single@17` / `postgresql:ha@17`, `valkey@7.2` (`:single@` / `:ha@`), `meilisearch@1.10`, `object-storage`
 
 ## Zerops Compatibility Assessment
 
 ### Requirements
 
 - [x] Stateless HTTP (catalog, sessions, and workflows live in Postgres + Valkey)
-- [x] Supported runtime (`nodejs@24`; Medusa 2.19 wants Node `^20.19.0` or `>=22.12.0`)
+- [x] Supported runtime (`nodejs@22`; Medusa 2.19 wants Node `^20.19.0` or `>=22.12.0`)
 - [x] Binds to a fixed port (backend `9000`, storefront `8000`)
 - [x] Health endpoint (`GET /health` on the backend)
 
 ### Potential Issues
 
-- Only **`dev`** and **`prod`** setups. Local–HA: `medusa` + `nextstore` on `prod`. Agent / Remote: `*dev` workspaces + `*stage` on `prod`. Split `buildFromGit` for backend vs nextstore. Project vault `CHANNEL_PUBLISHABLE_KEY`; Mailpit on dev envs.
+- Local / Stage / Small / HA use hostnames `medusa` / `nextstore` (`zeropsSetup: medusa` / `nextstore`). AI Agent / Remote use `medusadev` + `nextstoredev` (idle `*-dev` setups, deploy `./`, no start) and `medusastage` + `nextstorestage` (same `medusa` / `nextstore` setups). Storefront reads project vault `CHANNEL_PUBLISHABLE_KEY`; `MEDUSA_HOST` / `NEXTSTORE_HOST` keep internal URLs hostname-agnostic.
 - Backend is Yarn **1.22** (classic lockfile). Storefront is Yarn **Berry 3.2.3** via Corepack. Do not switch either repo to npm.
 - New Valkey services require a password. `zerops.yml` must use `${redis_connectionString}`, not `redis://${redis_hostname}:6379`.
 - In-repo Meilisearch module (`src/modules/meilisearch/`). Do **not** add `@rokmohar/medusa-plugin-meilisearch` (breaks on 2.19).
@@ -31,7 +31,7 @@
 
 ### Build Commands
 
-Split repos [`medusa-showcase`](https://github.com/zerops-recipe-apps/medusa-showcase) + [`medusa-showcase-nextstore`](https://github.com/zerops-recipe-apps/medusa-showcase-nextstore). `zerops.yml` uses `dev` / `prod` only. No Turbo — Yarn 1 backend + Yarn 3 storefront.
+Monorepo [`zerops-recipe-apps/medusa-showcase`](https://github.com/zerops-recipe-apps/medusa-showcase) — root `zerops.yml` with `medusa` / `nextstore` (Local–HA and Agent / Remote `*stage` hostnames) and idle `medusa-dev` / `nextstore-dev` (AI Agent / Remote workspaces). No Turbo — Yarn 1 backend + Yarn 3 storefront.
 
 Backend (`backend/`):
 
@@ -106,10 +106,11 @@ No `envVariables` on import **service** blocks. Superadmin stays on the medusa s
 | redis | valkey | Cache, events, workflows, locks, sessions | 10 |
 | search | meilisearch | Product search | 10 |
 | storage | object-storage | Product media | 10 |
-| medusa / medusastage | nodejs@24 | Backend (`zeropsSetup: prod`) | 6 |
-| nextstore / nextstorestage | nodejs@24 | Storefront (`zeropsSetup: prod`) | 5 |
+| medusa | nodejs@22 | Admin + Store / Admin API (`setup: medusa`) | 5 |
+| nextstore | nodejs@22 | Official Next.js storefront (`setup: nextstore`) | 5 |
 | mailpit | go@1 | SMTP catcher (Agent / Remote / Local) | 10 |
-| medusadev / nextstoredev | nodejs@24 | Agent / Remote workspaces (`zeropsSetup: dev`) | 5 |
+| medusadev / medusastage | nodejs@24 | AI Agent / Remote only (`medusa-dev` / `medusa`) | 5 / 6 |
+| nextstoredev / nextstorestage | nodejs@24 | AI Agent / Remote only (`nextstore-dev` / `nextstore`) | 5 |
 
 `nextstore` reads project vault `CHANNEL_PUBLISHABLE_KEY` after seed (`zsc setEnv` on the running medusa hostname, shared via `envIsolation`).
 
@@ -119,8 +120,8 @@ Floors from the app `zerops.yml` setups (production `yarn start` / `next start` 
 
 | Setup | minRam | minFreeRamGB | Rationale |
 |-------|--------|--------------|-----------|
-| `prod` (backend) | **1 GB** | **0.5 GB** | Admin UI + Store API + workflow engine + Redis clients. Platform default 0.25 GB OOMs on first boot. |
-| `prod` (storefront) | **0.5 GB** | **0.25 GB** | Next.js SSR storefront on port 8000. |
+| `medusa` | **1 GB** | **0.5 GB** | Admin UI + Store API + workflow engine + Redis clients. Platform default 0.25 GB OOMs on first boot (proven on the development import). |
+| `nextstore` | **0.5 GB** | **0.25 GB** | Next.js 15 SSR storefront (`next start -p 8000`). |
 | PostgreSQL | profile only | — | `oltp-hobby` rehearsal; `oltp-staging` Small Production + HA demo. Never `minFreeRamGB` on DB. |
 | Valkey | profile only | — | `hobby` rehearsal; `staging` Small Production + HA. No duplicate `verticalAutoscaling`. |
 | Meilisearch | omit / 1 GB HA | — | Demo catalog is tiny; HA bumps to 1 GB for index headroom. Single-node only. |

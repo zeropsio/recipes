@@ -16,10 +16,10 @@ files_created:
   - recipes/medusa-b2b/4 — Small Production/README.md
   - recipes/medusa-b2b/5 — Highly-available Production/import.yaml
   - recipes/medusa-b2b/5 — Highly-available Production/README.md
-apps_created:
-  - https://github.com/zerops-recipe-apps/medusa-b2b-nextstore
+apps_created: []
 apps_existing:
   - https://github.com/zerops-recipe-apps/medusa-b2b
+  - https://github.com/zerops-recipe-apps/medusa-b2b-nextstore
 strapi_fields:
   recipe_name: Medusa B2B
   slug: medusa-b2b

@@ -16,10 +16,10 @@ files_created:
   - recipes/medusa-showcase/4 — Small Production/README.md
   - recipes/medusa-showcase/5 — Highly-available Production/import.yaml
   - recipes/medusa-showcase/5 — Highly-available Production/README.md
-apps_created:
-  - https://github.com/zerops-recipe-apps/medusa-showcase-nextstore
+apps_created: []
 apps_existing:
   - https://github.com/zerops-recipe-apps/medusa-showcase
+  - https://github.com/zerops-recipe-apps/medusa-showcase-nextstore
 strapi_fields:
   recipe_name: Medusa Showcase
   slug: medusa-showcase
