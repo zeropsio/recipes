@@ -16,7 +16,8 @@ files_created:
   - recipes/medusa-dtc/4 — Small Production/README.md
   - recipes/medusa-dtc/5 — Highly-available Production/import.yaml
   - recipes/medusa-dtc/5 — Highly-available Production/README.md
-apps_created: []
+apps_created:
+  - https://github.com/zerops-recipe-apps/medusa-dtc-nextstore
 apps_existing:
   - https://github.com/zerops-recipe-apps/medusa-dtc
 strapi_fields:
@@ -28,12 +29,9 @@ strapi_fields:
   internal_type: example
 ready_for_testing: true
 notes:
-  - Closest sibling: medusa-b2b. This recipe drops Meilisearch and seeds the official DTC retail catalog instead of B2B company / quote / approval.
-  - Monorepo: backend/ (medusa setup) + nextstore/ (nextstore setup) in zerops-recipe-apps/medusa-dtc.
-  - Canonical import YAMLs live in zeropsio/recipes/medusa-dtc. The app repo keeps an optional copy under .zerops-recipe/.
-  - Both services buildFromGit the same repo; zeropsSetup selects the setup in root zerops.yml.
-  - nodejs@24 for medusa and nextstore. Project RELOAD_SECRET for publishable-key reload.
-  - Hostnames must stay medusa / nextstore for CHANNEL_PUBLISHABLE_KEY and internal URLs. No idle setup: dev — do not invent medusadev.
-  - Small Production keeps app verticalAutoscaling (1 GB / 0.5 GB) — Medusa admin OOMs at the Node platform default.
-  - Cover SVG reuses cover-nextjs.svg (storefront is Next.js 15). A Medusa-specific cover can be added later.
-  - Humans must create the Strapi recipe record (slug medusa-dtc) and refresh GitHub cache after merge.
+  - Split repos: medusa-dtc + medusa-dtc-nextstore. DTC retail seed (not B2B). Meilisearch + Mailpit on dev envs.
+  - Setups `dev` / `prod` only. Agent/Remote *dev workspaces + *stage on prod.
+  - Canonical imports in zeropsio/recipes/medusa-dtc; optional .zerops-recipe/ copy in app repo.
+  - nodejs@24. Project RELOAD_SECRET + vault CHANNEL_PUBLISHABLE_KEY.
+  - Small Production: 1 GB Medusa verticalAutoscaling (admin OOM at platform default).
+  - Humans: Strapi medusa-dtc, publish nextstore repo, refresh GitHub cache.

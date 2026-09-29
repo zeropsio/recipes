@@ -1,7 +1,7 @@
 # Medusa DTC Recipe
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-Medusa v2.21 DTC backend, admin, and Next.js storefront in one monorepo ([zerops-recipe-apps/medusa-dtc](https://github.com/zerops-recipe-apps/medusa-dtc)) on [Zerops](https://zerops.io). PostgreSQL, Valkey, and MinIO ship with the project; first deploy migrates, seeds a retail catalog, and writes a publishable key the storefront reads at runtime.
+Medusa v2.21 DTC backend and admin ([zerops-recipe-apps/medusa-dtc](https://github.com/zerops-recipe-apps/medusa-dtc)) with optional Next.js storefront ([medusa-dtc-nextstore](https://github.com/zerops-recipe-apps/medusa-dtc-nextstore)) on [Zerops](https://zerops.io). PostgreSQL, Valkey, Meilisearch, MinIO, and Mailpit (dev envs). Omit nextstore services for backend-only.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 
 ⬇️ **Full recipe page and deploy with one-click**
@@ -18,6 +18,24 @@ Offered in examples for the whole development lifecycle — from environments fo
 - **Stage** [[info]](/3%20—%20Stage) — [[deploy with one click]](https://app.zerops.io/recipes/medusa-dtc?environment=stage)
 - **Small Production** [[info]](/4%20—%20Small%20Production) — [[deploy with one click]](https://app.zerops.io/recipes/medusa-dtc?environment=small-production)
 - **Highly-available Production** [[info]](/5%20—%20Highly-available%20Production) — [[deploy with one click]](https://app.zerops.io/recipes/medusa-dtc?environment=highly-available-production)
+
+<!-- #ZEROPS_EXTRACT_START:faq# -->
+## FAQ
+
+**Backend-only** — omit nextstore services; backend `buildFromGit` stays `medusa-dtc`.
+
+**Setups** — `dev` and `prod` only. Stage hostnames use `zeropsSetup: prod`.
+
+**Search / mail** — Meilisearch + Mailpit on dev environments; configure SMTP vault on stage/prod.
+
+**Split repos** — `medusa-dtc` + `medusa-dtc-nextstore`; no Turbo/Nx.
+<!-- #ZEROPS_EXTRACT_END:faq# -->
+
+<!-- #ZEROPS_EXTRACT_START:integration-guide# -->
+## Integration
+
+Same deploy model as [medusa-b2b](https://github.com/zeropsio/recipes/tree/main/medusa-b2b): backend monorepo for local `nextstore/`, Zerops storefront from `*-nextstore` repo.
+<!-- #ZEROPS_EXTRACT_END:integration-guide# -->
 
 ---
 

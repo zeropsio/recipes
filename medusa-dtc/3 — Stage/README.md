@@ -3,5 +3,5 @@
 This is a stage environment for [Medusa DTC (info + deploy)](https://app.zerops.io/recipes/medusa-dtc?environment=stage) recipe on [Zerops](https://zerops.io).
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-**Stage** environment uses the same `medusa` + `nextstore` topology as production on a single container each, with hobby PostgreSQL and Valkey so rehearsal stays cheaper than Small Production.
+**Stage** uses `medusa` + `nextstore` on the `prod` setup (no `stage` setup), hobby data services, Meilisearch, and empty SMTP vault for your relay. Cheaper than Small Production.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
