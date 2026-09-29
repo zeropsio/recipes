@@ -1,7 +1,7 @@
 # Medusa Showcase Recipe
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-Medusa v2.19 commerce backend, admin, and Next.js storefront in one monorepo ([zerops-recipe-apps/medusa-showcase](https://github.com/zerops-recipe-apps/medusa-showcase)) on [Zerops](https://zerops.io). PostgreSQL, Valkey, Meilisearch, and MinIO ship with the project; first deploy migrates, seeds B2C + B2B channels, and writes a publishable key the storefront reads at runtime.
+Medusa v2.19 backend and admin ([zerops-recipe-apps/medusa-showcase](https://github.com/zerops-recipe-apps/medusa-showcase)) with optional Next.js storefront ([medusa-showcase-nextstore](https://github.com/zerops-recipe-apps/medusa-showcase-nextstore)) on [Zerops](https://zerops.io). PostgreSQL, Valkey, Meilisearch, MinIO, and Mailpit (dev envs). Omit nextstore for backend-only.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 
 ⬇️ **Full recipe page and deploy with one-click**
@@ -18,6 +18,24 @@ Offered in examples for the whole development lifecycle — from environments fo
 - **Stage** [[info]](/3%20—%20Stage) — [[deploy with one click]](https://app.zerops.io/recipes/medusa-showcase?environment=stage)
 - **Small Production** [[info]](/4%20—%20Small%20Production) — [[deploy with one click]](https://app.zerops.io/recipes/medusa-showcase?environment=small-production)
 - **Highly-available Production** [[info]](/5%20—%20Highly-available%20Production) — [[deploy with one click]](https://app.zerops.io/recipes/medusa-showcase?environment=highly-available-production)
+
+<!-- #ZEROPS_EXTRACT_START:faq# -->
+## FAQ
+
+**Backend-only** — omit nextstore services when you only need Medusa admin/API.
+
+**OAuth / analytics** — optional `GOOGLE_*`, `GITHUB_*`, `POSTHOG_*` in project vault on showcase imports.
+
+**Analog storefront** — separate recipe; keep `ANALOG_STORE_URL` in backend CORS.
+
+**Meilisearch** — in-repo module (not the Rok Mohar plugin).
+<!-- #ZEROPS_EXTRACT_END:faq# -->
+
+<!-- #ZEROPS_EXTRACT_START:integration-guide# -->
+## Integration
+
+Split `medusa-showcase` + `medusa-showcase-nextstore`; setups `dev` / `prod` only. Imports live under `recipes/medusa-showcase/` and in the app `.zerops-recipe/` copy.
+<!-- #ZEROPS_EXTRACT_END:integration-guide# -->
 
 ---
 

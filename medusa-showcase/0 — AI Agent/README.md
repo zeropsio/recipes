@@ -3,5 +3,5 @@
 This is [an AI agent environment](https://app.zerops.io/recipes/medusa-showcase?environment=ai-agent) for the [Medusa recipe (info + deploy)](https://app.zerops.io/recipes/medusa-showcase?environment=ai-agent) on [Zerops](https://zerops.io).
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-**AI agent** environment deploys a `*dev` + `*stage` pair from [zerops-recipe-apps/medusa-showcase](https://github.com/zerops-recipe-apps/medusa-showcase) plus hobby PostgreSQL, Valkey, Meilisearch, and public-read object storage. `medusastage` / `nextstorestage` run the production setups (`/health`, `/app`). `medusadev` / `nextstoredev` are idle workspaces — SSH in and run `yarn dev`.
+**AI agent** environment deploys `medusadev` / `nextstoredev` (`zeropsSetup: dev`, workspaces) and `medusastage` / `nextstorestage` (`zeropsSetup: prod`) from [medusa-showcase](https://github.com/zerops-recipe-apps/medusa-showcase) and [medusa-showcase-nextstore](https://github.com/zerops-recipe-apps/medusa-showcase-nextstore), plus hobby PostgreSQL, Valkey, Meilisearch, MinIO, and Mailpit. Omit nextstore services for backend-only. SSH into `medusadev` (`cd backend && yarn dev`) or `nextstoredev` (`yarn dev`).
 <!-- #ZEROPS_EXTRACT_END:intro# -->
