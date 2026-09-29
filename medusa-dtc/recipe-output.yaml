@@ -19,7 +19,7 @@ files_created:
 apps_created: []
 apps_existing:
   - https://github.com/zerops-recipe-apps/medusa-dtc
-  - https://github.com/zerops-recipe-apps/medusa-dtc-nextstore
+  - https://github.com/zerops-recipe-apps/medusa-dtc-frontend
 strapi_fields:
   recipe_name: Medusa DTC
   slug: medusa-dtc
@@ -29,9 +29,9 @@ strapi_fields:
   internal_type: example
 ready_for_testing: true
 notes:
-  - Split repos: medusa-dtc + medusa-dtc-nextstore. DTC retail seed (not B2B). Meilisearch + Mailpit on dev envs.
+  - Split repos: medusa-dtc + medusa-dtc-frontend. DTC retail seed (not B2B). Meilisearch + Mailpit on dev envs.
   - Setups `dev` / `prod` only. Agent/Remote *dev workspaces + *stage on prod.
   - Canonical imports in zeropsio/recipes/medusa-dtc; optional .zerops-recipe/ copy in app repo.
   - nodejs@24. Project RELOAD_SECRET + vault CHANNEL_PUBLISHABLE_KEY.
   - Small Production: 1 GB Medusa verticalAutoscaling (admin OOM at platform default).
-  - Humans: Strapi medusa-dtc, publish nextstore repo, refresh GitHub cache.
+  - Humans: Strapi medusa-dtc; apps medusa-dtc (backend) + medusa-dtc-frontend (storefront); refresh GitHub cache.

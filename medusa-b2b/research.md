@@ -2,7 +2,7 @@
 
 ## Overview
 
-- **Software:** Medusa v2.21.0 B2B backend + admin; storefront in [medusa-b2b-nextstore](https://github.com/zerops-recipe-apps/medusa-b2b-nextstore)
+- **Software:** Medusa v2.21.0 B2B backend + admin; storefront in [medusa-b2b-frontend](https://github.com/zerops-recipe-apps/medusa-b2b-frontend)
 - **Type:** framework (headless B2B commerce; TypeScript)
 - **Official Site:** https://medusajs.com/
 - **Zerops Runtime:** `nodejs@24`, `postgresql@17`, `valkey@7.2`, `meilisearch@1.10`, `object-storage`
@@ -19,7 +19,7 @@
 ### Potential Issues
 
 - Setups are only **`dev`** and **`prod`**. `medusadev` → `dev`. `medusastage` / `medusa` → `prod`. There is no `stage` setup.
-- Storefront is a **separate** repo (`medusa-b2b-nextstore`). Omit `nextstore*` services for backend-only (Mate / ZCP).
+- Storefront is a **separate** repo (`medusa-b2b-frontend`). Omit `nextstore*` services for backend-only (Mate / ZCP).
 - This app repo is **Medusa only** at repository root (no `backend/` or `nextstore/` folders).
 - `dev` deploys `./`; `prod` deploys `.medusa/server` + `node_modules`.
 - Vault keys inject as-is. Do not write `STRIPE_API_KEY: ${STRIPE_API_KEY}`.

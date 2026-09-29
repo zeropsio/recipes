@@ -19,7 +19,7 @@ files_created:
 apps_created: []
 apps_existing:
   - https://github.com/zerops-recipe-apps/medusa-b2b
-  - https://github.com/zerops-recipe-apps/medusa-b2b-nextstore
+  - https://github.com/zerops-recipe-apps/medusa-b2b-frontend
 strapi_fields:
   recipe_name: Medusa B2B
   slug: medusa-b2b
@@ -29,8 +29,8 @@ strapi_fields:
   internal_type: example
 ready_for_testing: true
 notes:
-  - Split repos: backend medusa-b2b, storefront medusa-b2b-nextstore. Omit nextstore services for backend-only.
+  - Split repos: backend medusa-b2b, storefront medusa-b2b-frontend. Omit nextstore services for backend-only.
   - Setups are only `dev` and `prod`. medusadev / nextstoredev → dev; medusastage / nextstorestage / medusa / nextstore → prod.
   - Project vault (not envVariables/envSecrets). No identity passthrough in zerops.yml. No run.start.
   - Meilisearch 1.10 + Mailpit on Agent/Remote/Local. SMTP vault empty on stage/prod.
-  - Humans: Strapi slug medusa-b2b, create nextstore repo on GitHub, refresh cache, optional Medusa community FAQ.
+  - Humans: Strapi slug medusa-b2b; apps medusa-b2b (backend) + medusa-b2b-frontend (storefront); refresh GitHub cache.
