@@ -29,6 +29,8 @@ Offered in examples for the whole development lifecycle — from environments fo
 **Analog storefront** — separate recipe; keep `ANALOG_STORE_URL` in backend CORS.
 
 **Meilisearch** — in-repo module (not the Rok Mohar plugin).
+
+**Repos** — [medusa-showcase](https://github.com/zerops-recipe-apps/medusa-showcase) is Medusa API + admin at repository root (renamed from `medusa-showcase-app`). [medusa-showcase-frontend](https://github.com/zerops-recipe-apps/medusa-showcase-frontend) is the optional Next.js storefront.
 <!-- #ZEROPS_EXTRACT_END:faq# -->
 
 <!-- #ZEROPS_EXTRACT_START:integration-guide# -->

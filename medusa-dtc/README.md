@@ -1,7 +1,7 @@
 # Medusa DTC Recipe
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-Medusa v2.21 DTC backend and admin ([zerops-recipe-apps/medusa-dtc](https://github.com/zerops-recipe-apps/medusa-dtc)) with optional Next.js storefront ([medusa-dtc-nextstore](https://github.com/zerops-recipe-apps/medusa-dtc-nextstore)) on [Zerops](https://zerops.io). PostgreSQL, Valkey, Meilisearch, MinIO, and Mailpit (dev envs). Omit nextstore services for backend-only.
+Medusa v2.21 DTC backend and admin ([zerops-recipe-apps/medusa-dtc](https://github.com/zerops-recipe-apps/medusa-dtc)) with optional Next.js storefront ([medusa-dtc-frontend](https://github.com/zerops-recipe-apps/medusa-dtc-frontend)) on [Zerops](https://zerops.io). PostgreSQL, Valkey, Meilisearch, MinIO, and Mailpit (dev envs). Omit nextstore services for backend-only.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 
 ⬇️ **Full recipe page and deploy with one-click**
@@ -28,13 +28,13 @@ Offered in examples for the whole development lifecycle — from environments fo
 
 **Search / mail** — Meilisearch + Mailpit on dev environments; configure SMTP vault on stage/prod.
 
-**Split repos** — `medusa-dtc` + `medusa-dtc-nextstore`; no Turbo/Nx.
+**Repos** — [medusa-dtc](https://github.com/zerops-recipe-apps/medusa-dtc) is Medusa API + admin at repository root. [medusa-dtc-frontend](https://github.com/zerops-recipe-apps/medusa-dtc-frontend) is the optional Next.js DTC storefront. No Turbo/Nx.
 <!-- #ZEROPS_EXTRACT_END:faq# -->
 
 <!-- #ZEROPS_EXTRACT_START:integration-guide# -->
 ## Integration
 
-Same deploy model as [medusa-b2b](https://github.com/zeropsio/recipes/tree/main/medusa-b2b): backend monorepo for local `nextstore/`, Zerops storefront from `*-nextstore` repo.
+Same deploy model as [medusa-b2b](https://github.com/zeropsio/recipes/tree/main/medusa-b2b): backend at repo root (`prod` → `.medusa/server`, `dev` → `./`); storefront from `medusa-dtc-frontend`.
 <!-- #ZEROPS_EXTRACT_END:integration-guide# -->
 
 ---

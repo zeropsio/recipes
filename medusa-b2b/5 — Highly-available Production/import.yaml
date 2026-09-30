@@ -82,7 +82,7 @@ services:
     type: nodejs@24
     priority: 5
     zeropsSetup: prod
-    buildFromGit: https://github.com/zerops-recipe-apps/medusa-b2b-nextstore
+    buildFromGit: https://github.com/zerops-recipe-apps/medusa-b2b-frontend
     enableSubdomainAccess: true
     minContainers: 2
     verticalAutoscaling:

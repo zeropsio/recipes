@@ -78,7 +78,7 @@ services:
     type: nodejs@24
     priority: 5
     zeropsSetup: prod
-    buildFromGit: https://github.com/zerops-recipe-apps/medusa-dtc-nextstore
+    buildFromGit: https://github.com/zerops-recipe-apps/medusa-dtc-frontend
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 0.5

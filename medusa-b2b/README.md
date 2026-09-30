@@ -1,7 +1,7 @@
 # Medusa B2B Recipe
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-Medusa v2.21 B2B backend and admin ([zerops-recipe-apps/medusa-b2b](https://github.com/zerops-recipe-apps/medusa-b2b)) with optional Next.js storefront ([medusa-b2b-nextstore](https://github.com/zerops-recipe-apps/medusa-b2b-nextstore)) on [Zerops](https://zerops.io). PostgreSQL, Valkey, Meilisearch, MinIO, and Mailpit (dev envs). Omit nextstore services for a backend-only project.
+Medusa v2.21 B2B backend and admin ([zerops-recipe-apps/medusa-b2b](https://github.com/zerops-recipe-apps/medusa-b2b)) with optional Next.js storefront ([medusa-b2b-frontend](https://github.com/zerops-recipe-apps/medusa-b2b-frontend)) on [Zerops](https://zerops.io). PostgreSQL, Valkey, Meilisearch, MinIO, and Mailpit (dev envs). Omit nextstore services for a backend-only project.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 
 ⬇️ **Full recipe page and deploy with one-click**
@@ -28,14 +28,14 @@ Medusa v2.21 B2B backend and admin ([zerops-recipe-apps/medusa-b2b](https://gith
 
 **Secrets** — project `vault:` in import YAML; do not duplicate `KEY: ${KEY}` in `zerops.yml`.
 
-**Monorepo** — `nextstore/` in the backend repo is for local dev; Zerops uses `medusa-b2b-nextstore` so git-connected `dev` deploys `./` safely.
+**Repos** — [medusa-b2b](https://github.com/zerops-recipe-apps/medusa-b2b) is Medusa API + admin at repository root (no `backend/` folder). [medusa-b2b-frontend](https://github.com/zerops-recipe-apps/medusa-b2b-frontend) is the optional Next.js storefront. Zerops service hostnames stay `nextstore*`; only Git repo names use `-frontend`.
 <!-- #ZEROPS_EXTRACT_END:faq# -->
 
 <!-- #ZEROPS_EXTRACT_START:integration-guide# -->
 ## Integration
 
-- Backend `prod`: deploy `backend/.medusa/server`. Backend `dev`: `deployFiles: ./`.
-- Storefront: separate repo; `dev` deploys `./`, `prod` ships the Next build output.
+- Backend `prod`: deploy `.medusa/server`. Backend `dev`: `deployFiles: ./` (full repo root).
+- Storefront: `medusa-b2b-frontend`; `dev` deploys `./`, `prod` ships the Next build output.
 - No `run.start` in `zerops.yml`.
 <!-- #ZEROPS_EXTRACT_END:integration-guide# -->
 
