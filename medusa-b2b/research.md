@@ -51,7 +51,10 @@ No `start` key. Vault injects `JWT_SECRET`, `COOKIE_SECRET`, `SMTP_*`, `STRIPE_*
 
 ### Health Check
 
-HTTP `GET /health` on port 9000.
+- Backend (`medusa-b2b`): HTTP `GET /health` on port 9000 (readiness + healthCheck)
+- Storefront (`medusa-b2b-frontend`): HTTP `GET /api/health` on port 8000; `next start -H 0.0.0.0`; no `process.exit` in instrumentation or reload-env
+- Publishable key: project `CHANNEL_PUBLISHABLE_KEY` after seed, else medusa `GET /internal/publishable-key` (requires `RELOAD_SECRET` on both services)
+- Subdomain 502 with healthy container: `zcli service enable-subdomain nextstore` then `zcli service start nextstore`
 
 ## Database/Storage Requirements
 
