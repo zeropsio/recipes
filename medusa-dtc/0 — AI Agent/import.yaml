@@ -1,6 +1,19 @@
 #zeropsPreprocessor=on
 # yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
 
+# AI Agent environment — `*dev` workspaces plus `*stage`
+# deploy targets that reuse the production `medusa` / `nextstore`
+# setups. APP_URL / API_URL point at staged subdomains; DEV_* at
+# the interactive medusadev / nextstoredev runtimes. Shared hobby
+# data plane (one db / redis / search / storage) plus Mailpit.
+#
+# Project vault is the value store. Each app's zerops.yml maps:
+#   APP_URL  → STOREFRONT_URL / NEXT_PUBLIC_BASE_URL / CORS
+#   API_URL  → BACKEND_URL / ADMIN_CORS / MEDUSA_BACKEND_URL
+#   SEARCH_URL → NEXT_PUBLIC_SEARCH_ENDPOINT
+#   DEV_APP_URL / DEV_API_URL → workspace CORS + `yarn dev` URLs
+#   MEDUSA_HOST / NEXTSTORE_HOST / CHANNEL_PUBLISHABLE_KEY →
+#     hostname-agnostic publishable key + internal reload
 project:
   name: medusa-dtc-agent
   vault:
@@ -46,24 +59,29 @@ services:
     type: postgresql:single@17
     profile: oltp-hobby
     priority: 10
+
   - hostname: redis
     type: valkey:single@7.2
     profile: hobby
     priority: 10
+
   - hostname: search
     type: meilisearch@1.10
     enableSubdomainAccess: true
     priority: 10
+
   - hostname: storage
     type: object-storage
     objectStorageSize: 2
     objectStoragePolicy: public-read
     priority: 10
+
   - hostname: mailpit
     type: go@1
     buildFromGit: https://github.com/zerops-recipe-apps/mailpit-app
     enableSubdomainAccess: true
     priority: 10
+  # Idle workspace — deploy `./`, SSH in and run `yarn dev`.
   - hostname: medusadev
     type: nodejs@24
     priority: 6
@@ -72,6 +90,8 @@ services:
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 1
+
+  # Staged prod setup. Seeds project CHANNEL_PUBLISHABLE_KEY for nextstorestage.
   - hostname: medusastage
     type: nodejs@24
     priority: 6
@@ -87,6 +107,7 @@ services:
     verticalAutoscaling:
       minRam: 1
       minFreeRamGB: 0.5
+
   - hostname: nextstoredev
     type: nodejs@24
     priority: 5
@@ -95,6 +116,7 @@ services:
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 1
+
   - hostname: nextstorestage
     type: nodejs@24
     priority: 5

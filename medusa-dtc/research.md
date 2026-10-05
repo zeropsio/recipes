@@ -86,7 +86,9 @@ No `envVariables` on import **service** blocks. Superadmin stays `envSecrets` on
 ### Health Check
 
 - Backend: HTTP `GET /health` on port 9000 (readiness + healthCheck)
-- Storefront: HTTP `GET /api/health` on port 8000 (readiness + healthCheck)
+- Storefront: HTTP `GET /api/health` on port 8000 (readiness + healthCheck); `next start -H 0.0.0.0`
+- Storefront must not `process.exit` on boot or in `/api/internal/reload-env`; publishable key loads from vault or medusa `GET /internal/publishable-key`
+- `enableSubdomainAccess: true` on `nextstore`; if public URL is 502 while in-project health passes: `zcli service enable-subdomain nextstore` then `zcli service start nextstore`
 
 ## Database/Storage Requirements
 
