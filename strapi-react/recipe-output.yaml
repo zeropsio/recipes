@@ -1,0 +1,19 @@
+# recipe-output.yaml
+recipe_created: strapi-react
+apps_created:
+  - https://github.com/zerops-recipe-apps/strapi-react
+  - https://github.com/zerops-recipe-apps/strapi-react-frontend
+apps_existing: []
+strapi_fields:
+  recipe_name: Strapi + React
+  slug: strapi-react
+  recipe_source: strapi-react
+  categories: [framework]
+  languages_frameworks: [Strapi, React, TypeScript, Node.js]
+  internal_type: example
+ready_for_testing: false
+notes:
+  - Create GitHub repos zerops-recipe-apps/strapi-react and strapi-react-frontend.
+  - Register Strapi CMS recipe slug strapi-react; refresh GitHub cache.
+  - Strapi requires nodejs@22 on Zerops; verify deploy before ready_for_testing true.
+  - Site Info single type seeds on bootstrap; public GET /api/site-info.

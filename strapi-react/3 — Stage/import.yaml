@@ -1,0 +1,58 @@
+#zeropsPreprocessor=on
+# yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
+
+# Strapi + React — split repos (strapi-react + strapi-react-frontend).
+# Setups: only `dev` and `prod`. Stage hostnames use `zeropsSetup: prod`.
+# Vault: API_URL / APP_URL (+ DEV_* on Agent/Remote). Map to VITE_API_URL in frontend zerops.yaml.
+
+project:
+  name: strapi-react-stage
+  vault:
+    APP_URL: https://frontend-${zeropsSubdomainHost}.prg1.zerops.app
+    API_URL: https://strapi-${zeropsSubdomainHost}-1337.prg1.zerops.app
+    DEV_APP_URL: https://frontend-${zeropsSubdomainHost}.prg1.zerops.app
+    DEV_API_URL: https://strapi-${zeropsSubdomainHost}-1337.prg1.zerops.app
+
+    APP_KEYS:
+      value: <@generateRandomString(<32>)>,<@generateRandomString(<32>)>,<@generateRandomString(<32>)>,<@generateRandomString(<32>)>
+      sensitive: true
+    API_TOKEN_SALT:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
+    ADMIN_JWT_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
+    TRANSFER_TOKEN_SALT:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
+    JWT_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
+
+
+services:
+  - hostname: db
+    type: postgresql:single@17
+    profile: oltp-hobby
+    priority: 10
+  - hostname: strapi
+    type: nodejs@22
+    priority: 6
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/strapi-react
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 1
+      minFreeRamGB: 0.5
+    vault:
+      ADMIN_EMAIL: admin@example.com
+      ADMIN_PASSWORD:
+        value: <@generateRandomString(<20>)>
+        sensitive: true
+    envIsolation: service service@frontend
+  - hostname: frontend
+    type: static
+    priority: 5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/strapi-react-frontend
+    enableSubdomainAccess: true
