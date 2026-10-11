@@ -56,3 +56,4 @@ services:
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/strapi-react-frontend
     enableSubdomainAccess: true
+    envIsolation: service

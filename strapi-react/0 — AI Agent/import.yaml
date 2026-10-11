@@ -62,6 +62,7 @@ services:
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/strapi-react-frontend
     enableSubdomainAccess: true
+    envIsolation: service
     verticalAutoscaling:
       minRam: 0.5
   - hostname: frontendstage
@@ -70,3 +71,4 @@ services:
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/strapi-react-frontend
     enableSubdomainAccess: true
+    envIsolation: service
