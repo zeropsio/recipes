@@ -49,7 +49,7 @@ services:
       ADMIN_PASSWORD:
         value: <@generateRandomString(<20>)>
         sensitive: true
-    envIsolation: service service@frontend
+    envIsolation: service
   - hostname: frontend
     type: static
     priority: 5

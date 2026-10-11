@@ -4,6 +4,7 @@
 # Strapi + React — split repos (strapi-react + strapi-react-frontend).
 # Setups: only `dev` and `prod`. Stage hostnames use `zeropsSetup: prod`.
 # Vault: API_URL / APP_URL (+ DEV_* on Agent/Remote). Map to VITE_API_URL in frontend zerops.yaml.
+# Strapi services use envIsolation: service only — do not add service@frontend (static runtime breaks CMS).
 
 project:
   name: strapi-react-small-prod
@@ -49,7 +50,7 @@ services:
       ADMIN_PASSWORD:
         value: <@generateRandomString(<20>)>
         sensitive: true
-    envIsolation: service service@frontend
+    envIsolation: service
   - hostname: frontend
     type: static
     priority: 5

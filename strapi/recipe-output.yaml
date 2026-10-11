@@ -1,0 +1,18 @@
+# recipe-output.yaml
+recipe_created: strapi
+apps_created:
+  - https://github.com/zerops-recipe-apps/strapi
+apps_existing:
+  - https://github.com/zerops-recipe-apps/strapi-react-frontend
+strapi_fields:
+  recipe_name: Strapi
+  slug: strapi
+  recipe_source: strapi
+  categories: [cms]
+  languages_frameworks: [Strapi, TypeScript, Node.js]
+  internal_type: example
+ready_for_testing: false
+notes:
+  - CMS-only recipe; full stack uses recipes/strapi-react with strapi-react-frontend.
+  - Strapi services use nodejs@24; set envIsolation service on app services for vault merge.
+  - Verify deploy (admin /_health, /api/site-info) before ready_for_testing true.
