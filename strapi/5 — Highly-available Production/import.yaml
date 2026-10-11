@@ -51,4 +51,4 @@ services:
       ADMIN_PASSWORD:
         value: <@generateRandomString(<20>)>
         sensitive: true
-
+    envIsolation: service
