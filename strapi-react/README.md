@@ -1,7 +1,7 @@
 # Strapi + React Recipe
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-Strapi v5 headless CMS ([zerops-recipe-apps/strapi-react](https://github.com/zerops-recipe-apps/strapi-react)) with a Vite + React frontend ([strapi-react-frontend](https://github.com/zerops-recipe-apps/strapi-react-frontend)) on [Zerops](https://zerops.io). PostgreSQL ships with the project. Default **Site Info** content seeds in Strapi and displays in React. Omit `frontend*` services for CMS-only.
+Strapi v5 headless CMS ([zerops-recipe-apps/strapi](https://github.com/zerops-recipe-apps/strapi)) with a Vite + React frontend ([strapi-react-frontend](https://github.com/zerops-recipe-apps/strapi-react-frontend)) on [Zerops](https://zerops.io). PostgreSQL ships with the project. Default **Site Info** content seeds in Strapi and displays in React. Omit `frontend*` services for CMS-only.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 
 ⬇️ **Full recipe page and deploy with one-click**

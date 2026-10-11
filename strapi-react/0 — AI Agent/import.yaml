@@ -36,16 +36,16 @@ services:
     profile: oltp-hobby
     priority: 10
   - hostname: strapidev
-    type: nodejs@22
+    type: nodejs@24
     priority: 6
     zeropsSetup: dev
-    buildFromGit: https://github.com/zerops-recipe-apps/strapi-react
+    buildFromGit: https://github.com/zerops-recipe-apps/strapi
     enableSubdomainAccess: true
   - hostname: strapistage
-    type: nodejs@22
+    type: nodejs@24
     priority: 6
     zeropsSetup: prod
-    buildFromGit: https://github.com/zerops-recipe-apps/strapi-react
+    buildFromGit: https://github.com/zerops-recipe-apps/strapi
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 1
@@ -60,7 +60,7 @@ services:
     type: nodejs@24
     priority: 5
     zeropsSetup: dev
-    buildFromGit: https://github.com/zerops-recipe-apps/strapi-react-frontend
+    buildFromGit: https://github.com/zerops-recipe-apps/strapi-frontend
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 0.5
@@ -68,5 +68,5 @@ services:
     type: static
     priority: 5
     zeropsSetup: prod
-    buildFromGit: https://github.com/zerops-recipe-apps/strapi-react-frontend
+    buildFromGit: https://github.com/zerops-recipe-apps/strapi-frontend
     enableSubdomainAccess: true

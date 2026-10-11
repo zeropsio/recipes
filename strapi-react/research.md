@@ -13,7 +13,7 @@
 
 ## Split repos
 
-- `strapi-react` — CMS, port 1337, `/_health`
+- `strapi` — CMS, port 1337, `/_health`
 - `strapi-react-frontend` — `VITE_API_URL` from vault `API_URL`
 
 ## Scaling
@@ -32,4 +32,4 @@ Omit frontend services for Mate/ZCP CMS-only imports.
 ## References
 
 - https://docs.strapi.io/
-- https://github.com/zerops-recipe-apps/strapi-react
+- https://github.com/zerops-recipe-apps/strapi
