@@ -56,6 +56,6 @@ services:
     type: static
     priority: 5
     zeropsSetup: prod
-    buildFromGit: https://github.com/zerops-recipe-apps/strapi-frontend
+    buildFromGit: https://github.com/zerops-recipe-apps/strapi-react-frontend
     enableSubdomainAccess: true
     minContainers: 2

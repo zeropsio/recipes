@@ -4,7 +4,7 @@
 
 - **Software:** Strapi 5.12 + React 19 (Vite) SPA
 - **Type:** headless CMS + static frontend
-- **Zerops Runtime:** `nodejs@22` (Strapi), `nodejs@24` build + `static` (frontend), `postgresql@17`
+- **Zerops Runtime:** `nodejs@24` (Strapi), `nodejs@24` build + `static` (frontend), `postgresql@17`
 
 ## Setups
 
@@ -27,9 +27,10 @@
 
 ## Composability
 
-Omit frontend services for Mate/ZCP CMS-only imports.
+Omit frontend services for Mate/ZCP CMS-only imports; use the `strapi` recipe for CMS-only.
 
 ## References
 
 - https://docs.strapi.io/
 - https://github.com/zerops-recipe-apps/strapi
+- https://github.com/zerops-recipe-apps/strapi-react-frontend

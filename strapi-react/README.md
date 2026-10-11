@@ -1,7 +1,7 @@
 # Strapi + React Recipe
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-Strapi v5 headless CMS ([zerops-recipe-apps/strapi](https://github.com/zerops-recipe-apps/strapi)) with a Vite + React frontend ([strapi-react-frontend](https://github.com/zerops-recipe-apps/strapi-react-frontend)) on [Zerops](https://zerops.io). PostgreSQL ships with the project. Default **Site Info** content seeds in Strapi and displays in React. Omit `frontend*` services for CMS-only.
+Strapi v5 headless CMS ([zerops-recipe-apps/strapi](https://github.com/zerops-recipe-apps/strapi)) with a Vite + React frontend ([strapi-react-frontend](https://github.com/zerops-recipe-apps/strapi-react-frontend)) on [Zerops](https://zerops.io). PostgreSQL ships with the project. Default **Site Info** content seeds in Strapi and displays in React. Omit `frontend*` services for CMS-only — use the [strapi](https://app.zerops.io/recipes/strapi) recipe instead.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 
 ⬇️ **Full recipe page and deploy with one-click**
@@ -20,11 +20,11 @@ Strapi v5 headless CMS ([zerops-recipe-apps/strapi](https://github.com/zerops-re
 <!-- #ZEROPS_EXTRACT_START:faq# -->
 ## FAQ
 
-**CMS-only** — deploy `strapi` / `strapidev` / `strapistage`; skip `frontend*`.
+**CMS-only** — use the [strapi](https://app.zerops.io/recipes/strapi) recipe or deploy `strapi` / `strapidev` / `strapistage` and skip `frontend*`.
 
 **Setups** — `dev` and `prod` only. `strapistage` uses `prod`.
 
-**Node** — Strapi services use `nodejs@22` (Strapi 5 engine cap). Frontend build uses `nodejs@24` + `static` runtime.
+**Node** — Strapi services use `nodejs@24`. Frontend build uses `nodejs@24` + `static` runtime.
 
 **Content** — edit **Site Info** in `/admin`; React reads `/api/site-info`.
 <!-- #ZEROPS_EXTRACT_END:faq# -->
@@ -32,7 +32,7 @@ Strapi v5 headless CMS ([zerops-recipe-apps/strapi](https://github.com/zerops-re
 <!-- #ZEROPS_EXTRACT_START:integration-guide# -->
 ## Integration
 
-Split repos like Medusa: backend `deployFiles: ./` on `dev`; frontend Vite `dist/` on `prod`. Project `vault` for URLs and Strapi secrets.
+Split repos like Medusa: CMS from [strapi](https://github.com/zerops-recipe-apps/strapi); frontend Vite `dist/` on `prod`. Project `vault` for URLs and Strapi secrets.
 <!-- #ZEROPS_EXTRACT_END:integration-guide# -->
 
 ---

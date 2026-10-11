@@ -60,7 +60,7 @@ services:
     type: nodejs@24
     priority: 5
     zeropsSetup: dev
-    buildFromGit: https://github.com/zerops-recipe-apps/strapi-frontend
+    buildFromGit: https://github.com/zerops-recipe-apps/strapi-react-frontend
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 0.5
@@ -68,5 +68,5 @@ services:
     type: static
     priority: 5
     zeropsSetup: prod
-    buildFromGit: https://github.com/zerops-recipe-apps/strapi-frontend
+    buildFromGit: https://github.com/zerops-recipe-apps/strapi-react-frontend
     enableSubdomainAccess: true
