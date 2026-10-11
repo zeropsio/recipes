@@ -41,6 +41,7 @@ services:
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/strapi
     enableSubdomainAccess: true
+    envIsolation: service
   - hostname: strapistage
     type: nodejs@24
     priority: 6
@@ -55,7 +56,7 @@ services:
       ADMIN_PASSWORD:
         value: <@generateRandomString(<20>)>
         sensitive: true
-    envIsolation: service service@frontendstage service@frontenddev service@frontend
+    envIsolation: service
   - hostname: frontenddev
     type: nodejs@24
     priority: 5
