@@ -3,14 +3,14 @@
 
 # Payload + Next.js — split repos (payload-next + payload-next-frontend).
 # Setups: only `dev` and `prod`. Stage hostnames use `zeropsSetup: prod`.
-# Vault: API_URL / APP_URL (+ DEV_* on Agent/Remote). Map NEXT_PUBLIC_PAYLOAD_URL from API_URL in storefront zerops.yaml in frontend zerops.yaml.
+# Vault: API_URL / APP_URL (+ DEV_* on Agent/Remote). Map NEXT_PUBLIC_PAYLOAD_URL from vault API_URL in the storefront zerops.yaml.
 
 project:
   name: payload-next-agent
   vault:
-    APP_URL: https://frontendstage-${zeropsSubdomainHost}.prg1.zerops.app
+    APP_URL: https://frontendstage-${zeropsSubdomainHost}-3000.prg1.zerops.app
     API_URL: https://payloadstage-${zeropsSubdomainHost}-3000.prg1.zerops.app
-    DEV_APP_URL: https://frontenddev-${zeropsSubdomainHost}.prg1.zerops.app
+    DEV_APP_URL: https://frontenddev-${zeropsSubdomainHost}-3000.prg1.zerops.app
     DEV_API_URL: https://payloaddev-${zeropsSubdomainHost}-3000.prg1.zerops.app
 
     PAYLOAD_SECRET:
@@ -37,8 +37,8 @@ services:
     buildFromGit: https://github.com/zerops-recipe-apps/payload
     enableSubdomainAccess: true
     verticalAutoscaling:
-      minRam: 1
-      minFreeRamGB: 0.5
+      minRam: 0.5
+      minFreeRamGB: 0.25
     envIsolation: service
   - hostname: frontenddev
     type: nodejs@24
@@ -56,3 +56,6 @@ services:
     buildFromGit: https://github.com/zerops-recipe-apps/payload-next-frontend
     enableSubdomainAccess: true
     envIsolation: service
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25

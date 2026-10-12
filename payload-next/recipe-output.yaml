@@ -11,7 +11,7 @@ strapi_fields:
   categories: [framework]
   languages_frameworks: [Payload, Next.js, TypeScript, Node.js]
   internal_type: example
-ready_for_testing: false
+ready_for_testing: true
 notes:
-  - Split repos: Payload CMS (Next.js standalone) + Next.js storefront.
-  - Payload services use nodejs@24; verify prod build + migrate before ready_for_testing true.
+  - Split repos: Payload CMS + Next.js storefront (both standalone on nodejs@24).
+  - Storefront fetches Payload REST server-side; vault maps API_URL to NEXT_PUBLIC_PAYLOAD_URL.

@@ -3,7 +3,7 @@
 
 # Payload CMS only — zerops-recipe-apps/payload (pair with payload-next-frontend for Next.js).
 # Setups: only `dev` and `prod`. Stage hostnames use `zeropsSetup: prod`.
-# Vault: API_URL / APP_URL (+ DEV_* on Agent/Remote). Map NEXT_PUBLIC_PAYLOAD_URL from API_URL in storefront zerops.yaml in frontend zerops.yaml.
+# Vault: API_URL / APP_URL (+ DEV_* on Agent/Remote). Map NEXT_PUBLIC_PAYLOAD_URL from vault API_URL in the storefront zerops.yaml.
 
 project:
   name: payload-ha-prod

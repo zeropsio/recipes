@@ -11,7 +11,7 @@ strapi_fields:
   categories: [cms]
   languages_frameworks: [Payload, TypeScript, Node.js, Next.js]
   internal_type: example
-ready_for_testing: false
+ready_for_testing: true
 notes:
   - CMS-only recipe; full stack uses recipes/payload-next.
-  - Payload runs inside Next.js (admin + REST at /api).
+  - Prod verified: migrate, generate:importmap, Next standalone, admin dashboard.

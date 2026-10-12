@@ -1,7 +1,7 @@
 # Payload + Next.js Recipe
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-Payload CMS ([zerops-recipe-apps/payload](https://github.com/zerops-recipe-apps/payload)) with a Vite + React frontend ([payload-next-frontend](https://github.com/zerops-recipe-apps/payload-next-frontend)) on [Zerops](https://zerops.io). PostgreSQL ships with the project. Default **Site Info** content seeds in Payload and displays in React. Omit `frontend*` services for CMS-only — use the [payload](https://app.zerops.io/recipes/payload) recipe instead.
+Payload CMS ([zerops-recipe-apps/payload](https://github.com/zerops-recipe-apps/payload)) with a Next.js storefront ([payload-next-frontend](https://github.com/zerops-recipe-apps/payload-next-frontend)) on [Zerops](https://zerops.io). PostgreSQL ships with the project. **Site Info** and sample blog posts seed in Payload; the storefront reads REST on the **Next server** (no browser CORS). Omit `frontend*` services for CMS-only — use the [payload](https://app.zerops.io/recipes/payload) recipe instead.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 
 ⬇️ **Full recipe page and deploy with one-click**
@@ -24,15 +24,17 @@ Payload CMS ([zerops-recipe-apps/payload](https://github.com/zerops-recipe-apps/
 
 **Setups** — `dev` and `prod` only. `payloadstage` uses `prod`.
 
-**Node** — Payload services use `nodejs@24`. Frontend build uses `nodejs@24` + `static` runtime.
+**Node** — Payload and storefront use `nodejs@24` with Next **`standalone`** on `prod`.
 
-**Content** — edit **Site Info** in `/admin`; React reads `/api/site-info`.
+**Content** — edit **Site Info** and blog posts in `/admin`; storefront uses `/api/globals/site-info` and `/api/blog-posts` server-side.
+
+**URLs** — Storefront is `https://frontend-{host}-3000.prg1.zerops.app` (vault `APP_URL`); CMS is `https://payload-{host}-3000.prg1.zerops.app` (`API_URL`).
 <!-- #ZEROPS_EXTRACT_END:faq# -->
 
 <!-- #ZEROPS_EXTRACT_START:integration-guide# -->
 ## Integration
 
-Split repos like Medusa: CMS from [payload](https://github.com/zerops-recipe-apps/payload); frontend Vite `dist/` on `prod`. Project `vault` for URLs and Payload secrets.
+Split repos like Medusa: CMS from [payload](https://github.com/zerops-recipe-apps/payload); storefront from [payload-next-frontend](https://github.com/zerops-recipe-apps/payload-next-frontend) (`NEXT_PUBLIC_PAYLOAD_URL` ← vault `API_URL`). Project `vault` for URLs and `PAYLOAD_SECRET`.
 <!-- #ZEROPS_EXTRACT_END:integration-guide# -->
 
 ---

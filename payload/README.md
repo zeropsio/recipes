@@ -32,9 +32,10 @@ Payload CMS ([zerops-recipe-apps/payload](https://github.com/zerops-recipe-apps/
 <!-- #ZEROPS_EXTRACT_START:integration-guide# -->
 ## Integration
 
-- Payload `prod`: Next.js standalone (`output: standalone`); deploy compiled app + `node_modules`.
-- Payload `dev`: `deployFiles: ./`, `npm run dev` over SSH.
-- Project `vault` holds Payload secrets and public `API_URL`.
+- Payload `prod`: Next.js **`output: standalone`** — build runs `payload migrate`, `payload generate:importmap`, `next build`, and `prepare-standalone`; runtime starts `node .next/standalone/bin/run.mjs` (do not set `HOSTNAME` in zerops.yaml).
+- Payload `dev`: `deployFiles: ./`, `npm run dev` over SSH (`zsc noop` start).
+- Project **`vault`**: `PAYLOAD_SECRET`, `API_URL`, `APP_URL`, `DEV_*`; map in app `zerops.yaml` (never `HOSTNAME` — reserved by Zerops).
+- Services use **`enableSubdomainAccess: true`** so public URLs work after deploy.
 <!-- #ZEROPS_EXTRACT_END:integration-guide# -->
 
 ---

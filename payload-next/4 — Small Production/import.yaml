@@ -3,15 +3,15 @@
 
 # Payload + Next.js — split repos (payload-next + payload-next-frontend).
 # Setups: only `dev` and `prod`. Stage hostnames use `zeropsSetup: prod`.
-# Vault: API_URL / APP_URL (+ DEV_* on Agent/Remote). Map NEXT_PUBLIC_PAYLOAD_URL from API_URL in storefront zerops.yaml in frontend zerops.yaml.
+# Vault: API_URL / APP_URL (+ DEV_* on Agent/Remote). Map NEXT_PUBLIC_PAYLOAD_URL from vault API_URL in the storefront zerops.yaml.
 # Payload services use envIsolation: service only — do not add service@frontend on Payload CMS.
 
 project:
   name: payload-next-small-prod
   vault:
-    APP_URL: https://frontend-${zeropsSubdomainHost}.prg1.zerops.app
+    APP_URL: https://frontend-${zeropsSubdomainHost}-3000.prg1.zerops.app
     API_URL: https://payload-${zeropsSubdomainHost}-3000.prg1.zerops.app
-    DEV_APP_URL: https://frontend-${zeropsSubdomainHost}.prg1.zerops.app
+    DEV_APP_URL: https://frontend-${zeropsSubdomainHost}-3000.prg1.zerops.app
     DEV_API_URL: https://payload-${zeropsSubdomainHost}-3000.prg1.zerops.app
 
     PAYLOAD_SECRET:
@@ -41,3 +41,6 @@ services:
     buildFromGit: https://github.com/zerops-recipe-apps/payload-next-frontend
     enableSubdomainAccess: true
     envIsolation: service
+    verticalAutoscaling:
+      minRam: 0.5
+      minFreeRamGB: 0.25
