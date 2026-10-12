@@ -1,0 +1,17 @@
+# recipe-output.yaml
+recipe_created: payload
+apps_created:
+  - https://github.com/zerops-recipe-apps/payload
+apps_existing:
+  - https://github.com/zerops-recipe-apps/payload-next-frontend
+strapi_fields:
+  recipe_name: Payload CMS
+  slug: payload
+  recipe_source: payload
+  categories: [cms]
+  languages_frameworks: [Payload, TypeScript, Node.js, Next.js]
+  internal_type: example
+ready_for_testing: false
+notes:
+  - CMS-only recipe; full stack uses recipes/payload-next.
+  - Payload runs inside Next.js (admin + REST at /api).

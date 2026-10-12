@@ -1,0 +1,17 @@
+# recipe-output.yaml
+recipe_created: payload-next
+apps_created: []
+apps_existing:
+  - https://github.com/zerops-recipe-apps/payload
+  - https://github.com/zerops-recipe-apps/payload-next-frontend
+strapi_fields:
+  recipe_name: Payload + Next.js
+  slug: payload-next
+  recipe_source: payload-next
+  categories: [framework]
+  languages_frameworks: [Payload, Next.js, TypeScript, Node.js]
+  internal_type: example
+ready_for_testing: false
+notes:
+  - Split repos: Payload CMS (Next.js standalone) + Next.js storefront.
+  - Payload services use nodejs@24; verify prod build + migrate before ready_for_testing true.

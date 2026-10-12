@@ -1,0 +1,45 @@
+#zeropsPreprocessor=on
+# yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
+
+# Payload + Next.js — split repos (payload-next + payload-next-frontend).
+# Setups: only `dev` and `prod`. Stage hostnames use `zeropsSetup: prod`.
+# Vault: API_URL / APP_URL (+ DEV_* on Agent/Remote). Map NEXT_PUBLIC_PAYLOAD_URL from API_URL in storefront zerops.yaml in frontend zerops.yaml.
+
+project:
+  name: payload-next-ha-prod
+  corePackage: SERIOUS
+  vault:
+    APP_URL: https://frontend-${zeropsSubdomainHost}.prg1.zerops.app
+    API_URL: https://payload-${zeropsSubdomainHost}-3000.prg1.zerops.app
+    DEV_APP_URL: https://frontend-${zeropsSubdomainHost}.prg1.zerops.app
+    DEV_API_URL: https://payload-${zeropsSubdomainHost}-3000.prg1.zerops.app
+
+    PAYLOAD_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
+
+
+services:
+  - hostname: db
+    type: postgresql:ha@17
+    profile: oltp-staging
+    priority: 10
+  - hostname: payload
+    type: nodejs@24
+    priority: 6
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/payload
+    enableSubdomainAccess: true
+    minContainers: 2
+    verticalAutoscaling:
+      minRam: 1
+      minFreeRamGB: 0.5
+    envIsolation: service
+  - hostname: frontend
+    type: nodejs@24
+    priority: 5
+    zeropsSetup: prod
+    buildFromGit: https://github.com/zerops-recipe-apps/payload-next-frontend
+    enableSubdomainAccess: true
+    envIsolation: service
+    minContainers: 2
