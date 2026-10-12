@@ -10,7 +10,7 @@ services:
     priority: 10
 
   - hostname: umami
-    type: nodejs@22
+    type: nodejs@24
     buildFromGit: https://github.com/zerops-recipe-apps/umami-app
     enableSubdomainAccess: true
     envSecrets:

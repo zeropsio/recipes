@@ -17,7 +17,7 @@ _TODO: Update the description to better fit the software._
 
 1. Add `UMAMI_RELEASE_TAG` environment variable with target Umami version:
 ```shell
-UMAMI_RELEASE_TAG=v3.0.1
+UMAMI_RELEASE_TAG=v3.1.0
 ```
 
 2. Trigger re-deploy of the `umami` service.
