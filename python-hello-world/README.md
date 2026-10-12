@@ -1,7 +1,7 @@
 # Python Hello World Recipe
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-A [Python](https://python.org) 3.11 application built with Flask and served by
+A [Python](https://python.org) 3.12 application built with Flask and served by
 Gunicorn, backed by [PostgreSQL](https://zerops.io) on [Zerops](https://zerops.io).
 Demonstrates vendored dependencies via `pip --target`, idempotent database
 migrations, and a production-ready WSGI setup — paired with six ready-made

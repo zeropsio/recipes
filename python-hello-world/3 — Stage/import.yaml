@@ -10,7 +10,7 @@ services:
   # to build and deploy the vendored artifact. Subdomain access
   # provides a public HTTPS URL for pre-release testing.
   - hostname: app
-    type: python@3.11
+    type: python@3.12
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/python-hello-world-app
     enableSubdomainAccess: true

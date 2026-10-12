@@ -12,7 +12,7 @@ services:
   # Subdomain provides a public HTTPS URL for end-to-end testing
   # without running the server locally.
   - hostname: app
-    type: python@3.11
+    type: python@3.12
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/python-hello-world-app
     enableSubdomainAccess: true

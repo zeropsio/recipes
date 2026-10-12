@@ -18,7 +18,7 @@ services:
   # verticalAutoscaling:
   #   minRam: 4
   - hostname: appdev
-    type: python@3.11
+    type: python@3.12
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/python-hello-world-app
     enableSubdomainAccess: true
@@ -30,7 +30,7 @@ services:
   # zeropsSetup: vendored pip install, minimal deployFiles, and
   # Gunicorn start command. Subdomain provides a public HTTPS URL.
   - hostname: appstage
-    type: python@3.11
+    type: python@3.12
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/python-hello-world-app
     enableSubdomainAccess: true
