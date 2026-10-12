@@ -17,7 +17,7 @@ services:
   # rolling deploys. Zerops autoscales RAM within the verticalAutoscaling bounds
   # when traffic spikes.
   - hostname: app
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-minimal-app
     enableSubdomainAccess: true

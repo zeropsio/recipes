@@ -19,7 +19,7 @@ services:
   # request, no restart needed. Subdomain gives the agent a URL to verify output
   # against.
   - hostname: appdev
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-minimal-app
     enableSubdomainAccess: true
@@ -31,7 +31,7 @@ services:
   # config:cache + route:cache + view:cache in initCommands) before the agent
   # marks the task complete.
   - hostname: appstage
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-minimal-app
     enableSubdomainAccess: true

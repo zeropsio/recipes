@@ -20,7 +20,7 @@ services:
   # phpunit, and pail are available on the container. PHP interprets each
   # request — no restart cycle between edits.
   - hostname: appdev
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-minimal-app
     enableSubdomainAccess: true
@@ -31,7 +31,7 @@ services:
   # pipeline (optimized autoloader, Vite build, framework cache warming) so you
   # can validate deploys before merging to main.
   - hostname: appstage
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-minimal-app
     enableSubdomainAccess: true
