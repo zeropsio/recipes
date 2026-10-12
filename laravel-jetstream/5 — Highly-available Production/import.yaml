@@ -10,9 +10,9 @@ project:
 
 services:
   # Deploy the Laravel Jetstream app, running on
-  # PHP 8.4 with Nginx (FastCGI) as webserver. 
+  # PHP 8.5 with Nginx (FastCGI) as webserver. 
   - hostname: app
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-jetstream-app
     # Disabling the subdomain access is recommended,

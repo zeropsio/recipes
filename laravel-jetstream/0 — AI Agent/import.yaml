@@ -9,14 +9,14 @@ project:
 
 services:
   # Deploy the Laravel Jetstream stage app, running on
-  # PHP 8.4 with Nginx (FastCGI) as webserver.
+  # PHP 8.5 with Nginx (FastCGI) as webserver.
   # In a typical agentic development workflow, AI agents
   # continuously deploy to this staging 'appstage' service
   # (via zCLI or Git integration) from the 'appdev' workstation,
   # thus testing the deployment process and deployed
   # app's behavior.
   - hostname: appstage
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-jetstream-app
     enableSubdomainAccess: true
@@ -29,7 +29,7 @@ services:
 
   # Deploy the workstation of the AI agent.
   - hostname: appdev
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     # Notice that 'dev' setup is used,
     # deploying this service with only source code
     # and required development toolset (PHP, Node.js, ...).

@@ -9,14 +9,14 @@ project:
 
 services:
   # Deploy the Laravel Jetstream stage app, running on
-  # PHP 8.4 with Nginx (FastCGI) as webserver.
+  # PHP 8.5 with Nginx (FastCGI) as webserver.
   # In a typical local development workflow, developers
   # continuously deploy to this stage 'app' service
   # (via zCLI or Git integration) from their local workstation,
   # thus testing the deployment process and deployed
   # app's behavior.
   - hostname: app
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-jetstream-app
     enableSubdomainAccess: true
