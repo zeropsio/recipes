@@ -28,7 +28,7 @@ services:
 
   # ---- single production-built app container ----
   - hostname: app
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/wordpress-app
     enableSubdomainAccess: true

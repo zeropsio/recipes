@@ -29,7 +29,7 @@ services:
 
   # ---- single cloud dev container (`dev` setup; SSH in and iterate) ----
   - hostname: app
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/wordpress-app
     enableSubdomainAccess: true
