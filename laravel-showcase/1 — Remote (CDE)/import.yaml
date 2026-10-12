@@ -22,7 +22,7 @@ services:
   # edits take effect immediately without restart. prepareCommands installs Node
   # so the developer can run Vite HMR (npm run dev) over SSH.
   - hostname: appdev
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
     enableSubdomainAccess: true
@@ -34,7 +34,7 @@ services:
   # the developer validate the full deploy pipeline before pushing to CI or
   # tagging a release.
   - hostname: appstage
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
     enableSubdomainAccess: true
@@ -46,7 +46,7 @@ services:
   # (artisan queue:work). No dev variant needed — the developer runs the
   # worker process from appdev during iteration.
   - hostname: workerstage
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: worker
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
     verticalAutoscaling:
