@@ -1,0 +1,46 @@
+#zeropsPreprocessor=on
+# yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
+
+# Karakoram control plane. Source stays at KarakoramDev/Karakoram (not zerops-recipe-apps).
+# Setup name is `karakoram` — that is the only `- setup:` in upstream zerops.yaml.
+# After import, paste a project-scoped Full access token into KARAKORAM_ZEROPS_TOKEN
+# on this service and restart. The control plane then provisions PSMDB members here.
+# Do not put secrets in project vault: a later member must not inherit the master key.
+
+project:
+  name: karakoram-development
+
+services:
+  # SQLite state lives on Local Storage, not the disposable runtime disk.
+  # Platform minimum is 5 GB; mounted capacity follows maxDisk. Single-host, not HA.
+  - hostname: karakoramdata
+    type: local-storage:single@1
+    priority: 10
+    verticalAutoscaling:
+      minDisk: 5
+      maxDisk: 5
+
+  # ubuntu@24.04 matches run.base. The Git pipeline builds with go@1 + nodejs@22
+  # and deploys a static binary. SQLite is single-writer: maxContainers: 1 is a
+  # correctness constraint (a second replica corrupts the volume), not a cost cap.
+  - hostname: karakoram
+    type: ubuntu@24.04
+    zeropsSetup: karakoram
+    buildFromGit: https://github.com/KarakoramDev/Karakoram
+    enableSubdomainAccess: true
+    maxContainers: 1
+    envIsolation: service
+    verticalAutoscaling:
+      cpuMode: SHARED
+      minRam: 0.5
+    vault:
+      KARAKORAM_MASTER_KEY:
+        value: <@generateRandomString(<48>)>
+        sensitive: true
+      KARAKORAM_ADMIN_PASSWORD:
+        value: <@generateRandomString(<24>)>
+        sensitive: true
+      # Empty until the operator pastes the project token. Zerops reserves ZEROPS_*.
+      KARAKORAM_ZEROPS_TOKEN:
+        value: ""
+        sensitive: true
