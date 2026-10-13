@@ -8,6 +8,12 @@ services:
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/analog-ssr-hello-world-app
     enableSubdomainAccess: true
+    # Analog SSR (Nitro + Angular) needs a RAM floor — without minRam
+    # the default tiny container OOMs seconds after listen, which shows
+    # up as RUN.START FINISHED and balancer 502s.
+    verticalAutoscaling:
+      minRam: 0.25
+      minFreeRamGB: 0.125
 
   # PostgreSQL for app data. Priority 10 starts data services
   # before app containers, preventing connection errors on
