@@ -5,8 +5,8 @@
 # SQLite on Local Storage is single-writer and single-host. Do not add
 # minContainers: 2 or corePackage: SERIOUS for this import — replica-set HA is
 # created later in the Karakoram UI and is still subject to platform anti-affinity.
-# After import, paste a project-scoped Full access token into KARAKORAM_ZEROPS_TOKEN
-# on this service and restart.
+# Replace KARAKORAM_ZEROPS_TOKEN with a project-scoped Full access token before
+# creating clusters in the UI.
 
 project:
   name: mongodb-production
@@ -20,9 +20,7 @@ services:
       minDisk: 5
       maxDisk: 10
 
-  # Same 0.5 GB floor as Development — the binary is compiled Go, not Node SSR.
-  # maxContainers: 1 remains mandatory. envIsolation keeps secrets off members
-  # the control plane creates in this project.
+  # Same 0.5 GB floor as Development. maxContainers: 1 remains mandatory.
   - hostname: karakoram
     type: ubuntu@24.04
     zeropsSetup: karakoram
@@ -40,7 +38,45 @@ services:
       KARAKORAM_ADMIN_PASSWORD:
         value: <@generateRandomString(<24>)>
         sensitive: true
-      # Empty until the operator pastes the project token. Zerops reserves ZEROPS_*.
       KARAKORAM_ZEROPS_TOKEN:
-        value: ""
+        value: REPLACE_WITH_PROJECT_FULL_ACCESS_TOKEN
         sensitive: true
+    zeropsYaml:
+      
+      zerops:
+        - setup: karakoram
+          build:
+            base: [go@1, nodejs@22]
+            buildCommands:
+              - cd ui && npm ci && npm run build
+              - >-
+                CGO_ENABLED=0 go build -tags ui -trimpath
+                -ldflags "-s -w
+                -X github.com/KarakoramDev/Karakoram/internal/version.Version=${KARAKORAM_VERSION:-dev}
+                -X github.com/KarakoramDev/Karakoram/internal/version.Commit=$(git rev-parse --short HEAD 2>/dev/null || printf unknown)
+                -X github.com/KarakoramDev/Karakoram/internal/version.BuildDate=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+                -o karakoram ./cmd/karakoram
+            deployFiles: [karakoram]
+          deploy:
+            temporaryShutdown: true
+            readinessCheck:
+              httpGet:
+                port: 8080
+                path: /healthz
+              failureTimeout: "120s"
+              retryPeriod: "10s"
+          run:
+            base: ubuntu@24.04
+            volume:
+              hostname: karakoramdata
+            ports:
+              - port: 8080
+                protocol: tcp
+                httpSupport: true
+              - port: 9443
+                protocol: tcp
+                httpSupport: false
+            envVariables:
+              KARAKORAM_DATA_DIR: /mnt/karakoramdata
+              KARAKORAM_PUBLIC_URL: ${zeropsSubdomain}
+            start: ./karakoram server

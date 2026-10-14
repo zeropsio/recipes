@@ -58,7 +58,7 @@ Use [deploy/zerops/import.yaml](https://github.com/KarakoramDev/Karakoram/blob/m
 
 - `buildFromGit`: https://github.com/KarakoramDev/Karakoram. Setup `karakoram`: Node 22 UI build, Go 1.24 binary, Ubuntu 24.04 runtime.
 - HTTP UI/API on port 8080 (`/healthz`). Do not publish port 9443 (agent TLS).
-- `KARAKORAM_PUBLIC_URL` and `KARAKORAM_ZEROPS_PROJECT_ID` come from the app pipeline — do not duplicate in import vault.
+- `KARAKORAM_PUBLIC_URL` is set in recipe `zeropsYaml`. Project ID comes from Zerops-injected `projectId` (recipe omits upstream `KARAKORAM_ZEROPS_PROJECT_ID: ${projectId}` because an empty resolved value blocks Karakoram’s fallback).
 - First sign-in: `admin` + `KARAKORAM_ADMIN_PASSWORD`, then mandatory password change.
 <!-- #ZEROPS_EXTRACT_END:integration-guide# -->
 

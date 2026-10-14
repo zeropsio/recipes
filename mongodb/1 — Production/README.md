@@ -11,9 +11,9 @@ This is a Production environment for the [MongoDB (info + deploy)](https://app.z
 
 ## After import
 
-1. Wait until `karakoram` is **ACTIVE**. Confirm `https://YOUR-SUBDOMAIN/healthz`.
-2. In **karakoram → Environment variables → Secret variables**, paste a **project-scoped Full access** integration token into `KARAKORAM_ZEROPS_TOKEN`. Create the token under **Settings → Access Tokens Management** for this project only. Do not name it `ZEROPS_TOKEN`.
-3. Restart or redeploy so the process picks up the secret.
+1. In **karakoram → Environment variables → Secret variables**, replace `KARAKORAM_ZEROPS_TOKEN` with a **project-scoped Full access** integration token (Settings → Access Tokens Management). Do not use the `ZEROPS_` prefix.
+2. If logs still show `KARAKORAM_ZEROPS_PROJECT_ID … required`, set secret `KARAKORAM_ZEROPS_PROJECT_ID` to this project’s ID, or redeploy after a recipe revision with `zeropsYaml` (omits the empty `${projectId}` pipeline key).
+3. Wait until `karakoram` is **ACTIVE**. Confirm `https://YOUR-SUBDOMAIN/healthz`.
 4. Open the HTTPS subdomain. Sign in as `admin` with `KARAKORAM_ADMIN_PASSWORD`. Karakoram requires a password change before privileged API use; sign in again afterward.
 5. Preserve `KARAKORAM_MASTER_KEY` outside Zerops. Losing it makes the SQLite state undecryptable.
 6. For production traffic, attach a custom domain. `KARAKORAM_PUBLIC_URL` comes from the pipeline (`${zeropsSubdomain}`); override it in upstream `zerops.yaml` and redeploy — a service secret with the same key does not win.

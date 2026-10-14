@@ -3,8 +3,8 @@
 
 # MongoDB recipe — Karakoram control plane (KarakoramDev/Karakoram, not zerops-recipe-apps).
 # Setup name is `karakoram` — that is the only `- setup:` in upstream zerops.yaml.
-# After import, paste a project-scoped Full access token into KARAKORAM_ZEROPS_TOKEN
-# on this service and restart. The control plane then provisions PSMDB members here.
+# Replace KARAKORAM_ZEROPS_TOKEN with a project-scoped Full access token before
+# creating clusters in the UI (placeholder allows first deploy /healthz to pass).
 # Do not put secrets in project vault: a later member must not inherit the master key.
 
 project:
@@ -12,7 +12,6 @@ project:
 
 services:
   # SQLite state lives on Local Storage, not the disposable runtime disk.
-  # Platform minimum is 5 GB; mounted capacity follows maxDisk. Single-host, not HA.
   - hostname: karakoramdata
     type: local-storage:single@1
     priority: 10
@@ -20,9 +19,7 @@ services:
       minDisk: 5
       maxDisk: 5
 
-  # ubuntu@24.04 matches run.base. The Git pipeline builds with go@1 + nodejs@22
-  # and deploys a static binary. SQLite is single-writer: maxContainers: 1 is a
-  # correctness constraint (a second replica corrupts the volume), not a cost cap.
+  # Recipe zeropsYaml omits KARAKORAM_ZEROPS_PROJECT_ID so platform projectId is used.
   - hostname: karakoram
     type: ubuntu@24.04
     zeropsSetup: karakoram
@@ -40,7 +37,45 @@ services:
       KARAKORAM_ADMIN_PASSWORD:
         value: <@generateRandomString(<24>)>
         sensitive: true
-      # Empty until the operator pastes the project token. Zerops reserves ZEROPS_*.
       KARAKORAM_ZEROPS_TOKEN:
-        value: ""
+        value: REPLACE_WITH_PROJECT_FULL_ACCESS_TOKEN
         sensitive: true
+    zeropsYaml:
+      
+      zerops:
+        - setup: karakoram
+          build:
+            base: [go@1, nodejs@22]
+            buildCommands:
+              - cd ui && npm ci && npm run build
+              - >-
+                CGO_ENABLED=0 go build -tags ui -trimpath
+                -ldflags "-s -w
+                -X github.com/KarakoramDev/Karakoram/internal/version.Version=${KARAKORAM_VERSION:-dev}
+                -X github.com/KarakoramDev/Karakoram/internal/version.Commit=$(git rev-parse --short HEAD 2>/dev/null || printf unknown)
+                -X github.com/KarakoramDev/Karakoram/internal/version.BuildDate=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+                -o karakoram ./cmd/karakoram
+            deployFiles: [karakoram]
+          deploy:
+            temporaryShutdown: true
+            readinessCheck:
+              httpGet:
+                port: 8080
+                path: /healthz
+              failureTimeout: "120s"
+              retryPeriod: "10s"
+          run:
+            base: ubuntu@24.04
+            volume:
+              hostname: karakoramdata
+            ports:
+              - port: 8080
+                protocol: tcp
+                httpSupport: true
+              - port: 9443
+                protocol: tcp
+                httpSupport: false
+            envVariables:
+              KARAKORAM_DATA_DIR: /mnt/karakoramdata
+              KARAKORAM_PUBLIC_URL: ${zeropsSubdomain}
+            start: ./karakoram server
