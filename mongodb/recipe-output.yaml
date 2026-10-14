@@ -8,6 +8,7 @@ files_created:
   - mongodb/0 — Development/README.md
   - mongodb/1 — Production/import.yaml
   - mongodb/1 — Production/README.md
+  - mongodb/karakoram.zerops.yaml
 apps_created: []
 apps_existing:
   - https://github.com/KarakoramDev/Karakoram
@@ -18,11 +19,12 @@ strapi_fields:
   categories: [database]
   languages_frameworks: [MongoDB, Go]
   internal_type: oss
-ready_for_testing: false
+ready_for_testing: true
 notes:
   - GUI slug is `mongodb`; runtime services stay `karakoram` / `karakoramdata` (upstream zerops.yaml).
   - App is not in zerops-recipe-apps; buildFromGit points at KarakoramDev/Karakoram.
   - OSS template (Development + Production). Control plane cannot HA (SQLite + Local Storage).
-  - After import paste KARAKORAM_ZEROPS_TOKEN (project Full access) and restart before creating clusters.
+  - Service envSecrets (not vault) + embedded zeropsYaml; omit upstream KARAKORAM_ZEROPS_PROJECT_ID in pipeline.
+  - Replace KARAKORAM_ZEROPS_TOKEN with project Full access token before creating clusters in UI.
+  - Verified mongodb-production karakoram ACTIVE + /healthz 200 (2026-10-14).
   - Cover uses cover-go.svg until recipe-shared-assets has a MongoDB asset.
-  - Deploy proof pending before ready_for_testing true.

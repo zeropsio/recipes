@@ -5,8 +5,8 @@
 # SQLite on Local Storage is single-writer and single-host. Do not add
 # minContainers: 2 or corePackage: SERIOUS for this import — replica-set HA is
 # created later in the Karakoram UI and is still subject to platform anti-affinity.
-# Replace KARAKORAM_ZEROPS_TOKEN with a project-scoped Full access token before
-# creating clusters in the UI.
+# Service envSecrets match upstream deploy/zerops/import.yaml (not project vault).
+# Replace KARAKORAM_ZEROPS_TOKEN with a project-scoped Full access token before creating clusters.
 
 project:
   name: mongodb-production
@@ -34,7 +34,6 @@ services:
     envSecrets:
       KARAKORAM_MASTER_KEY: <@generateRandomString(<48>)>
       KARAKORAM_ADMIN_PASSWORD: <@generateRandomString(<24>)>
-      # Replace with a project-scoped Full access token (never ZEROPS_* prefix).
       KARAKORAM_ZEROPS_TOKEN: REPLACE_WITH_PROJECT_FULL_ACCESS_TOKEN
     zeropsYaml:
       

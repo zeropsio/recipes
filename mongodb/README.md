@@ -21,7 +21,7 @@ Offered in two basic environments:
 
 ### Project token (required once)
 
-After import, set `KARAKORAM_ZEROPS_TOKEN` on the **karakoram** service to a project-scoped **Full access** integration token, then restart or redeploy. Details are in each environment README.
+After import, replace `KARAKORAM_ZEROPS_TOKEN` on **karakoram** with a project-scoped **Full access** token before creating clusters. Do not shorten `KARAKORAM_MASTER_KEY` (minimum 32 characters). Details are in each environment README.
 
 ### Upgrading the control plane
 
