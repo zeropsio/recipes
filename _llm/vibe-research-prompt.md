@@ -56,7 +56,6 @@ Study these for patterns and best practices:
 | `umami`              | oss-install      | Install-based OSS      |
 | `elk`                | oss-install      | Multi-service stack    |
 | `mailpit`            | oss-install      | Single-service utility |
-| `mongodb`            | oss-source       | Karakoram CP, upstream Git, Local Storage   |
 
 ---
 
