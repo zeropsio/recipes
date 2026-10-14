@@ -30,16 +30,11 @@ services:
     verticalAutoscaling:
       cpuMode: SHARED
       minRam: 0.5
-    vault:
-      KARAKORAM_MASTER_KEY:
-        value: <@generateRandomString(<48>)>
-        sensitive: true
-      KARAKORAM_ADMIN_PASSWORD:
-        value: <@generateRandomString(<24>)>
-        sensitive: true
-      KARAKORAM_ZEROPS_TOKEN:
-        value: REPLACE_WITH_PROJECT_FULL_ACCESS_TOKEN
-        sensitive: true
+    envSecrets:
+      KARAKORAM_MASTER_KEY: <@generateRandomString(<48>)>
+      KARAKORAM_ADMIN_PASSWORD: <@generateRandomString(<24>)>
+      # Replace with a project-scoped Full access token (never ZEROPS_* prefix).
+      KARAKORAM_ZEROPS_TOKEN: REPLACE_WITH_PROJECT_FULL_ACCESS_TOKEN
     zeropsYaml:
       
       zerops:

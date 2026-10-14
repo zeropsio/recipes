@@ -11,11 +11,12 @@ This is a development environment for the [MongoDB (info + deploy)](https://app.
 
 ## After import
 
-1. In **karakoram → Environment variables → Secret variables**, replace `KARAKORAM_ZEROPS_TOKEN` with a **project-scoped Full access** integration token (Settings → Access Tokens Management). Do not use the `ZEROPS_` prefix. The import ships a placeholder so the first pipeline can pass `/healthz`; cluster APIs need a real token.
-2. If the service still logs `KARAKORAM_ZEROPS_PROJECT_ID … required` after a token is set, add secret `KARAKORAM_ZEROPS_PROJECT_ID` with this project’s ID (from the project URL), or redeploy after updating to a recipe revision that uses `zeropsYaml` without that pipeline key.
-3. Wait until `karakoram` is **ACTIVE**. Confirm `https://YOUR-SUBDOMAIN/healthz`.
-4. Open the HTTPS subdomain. Sign in as `admin` with `KARAKORAM_ADMIN_PASSWORD`. Karakoram requires a password change before privileged API use; sign in again afterward.
-5. Preserve `KARAKORAM_MASTER_KEY` outside Zerops. Losing it makes the SQLite state undecryptable.
+1. In **karakoram → Secret variables**, replace `KARAKORAM_ZEROPS_TOKEN` with a **project-scoped Full access** integration token (Settings → Access Tokens Management). Do not use the `ZEROPS_` prefix. Cluster APIs need a real token.
+2. Do **not** shorten `KARAKORAM_MASTER_KEY` in the GUI — Karakoram requires **at least 32 characters**. If you edited it while learning the `KARAKORAM_` prefix, regenerate it (48+ chars) or re-import `envSecrets` via service import.
+3. If logs show `KARAKORAM_ZEROPS_PROJECT_ID … required`, redeploy after a recipe with `zeropsYaml` (no empty `${projectId}` pipeline key) or set secret `KARAKORAM_ZEROPS_PROJECT_ID` to this project’s ID.
+4. Wait until `karakoram` is **ACTIVE**. Confirm `https://YOUR-SUBDOMAIN/healthz`.
+5. Open the HTTPS subdomain. Sign in as `admin` with `KARAKORAM_ADMIN_PASSWORD`. Karakoram requires a password change before privileged API use; sign in again afterward.
+6. Preserve `KARAKORAM_MASTER_KEY` outside Zerops. Losing it makes the SQLite state undecryptable.
 
 Create clusters in the UI (advertised PSMDB versions, TLS required, public exposure off until you need it). Members appear as additional services in this same project.
 

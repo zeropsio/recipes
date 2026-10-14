@@ -78,7 +78,7 @@ Pipeline-injected in upstream `zerops.yaml` (do **not** duplicate in import):
 | `KARAKORAM_ZEROPS_PROJECT_ID` | Yes | `${projectId}` |
 | `KARAKORAM_PUBLIC_URL` | Yes | `${zeropsSubdomain}` (HTTPS origin). Custom domain: change this in `zerops.yaml` and redeploy — a service secret with the same key does **not** override pipeline runtime vars. |
 
-Service secrets (import `vault:` on `karakoram` only — never project-level, never `ZEROPS_*` names):
+Service secrets (import `envSecrets:` on `karakoram` only — never project-level, never `ZEROPS_*` names):
 
 | Variable | Required | Description |
 |----------|----------|-------------|
@@ -183,7 +183,7 @@ Per-setup RAM floors (from upstream `deploy/zerops/import.yaml` + install guide)
 - Copy `_template_oss/` into folder **`mongodb`** (Development + Production), not the 6-env language template.
 - `zeropsSetup: karakoram` — do not invent `dev`/`prod`.
 - Do not add `APP_URL` to project vault; upstream maps `KARAKORAM_PUBLIC_URL` from `${zeropsSubdomain}`.
-- Service `vault:` for the three secrets; `envIsolation: service`.
+- Service `envSecrets:` for the three secrets (same shape as upstream Karakoram import); `envIsolation: service`.
 - `buildFromGit: https://github.com/KarakoramDev/Karakoram`.
 - Cover SVG: no Karakoram asset yet — use `cover-go.svg` until `recipe-shared-assets` adds one.
 - Do not modify the upstream app repo.
