@@ -1,5 +1,5 @@
-# Karakoram — Development Environment
-This is a development environment for [Karakoram (info + deploy)](https://app.zerops.io/recipes/karakoram?environment=development) recipe on [Zerops](https://zerops.io).
+# MongoDB — Development Environment
+This is a development environment for the [MongoDB (info + deploy)](https://app.zerops.io/recipes/mongodb?environment=development) recipe on [Zerops](https://zerops.io).
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
 **Development** imports a single Karakoram control plane (Ubuntu 24.04, 0.5 GB RAM) and a 5 GB Local Storage volume for SQLite. Use it to try the UI, create a small replica set, and learn the token + first-login flow. The control plane is not highly available — keep one container.

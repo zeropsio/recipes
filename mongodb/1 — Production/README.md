@@ -1,5 +1,5 @@
-# Karakoram — Production Environment
-This is a Production environment for [Karakoram (info + deploy)](https://app.zerops.io/recipes/karakoram?environment=production) recipe on [Zerops](https://zerops.io).
+# MongoDB — Production Environment
+This is a Production environment for the [MongoDB (info + deploy)](https://app.zerops.io/recipes/mongodb?environment=production) recipe on [Zerops](https://zerops.io).
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
 **Production** is the same control-plane topology as Development with a Local Storage volume that can grow to 10 GB. It is **not** a highly available control plane: SQLite and Local Storage stay single-writer and single-host. Replica-set HA is something you create later in the Karakoram UI, and even then Zerops does not guarantee physical-host anti-affinity. Read the [limitations](https://github.com/KarakoramDev/Karakoram/blob/main/docs/limitations.md) before loading important data.

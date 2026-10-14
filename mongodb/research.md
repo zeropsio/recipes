@@ -1,4 +1,4 @@
-# Karakoram — Zerops Recipe Research
+# MongoDB (Karakoram) — Zerops Recipe Research
 
 ## Overview
 
@@ -9,7 +9,7 @@
 - **Zerops Runtime:** `ubuntu@24.04` (run). Build uses `go@1` + `nodejs@22` from upstream `zerops.yaml`.
 - **Sibling recipes:** `umami` / `elk` (OSS `_template_oss`, two environments); `elk` also uses `ubuntu@24.04` + `maxContainers: 1` for a stateful coordinator.
 
-This recipe does **not** fork the app into `zerops-recipe-apps`. `buildFromGit` points at the upstream repository. The only setup name in that `zerops.yaml` is `karakoram`.
+Recipe folder / Strapi slug: **`mongodb`**. This recipe does **not** fork the app into `zerops-recipe-apps`. `buildFromGit` points at Karakoram upstream. Service hostnames remain `karakoram` / `karakoramdata`; the only pipeline setup in `zerops.yaml` is `karakoram`.
 
 ## Zerops Compatibility Assessment
 
@@ -180,7 +180,7 @@ Per-setup RAM floors (from upstream `deploy/zerops/import.yaml` + install guide)
 
 ## Notes for Terminal Agent
 
-- Copy `_template_oss/` (Development + Production), not the 6-env language template.
+- Copy `_template_oss/` into folder **`mongodb`** (Development + Production), not the 6-env language template.
 - `zeropsSetup: karakoram` — do not invent `dev`/`prod`.
 - Do not add `APP_URL` to project vault; upstream maps `KARAKORAM_PUBLIC_URL` from `${zeropsSubdomain}`.
 - Service `vault:` for the three secrets; `envIsolation: service`.

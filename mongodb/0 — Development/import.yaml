@@ -1,14 +1,14 @@
 #zeropsPreprocessor=on
 # yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
 
-# Karakoram control plane. Source stays at KarakoramDev/Karakoram (not zerops-recipe-apps).
+# MongoDB recipe — Karakoram control plane (KarakoramDev/Karakoram, not zerops-recipe-apps).
 # Setup name is `karakoram` — that is the only `- setup:` in upstream zerops.yaml.
 # After import, paste a project-scoped Full access token into KARAKORAM_ZEROPS_TOKEN
 # on this service and restart. The control plane then provisions PSMDB members here.
 # Do not put secrets in project vault: a later member must not inherit the master key.
 
 project:
-  name: karakoram-development
+  name: mongodb-development
 
 services:
   # SQLite state lives on Local Storage, not the disposable runtime disk.
