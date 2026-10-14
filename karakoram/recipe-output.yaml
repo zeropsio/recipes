@@ -1,13 +1,13 @@
 # recipe-output.yaml
 recipe_created: karakoram
 files_created:
-  - recipes/karakoram/README.md
-  - recipes/karakoram/research.md
-  - recipes/karakoram/recipe-output.yaml
-  - recipes/karakoram/0 — Development/import.yaml
-  - recipes/karakoram/0 — Development/README.md
-  - recipes/karakoram/1 — Production/import.yaml
-  - recipes/karakoram/1 — Production/README.md
+  - karakoram/README.md
+  - karakoram/research.md
+  - karakoram/recipe-output.yaml
+  - karakoram/0 — Development/import.yaml
+  - karakoram/0 — Development/README.md
+  - karakoram/1 — Production/import.yaml
+  - karakoram/1 — Production/README.md
 apps_created: []
 apps_existing:
   - https://github.com/KarakoramDev/Karakoram

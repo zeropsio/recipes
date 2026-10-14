@@ -15,6 +15,28 @@ Offered in two basic environments:
 - **Development** [[info]](/0%20—%20Development) — [[deploy with one click]](https://app.zerops.io/recipes/karakoram?environment=development)
 - **Production** [[info]](/1%20—%20Production) — [[deploy with one click]](https://app.zerops.io/recipes/karakoram?environment=production)
 
+## Takeover and maintenance
+
+<!-- #ZEROPS_EXTRACT_START:maintenance-guide# -->
+
+### Project token (required once)
+
+After import, set `KARAKORAM_ZEROPS_TOKEN` on the **karakoram** service to a project-scoped **Full access** integration token, then restart or redeploy. Details are in each environment README.
+
+### Upgrading Karakoram
+
+Re-trigger the `karakoram` Git pipeline from **Pipelines & CI/CD**. Do not re-import the recipe onto an existing installation. See the upstream [upgrade guide](https://github.com/KarakoramDev/Karakoram/blob/main/docs/upgrade.md).
+
+### Backing up control-plane state and MongoDB data
+
+Back up `KARAKORAM_MASTER_KEY` separately from Zerops. Snapshot SQLite on Local Storage with a consistent stopped-writer copy of `/mnt/karakoramdata`. Configure PBM backups in the Karakoram UI for database data. See [backups and restore](https://github.com/KarakoramDev/Karakoram/blob/main/docs/user-guide/backups-and-restore.md).
+
+### Add to an existing project
+
+Use [deploy/zerops/import.yaml](https://github.com/KarakoramDev/Karakoram/blob/main/deploy/zerops/import.yaml) (service import) instead of this one-click **new project** recipe.
+
+<!-- #ZEROPS_EXTRACT_END:maintenance-guide# -->
+
 <!-- #ZEROPS_EXTRACT_START:faq# -->
 ## FAQ
 
@@ -40,6 +62,6 @@ Offered in two basic environments:
 
 ---
 
-For more advanced examples see all [Go recipes](https://app.zerops.io/recipes?lf=golang) on Zerops.
+For more examples see [Go](https://app.zerops.io/recipes?lf=golang) and [database](https://app.zerops.io/recipes?lf=database) recipes on Zerops.
 
 Need help setting your project up? Join [Zerops Discord community](https://discord.gg/zeropsio).

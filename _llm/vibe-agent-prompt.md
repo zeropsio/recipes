@@ -277,6 +277,7 @@ Study these recipes (marked with `.human`) as examples. **Never modify these**, 
 | `umami`              | oss-install      | Install-based OSS, analytics     |
 | `elk`                | oss-install      | Multi-service stack              |
 | `mailpit`            | oss-install      | Single-service utility           |
+| `karakoram`          | oss-source       | Upstream repo, MongoDB orchestration on Zerops |
 
 ---
 
