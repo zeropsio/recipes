@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/zerops-yaml-json-schema.json
 # Recipe copy of KarakoramDev/Karakoram zerops.yaml — keep in sync on upstream releases.
-# Diff: omit KARAKORAM_ZEROPS_PROJECT_ID in run.envVariables so Karakoram reads
-# Zerops-injected projectId (upstream ${projectId} can resolve empty and block fallback).
+# Diff vs upstream: omit KARAKORAM_ZEROPS_PROJECT_ID (empty ${projectId} at pipeline merge).
+# Lift service envSecrets into run — Git pipelines do not always inject them before first start.
 
 zerops:
   - setup: karakoram
@@ -23,7 +23,7 @@ zerops:
         httpGet:
           port: 8080
           path: /healthz
-        failureTimeout: "120s"
+        failureTimeout: "180s"
         retryPeriod: "10s"
     run:
       base: ubuntu@24.04
@@ -39,4 +39,6 @@ zerops:
       envVariables:
         KARAKORAM_DATA_DIR: /mnt/karakoramdata
         KARAKORAM_PUBLIC_URL: ${zeropsSubdomain}
+        # Lift token only — auto-injected secrets can arrive after the first start attempt on Git pipelines.
+        KARAKORAM_ZEROPS_TOKEN: ${KARAKORAM_ZEROPS_TOKEN}
       start: ./karakoram server
