@@ -22,7 +22,7 @@ services:
     # Gives the service a public HTTPS URL on a Zerops subdomain
     # so the developer can preview the running dev server.
     enableSubdomainAccess: true
-    envVariables:
+    vault:
       # APP_ENV is available at build time as RUNTIME_APP_ENV.
       # zerops.yaml reads: VITE_APP_ENV=${RUNTIME_APP_ENV:-production}
       # — this bakes the environment name into the static bundle.
@@ -38,5 +38,5 @@ services:
     buildFromGit: https://github.com/zerops-recipe-apps/solidstart-static-hello-world-app
     # Subdomain access for previewing production builds.
     enableSubdomainAccess: true
-    envVariables:
+    vault:
       APP_ENV: staging
