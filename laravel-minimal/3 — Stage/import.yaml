@@ -8,8 +8,10 @@
 # by any previous deploy.
 project:
   name: laravel-minimal-stage
-  envVariables:
-    APP_KEY: <@generateRandomString(<32>)>
+  vault:
+    APP_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
 
 services:
   # Staging — mirrors production configuration (composer install --no-dev,
@@ -17,7 +19,7 @@ services:
   # on a single container with lower scaling bounds. Public subdomain for QA
   # review. Git integration or zcli push from CI triggers deploys.
   - hostname: app
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-minimal-app
     enableSubdomainAccess: true

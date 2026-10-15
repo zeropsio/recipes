@@ -11,8 +11,10 @@
 project:
   name: laravel-minimal-ha-prod
   corePackage: SERIOUS
-  envVariables:
-    APP_KEY: <@generateRandomString(<32>)>
+  vault:
+    APP_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
 
 services:
   # HA production — cpuMode: DEDICATED pins CPU cores to this service so
@@ -20,7 +22,7 @@ services:
   # minContainers: 2 plus autoscaling handles capacity; minFreeRamGB leaves
   # headroom for traffic spikes without waiting for scale-up.
   - hostname: app
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-minimal-app
     enableSubdomainAccess: true
