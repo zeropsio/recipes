@@ -36,3 +36,5 @@ services:
       cpuMode: DEDICATED
       minRam: 0.5
       minFreeRamGB: 0.25
+    vault:
+      APP_ENV: production

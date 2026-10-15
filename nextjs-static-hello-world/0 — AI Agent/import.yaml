@@ -31,6 +31,9 @@ services:
     verticalAutoscaling:
       minRam: 1
       minFreeRamGB: 0.5
+    vault:
+      # Baked at build time via RUNTIME_APP_ENV → NEXT_PUBLIC_APP_ENV in zerops.yaml.
+      APP_ENV: development
 
   # Staging service — Nginx serves the static export
   # produced by the 'prod' build pipeline. The agent pushes
@@ -45,3 +48,5 @@ services:
     verticalAutoscaling:
       minRam: 0.25
       minFreeRamGB: 0.125
+    vault:
+      APP_ENV: staging
