@@ -9,3 +9,7 @@
 ## Repo
 
 - App repo: `Zeropspullssourcecodeandzerops.yamlfromthis`
+
+## Environment (vault)
+
+No project or service vault entries — this demo does not use import env store keys; the app uses platform ties (`$zeropsSubdomain`, managed service hostnames) only.
