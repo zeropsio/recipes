@@ -1,7 +1,7 @@
 # Next.js Hello World Recipe
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-A ready-to-deploy [Next.js](https://nextjs.org) Hello World recipe for [Zerops](https://zerops.io), showcasing static export mode — built with Node.js and served by Nginx, with environment configurations covering every stage of the development lifecycle.
+A ready-to-deploy [Next.js](https://nextjs.org) 16 Hello World recipe for [Zerops](https://zerops.io), showcasing static export mode — built with Node.js and served by Nginx, with environment configurations covering every stage of the development lifecycle.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 
 ⬇️ **Full recipe page and deploy with one-click**

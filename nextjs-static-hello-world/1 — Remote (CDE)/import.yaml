@@ -30,6 +30,8 @@ services:
     verticalAutoscaling:
       minRam: 1
       minFreeRamGB: 0.5
+    vault:
+      APP_ENV: development
 
   # Staging service — Nginx serves the static export once
   # the developer pushes a production build for review.
@@ -43,3 +45,5 @@ services:
     verticalAutoscaling:
       minRam: 0.25
       minFreeRamGB: 0.125
+    vault:
+      APP_ENV: staging
