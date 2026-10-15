@@ -30,5 +30,7 @@ services:
   - hostname: apmserver
     type: ubuntu@24.04
     buildFromGit: https://github.com/zerops-recipe-apps/elk-apm-server-app
-    envSecrets:
-      SECRET_TOKEN: <@generateRandomString(<32>)>
+    vault:
+      APM_SECRET:
+        value: <@generateRandomString(<32>)>
+        sensitive: true
