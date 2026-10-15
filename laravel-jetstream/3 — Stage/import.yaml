@@ -6,6 +6,11 @@
 project:
   name: laravel-jetstream-stage
 
+  vault:
+    APP_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
+
 services:
   # Deploy the Laravel Jetstream stage app, running on
   # PHP 8.5 with Nginx (FastCGI) as webserver. 
@@ -14,8 +19,6 @@ services:
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-jetstream-app
     enableSubdomainAccess: true
-    envSecrets:
-      APP_KEY: <@generateRandomString(<32>)>
   
   # Set higher priority for databases and storages,
   # because the app depends on those services.

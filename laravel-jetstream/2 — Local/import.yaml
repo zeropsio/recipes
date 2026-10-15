@@ -7,6 +7,11 @@
 project:
   name: laravel-jetstream-local
 
+  vault:
+    APP_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
+
 services:
   # Deploy the Laravel Jetstream stage app, running on
   # PHP 8.5 with Nginx (FastCGI) as webserver.
@@ -20,13 +25,6 @@ services:
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-jetstream-app
     enableSubdomainAccess: true
-    envSecrets:
-      # Let Zerops generate random App key,
-      # used for encryption, signing and random data generation. 
-      # Using the Zerops YAML preprocessing:
-      # see https://docs.zerops.io/references/import-yaml/pre-processor.
-      # You'll may have to later copy this generated key to your local variables.
-      APP_KEY: <@generateRandomString(<32>)>
   
   # Deploy low-resource PostgreSQL database,
   # used by the app to store data. Both the staged

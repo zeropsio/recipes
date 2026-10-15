@@ -18,12 +18,6 @@ services:
     # Disabling the subdomain access is recommended,
     # after you set up access through your own domain(s).
     enableSubdomainAccess: true
-    envSecrets:
-      # Let Zerops generate random App key,
-      # used for encryption, signing and random data generation. 
-      # Using the Zerops YAML preprocessing:
-      # see https://docs.zerops.io/references/import-yaml/pre-processor.
-      APP_KEY: <@generateRandomString(<32>)>
     # Scale the app to at least 2 runtime containers
     # running simultaneously, with higher than minimal
     # assigned resources.
