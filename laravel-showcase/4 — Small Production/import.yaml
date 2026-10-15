@@ -8,8 +8,10 @@
 # requests across multiple containers.
 project:
   name: laravel-showcase-small-prod
-  envVariables:
-    APP_KEY: <@generateRandomString(<32>)>
+  vault:
+    APP_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
 
 services:
   # Small production — minContainers: 2 guarantees two app containers at all

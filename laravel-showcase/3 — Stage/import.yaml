@@ -7,8 +7,10 @@
 # import and fixed thereafter.
 project:
   name: laravel-showcase-stage
-  envVariables:
-    APP_KEY: <@generateRandomString(<32>)>
+  vault:
+    APP_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
 
 services:
   # Staging — mirrors production configuration (composer install --no-dev,

@@ -12,8 +12,10 @@
 # L7 balancer handles the request.
 project:
   name: laravel-showcase-remote
-  envVariables:
-    APP_KEY: <@generateRandomString(<32>)>
+  vault:
+    APP_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
 
 services:
   # Remote development workspace — SSH or mount via IDE-SSHFS and edit source

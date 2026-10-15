@@ -12,8 +12,10 @@
 # session cookies written by any container behind the L7 balancer.
 project:
   name: laravel-showcase-agent
-  envVariables:
-    APP_KEY: <@generateRandomString(<32>)>
+  vault:
+    APP_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
 
 services:
   # AI agent workspace — zeropsSetup:dev runs composer install (full dev deps)

@@ -8,8 +8,10 @@
 # containers.
 project:
   name: laravel-showcase-local
-  envVariables:
-    APP_KEY: <@generateRandomString(<32>)>
+  vault:
+    APP_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
 
 services:
   # Local-development validator — develop on localhost with zcli vpn
