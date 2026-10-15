@@ -15,7 +15,7 @@ services:
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/showcase-recipe-app
     enableSubdomainAccess: true
-    envSecrets:
+    vault:
       CORE_MODE: serious
     minContainers: 2
     verticalAutoscaling:
