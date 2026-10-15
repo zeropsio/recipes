@@ -37,20 +37,38 @@ services:
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/wordpress-app
     enableSubdomainAccess: true
-    envSecrets:
+    vault:
       WORDPRESS_TITLE: WordPress on Zerops
       WORDPRESS_ADMIN_USER: zadmin
       WORDPRESS_ADMIN_EMAIL: admin@example.com   # change after deploy (Settings → General)
-      WORDPRESS_ADMIN_PASSWORD: <@generateRandomString(<20>)>
+      WORDPRESS_ADMIN_PASSWORD:
+        value: <@generateRandomString(<20>)>
+        sensitive: true
       # Unique auth keys & salts
-      WORDPRESS_AUTH_KEY:         <@generateRandomString(<64>)>
-      WORDPRESS_SECURE_AUTH_KEY:  <@generateRandomString(<64>)>
-      WORDPRESS_LOGGED_IN_KEY:    <@generateRandomString(<64>)>
-      WORDPRESS_NONCE_KEY:        <@generateRandomString(<64>)>
-      WORDPRESS_AUTH_SALT:        <@generateRandomString(<64>)>
-      WORDPRESS_SECURE_AUTH_SALT: <@generateRandomString(<64>)>
-      WORDPRESS_LOGGED_IN_SALT:   <@generateRandomString(<64>)>
-      WORDPRESS_NONCE_SALT:       <@generateRandomString(<64>)>
+      WORDPRESS_AUTH_KEY:
+        value: <@generateRandomString(<64>)>
+        sensitive: true
+      WORDPRESS_SECURE_AUTH_KEY:
+        value: <@generateRandomString(<64>)>
+        sensitive: true
+      WORDPRESS_LOGGED_IN_KEY:
+        value: <@generateRandomString(<64>)>
+        sensitive: true
+      WORDPRESS_NONCE_KEY:
+        value: <@generateRandomString(<64>)>
+        sensitive: true
+      WORDPRESS_AUTH_SALT:
+        value: <@generateRandomString(<64>)>
+        sensitive: true
+      WORDPRESS_SECURE_AUTH_SALT:
+        value: <@generateRandomString(<64>)>
+        sensitive: true
+      WORDPRESS_LOGGED_IN_SALT:
+        value: <@generateRandomString(<64>)>
+        sensitive: true
+      WORDPRESS_NONCE_SALT:
+        value: <@generateRandomString(<64>)>
+        sensitive: true
 
   # ---- stage half (`prod` setup: always-running reference) ----
   - hostname: appstage
@@ -58,17 +76,35 @@ services:
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/wordpress-app
     enableSubdomainAccess: true
-    envSecrets:
+    vault:
       WORDPRESS_TITLE: WordPress on Zerops
       WORDPRESS_ADMIN_USER: zadmin
       WORDPRESS_ADMIN_EMAIL: admin@example.com   # change after deploy (Settings → General)
-      WORDPRESS_ADMIN_PASSWORD: <@generateRandomString(<20>)>
+      WORDPRESS_ADMIN_PASSWORD:
+        value: <@generateRandomString(<20>)>
+        sensitive: true
       # Unique auth keys & salts
-      WORDPRESS_AUTH_KEY:         <@generateRandomString(<64>)>
-      WORDPRESS_SECURE_AUTH_KEY:  <@generateRandomString(<64>)>
-      WORDPRESS_LOGGED_IN_KEY:    <@generateRandomString(<64>)>
-      WORDPRESS_NONCE_KEY:        <@generateRandomString(<64>)>
-      WORDPRESS_AUTH_SALT:        <@generateRandomString(<64>)>
-      WORDPRESS_SECURE_AUTH_SALT: <@generateRandomString(<64>)>
-      WORDPRESS_LOGGED_IN_SALT:   <@generateRandomString(<64>)>
-      WORDPRESS_NONCE_SALT:       <@generateRandomString(<64>)>
+      WORDPRESS_AUTH_KEY:
+        value: <@generateRandomString(<64>)>
+        sensitive: true
+      WORDPRESS_SECURE_AUTH_KEY:
+        value: <@generateRandomString(<64>)>
+        sensitive: true
+      WORDPRESS_LOGGED_IN_KEY:
+        value: <@generateRandomString(<64>)>
+        sensitive: true
+      WORDPRESS_NONCE_KEY:
+        value: <@generateRandomString(<64>)>
+        sensitive: true
+      WORDPRESS_AUTH_SALT:
+        value: <@generateRandomString(<64>)>
+        sensitive: true
+      WORDPRESS_SECURE_AUTH_SALT:
+        value: <@generateRandomString(<64>)>
+        sensitive: true
+      WORDPRESS_LOGGED_IN_SALT:
+        value: <@generateRandomString(<64>)>
+        sensitive: true
+      WORDPRESS_NONCE_SALT:
+        value: <@generateRandomString(<64>)>
+        sensitive: true
