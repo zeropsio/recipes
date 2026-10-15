@@ -10,20 +10,14 @@ project:
 
 services:
   # Deploy the Laravel Jetstream app, running on
-  # PHP 8.4 with Nginx (FastCGI) as webserver. 
+  # PHP 8.5 with Nginx (FastCGI) as webserver. 
   - hostname: app
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-jetstream-app
     # Disabling the subdomain access is recommended,
     # after you set up access through your own domain(s).
     enableSubdomainAccess: true
-    envSecrets:
-      # Let Zerops generate random App key,
-      # used for encryption, signing and random data generation. 
-      # Using the Zerops YAML preprocessing:
-      # see https://docs.zerops.io/references/import-yaml/pre-processor.
-      APP_KEY: <@generateRandomString(<32>)>
     # Scale the app to at least 2 runtime containers
     # running simultaneously, with higher than minimal
     # assigned resources.
