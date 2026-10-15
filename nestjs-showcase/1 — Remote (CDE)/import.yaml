@@ -7,8 +7,10 @@
 # interactive dev runtimes.
 project:
   name: nestjs-showcase-remote
-  envVariables:
-    APP_SECRET: <@generateRandomString(<32>)>
+  vault:
+    APP_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
     API_URL: https://apistage-${zeropsSubdomainHost}-3000.prg1.zerops.app
     DEV_API_URL: https://apidev-${zeropsSubdomainHost}-3000.prg1.zerops.app
     DEV_FRONTEND_URL: https://appdev-${zeropsSubdomainHost}-5173.prg1.zerops.app
@@ -44,7 +46,7 @@ services:
   # bundle at build time so the frontend points at apistage without
   # waiting on a peer-service first-deploy.
   - hostname: appdev
-    type: nodejs@22
+    type: nodejs@24
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/nestjs-showcase-app
     enableSubdomainAccess: true

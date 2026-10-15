@@ -7,8 +7,10 @@
 # requests across replicas.
 project:
   name: nestjs-showcase-small-prod
-  envVariables:
-    APP_SECRET: <@generateRandomString(<32>)>
+  vault:
+    APP_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
     API_URL: https://api-${zeropsSubdomainHost}-3000.prg1.zerops.app
     FRONTEND_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
 
