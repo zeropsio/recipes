@@ -11,8 +11,10 @@
 # the shared database.
 project:
   name: laravel-minimal-remote
-  envVariables:
-    APP_KEY: <@generateRandomString(<32>)>
+  vault:
+    APP_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
 
 services:
   # Remote development workspace — SSH or IDE-SSHFS into the container and

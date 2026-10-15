@@ -11,8 +11,10 @@
 project:
   name: laravel-minimal-ha-prod
   corePackage: SERIOUS
-  envVariables:
-    APP_KEY: <@generateRandomString(<32>)>
+  vault:
+    APP_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
 
 services:
   # HA production — cpuMode: DEDICATED pins CPU cores to this service so

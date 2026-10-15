@@ -10,8 +10,10 @@
 # when the L7 balancer routes requests to any app container in the project.
 project:
   name: laravel-minimal-agent
-  envVariables:
-    APP_KEY: <@generateRandomString(<32>)>
+  vault:
+    APP_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
 
 services:
   # AI agent workspace — zeropsSetup:dev deploys the full source tree so the

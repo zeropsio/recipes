@@ -8,8 +8,10 @@
 # by any previous deploy.
 project:
   name: laravel-minimal-stage
-  envVariables:
-    APP_KEY: <@generateRandomString(<32>)>
+  vault:
+    APP_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
 
 services:
   # Staging — mirrors production configuration (composer install --no-dev,
