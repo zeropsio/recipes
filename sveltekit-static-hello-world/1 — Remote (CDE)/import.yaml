@@ -44,5 +44,5 @@ services:
     # during the build as RUNTIME_APP_ENV so the SvelteKit
     # build can bake the value into the static output via
     # PUBLIC_APP_ENV — no code change needed per environment.
-    envVariables:
+    vault:
       APP_ENV: staging

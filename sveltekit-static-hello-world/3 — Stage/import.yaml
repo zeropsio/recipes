@@ -23,5 +23,5 @@ services:
     # APP_ENV is a runtime env var. Zerops makes it available
     # during the build as RUNTIME_APP_ENV — baked into the
     # static output as PUBLIC_APP_ENV at build time.
-    envVariables:
+    vault:
       APP_ENV: staging
