@@ -15,7 +15,7 @@ services:
   # workloads. minContainers: 2 maintains availability during
   # rolling deploys and traffic spikes.
   - hostname: app
-    type: python@3.11
+    type: python@3.12
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/python-hello-world-app
     enableSubdomainAccess: true
