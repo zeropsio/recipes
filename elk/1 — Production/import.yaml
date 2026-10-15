@@ -7,14 +7,14 @@ services:
   # Centerpiece of the ELK stack, Elasticsearch service.
   # Serves as a storage for the logs, traces, settings, etc.
   - hostname: elkstorage
-    type: elasticsearch:ha@8.16
+    type: elasticsearch:ha@8.17
     priority: 10
 
   - hostname: kibana
     type: ubuntu@24.04
     buildFromGit: https://github.com/zerops-recipe-apps/elk-kibana-app
     enableSubdomainAccess: true
-    envSecrets:
+    vault:
       NODE_OPTIONS_MAX_OLD_SPACE_SIZE_OVERRIDE: '4096'
     verticalAutoscaling:
       minRam: 0.75
@@ -27,7 +27,7 @@ services:
     type: ubuntu@24.04
     buildFromGit: https://github.com/zerops-recipe-apps/elk-logstash-app
     # Set higher heap memory for Logstash to handle more throughput.
-    envSecrets:
+    vault:
       LOGSTASH_HEAP_MEMORY_OVERRIDE: 1g
     verticalAutoscaling:
       minRam: 1
@@ -37,5 +37,7 @@ services:
   - hostname: apmserver
     type: ubuntu@24.04
     buildFromGit: https://github.com/zerops-recipe-apps/elk-apm-server-app
-    envSecrets:
-      SECRET_TOKEN: <@generateRandomString(<32>)>
+    vault:
+      APM_SECRET:
+        value: <@generateRandomString(<32>)>
+        sensitive: true

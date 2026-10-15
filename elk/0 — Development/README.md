@@ -187,7 +187,7 @@ For more information visit the individual apps README's below.
 ## Upgrades
 
 > [!CAUTION]
-> Please refer to the https://www.elastic.co/support/matrix#matrix_compatibility and https://www.elastic.co/guide/en/kibana/8.19/upgrade.html before you proceed with upgrades.
+> Please refer to the https://www.elastic.co/support/matrix#matrix_compatibility and https://www.elastic.co/guide/en/kibana/8.17/upgrade.html before you proceed with upgrades.
 
 Upgrades are done by upgrading the Elasticsearch storage service (_TBD, please refer to the "Scaling > Elasticsearch" of this manual_)
 and manipulating the installed versions in the `run.prepareCommands` section of `zerops.yaml`s of the individual apps ([Kibana](https://github.com/zerops-recipe-apps/elk-kibana-app), [Logstash](https://github.com/zerops-recipe-apps/elk-logstash-app), ...).
