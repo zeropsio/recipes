@@ -33,5 +33,5 @@ services:
       minFreeRamGB: 0.25
     # APP_ENV is baked into the static output at build time
     # via RUNTIME_APP_ENV — no rebuild needed to change it.
-    envVariables:
+    vault:
       APP_ENV: production
