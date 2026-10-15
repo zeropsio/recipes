@@ -13,6 +13,8 @@ services:
     type: nodejs@24
     buildFromGit: https://github.com/zerops-recipe-apps/umami-app
     enableSubdomainAccess: true
-    envSecrets:
-      APP_SECRET: <@generateRandomString(<64>)>
+    vault:
+      APP_SECRET:
+        value: <@generateRandomString(<64>)>
+        sensitive: true
     minContainers: 2
