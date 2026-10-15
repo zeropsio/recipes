@@ -12,8 +12,10 @@
 # session cookies written by any container behind the L7 balancer.
 project:
   name: laravel-showcase-agent
-  envVariables:
-    APP_KEY: <@generateRandomString(<32>)>
+  vault:
+    APP_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
 
 services:
   # AI agent workspace — zeropsSetup:dev runs composer install (full dev deps)
@@ -22,7 +24,7 @@ services:
   # subdomain URL. maxContainers:1 prevents file conflicts when editing over a
   # single mount point.
   - hostname: appdev
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
     enableSubdomainAccess: true
@@ -35,7 +37,7 @@ services:
   # finishing the task. readinessCheck gates traffic until the health endpoint
   # responds.
   - hostname: appstage
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
     enableSubdomainAccess: true
@@ -47,7 +49,7 @@ services:
   # jobs dispatched by the app via Redis. No HTTP traffic, no healthCheck —
   # the process itself is the liveness signal.
   - hostname: workerstage
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: worker
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
     verticalAutoscaling:

@@ -8,8 +8,10 @@
 # containers.
 project:
   name: laravel-showcase-local
-  envVariables:
-    APP_KEY: <@generateRandomString(<32>)>
+  vault:
+    APP_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
 
 services:
   # Local-development validator — develop on localhost with zcli vpn
@@ -18,7 +20,7 @@ services:
   # Composer, Vite assets, cache warming) deploys cleanly before tagging a
   # release. enableSubdomainAccess provides a public URL for smoke testing.
   - hostname: app
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
     enableSubdomainAccess: true
@@ -29,7 +31,7 @@ services:
   # that the queue pipeline (Redis driver + artisan queue:work) functions
   # correctly with the production build before release.
   - hostname: worker
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: worker
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
     verticalAutoscaling:

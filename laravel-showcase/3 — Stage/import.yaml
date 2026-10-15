@@ -7,8 +7,10 @@
 # import and fixed thereafter.
 project:
   name: laravel-showcase-stage
-  envVariables:
-    APP_KEY: <@generateRandomString(<32>)>
+  vault:
+    APP_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
 
 services:
   # Staging — mirrors production configuration (composer install --no-dev,
@@ -17,7 +19,7 @@ services:
   # readinessCheck ensures the L7 balancer only routes traffic after the health
   # endpoint responds.
   - hostname: app
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
     enableSubdomainAccess: true
@@ -28,7 +30,7 @@ services:
   # Queue worker — validates background job processing with production-grade
   # configuration. Single container sufficient for staging workloads.
   - hostname: worker
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: worker
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
     verticalAutoscaling:

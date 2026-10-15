@@ -8,8 +8,10 @@
 # requests across multiple containers.
 project:
   name: laravel-showcase-small-prod
-  envVariables:
-    APP_KEY: <@generateRandomString(<32>)>
+  vault:
+    APP_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
 
 services:
   # Small production — minContainers: 2 guarantees two app containers at all
@@ -18,7 +20,7 @@ services:
   # verticalAutoscaling bounds to absorb traffic spikes without manual
   # intervention.
   - hostname: app
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
     enableSubdomainAccess: true
@@ -31,7 +33,7 @@ services:
   # policy. Single container sufficient for moderate job volumes; scale
   # minContainers if queue depth grows.
   - hostname: worker
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: worker
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
     minContainers: 2

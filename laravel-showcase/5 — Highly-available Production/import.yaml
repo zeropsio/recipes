@@ -12,8 +12,10 @@
 project:
   name: laravel-showcase-ha-prod
   corePackage: SERIOUS
-  envVariables:
-    APP_KEY: <@generateRandomString(<32>)>
+  vault:
+    APP_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
 
 services:
   # HA production — cpuMode: DEDICATED pins CPU cores to this service,
@@ -21,7 +23,7 @@ services:
   # minContainers: 2 with autoscaling handles capacity spikes. healthCheck
   # restarts unresponsive containers within the 5-minute retry window.
   - hostname: app
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
     enableSubdomainAccess: true
@@ -35,7 +37,7 @@ services:
   # processing doesn't compete with co-located workloads. Processes jobs
   # reliably under sustained production throughput.
   - hostname: worker
-    type: php-nginx@8.4
+    type: php-nginx@8.5
     zeropsSetup: worker
     buildFromGit: https://github.com/zerops-recipe-apps/laravel-showcase-app
     minContainers: 2
