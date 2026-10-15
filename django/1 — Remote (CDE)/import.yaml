@@ -8,24 +8,26 @@
 project:
   name: django-remote
 
+  vault:
+    APP_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
+    ADMIN_PASSWORD:
+      value: <@generateRandomString(<12>)>
+      sensitive: true
+
 services:
   - hostname: appstage
     type: python@3.12
     zeropsSetup: prod
     buildFromGit: https://github.com/zerops-recipe-apps/django-app
     enableSubdomainAccess: true
-    envSecrets:
-      SECRET_KEY: <@generateRandomString(<32>)>
-      # Default superuser password can be found in the environment variables section of the service in GUI.
-      DJANGO_SUPERUSER_PASSWORD: <@generateRandomString(<12>)>
       
   - hostname: appdev
     type: python@3.12
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/django-app
     enableSubdomainAccess: true
-    envSecrets:
-      SECRET_KEY: <@generateRandomString(<32>)>
 
   - hostname: db
     type: postgresql:single@17
