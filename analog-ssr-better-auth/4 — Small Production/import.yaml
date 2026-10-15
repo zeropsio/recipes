@@ -3,8 +3,10 @@
 # Analog SSR Better Auth — Small Production environment.
 project:
   name: analog-ssr-better-auth-small-prod
-  envVariables:
-    BETTER_AUTH_SECRET: <@generateRandomString(<32>)>
+  vault:
+    BETTER_AUTH_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
 
 services:
   - hostname: app

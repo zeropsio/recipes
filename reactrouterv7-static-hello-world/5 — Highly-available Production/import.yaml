@@ -26,7 +26,7 @@ services:
     # Always run at least 2 containers for traffic distribution
     # and zero-downtime deploys.
     minContainers: 2
-    envVariables:
+    vault:
       # Runtime env var exposed as RUNTIME_APP_ENV in the build
       # shell (Zerops auto-prefixes runtime vars with RUNTIME_).
       # The zerops.yaml buildCommands inject it as VITE_APP_ENV,

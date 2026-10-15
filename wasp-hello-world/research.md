@@ -68,7 +68,7 @@ Client: Zerops `static` (Nginx).
 | `API_URL` | Project import | Public API URL — `zerops.yaml` maps to `WASP_SERVER_URL` and `REACT_APP_API_URL` |
 | `NODE_ENV` | API | `production` in prod |
 
-Project `import.yaml` stores `APP_URL` / `API_URL` only (no per-service `envVariables`). Wasp runtime keys are wired in `zerops.yaml`.
+Project `import.yaml` `vault` stores `APP_URL` / `API_URL` only (no per-service vault keys). Wasp runtime keys are wired in `zerops.yaml`.
 
 ### Health Check
 
@@ -120,3 +120,7 @@ Project `import.yaml` stores `APP_URL` / `API_URL` only (no per-service `envVari
 - Closest sibling: `nestjs-showcase` (app/api dev-stage pairs + PostgreSQL).
 - Single app repo, three `zerops.yaml` setups: `dev`, `prod-client`, `prod-api`.
 - Use `#zeropsPreprocessor=on` for subdomain URL env vars in `import.yaml`.
+
+## Environment (vault)
+
+Import uses `project.vault` / `service.vault` as the value store (not `envVariables` / `envSecrets` on services). Map keys explicitly in each app `zerops.yaml` — do not rely on auto-injection. Avoid self-references (e.g. `KEY: ${KEY}`).

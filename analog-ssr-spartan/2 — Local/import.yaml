@@ -7,8 +7,10 @@
 # setup needs to match what's deployed here.
 project:
   name: analog-ssr-spartan-local
-  envVariables:
-    BETTER_AUTH_SECRET: <@generateRandomString(<32>)>
+  vault:
+    BETTER_AUTH_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
 
 services:
   # Single app container in the compiled production shape — no
