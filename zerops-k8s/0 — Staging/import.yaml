@@ -12,7 +12,7 @@ project:
     - kubernetes
     - github-zerops-recipe-apps-zerops-k8s
     - zerops-k8s-profile-staging
-  envVariables:
+  vault:
     K8S_MANAGED: "true"
     K8S_PROFILE: staging
     K8S_REPOSITORY: zerops-recipe-apps/zerops-k8s

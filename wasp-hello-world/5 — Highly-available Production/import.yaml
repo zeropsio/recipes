@@ -4,13 +4,13 @@
 # HA PostgreSQL and scaled client/API containers — lightweight
 # demo resources (oltp-staging DB, shared CPU on API).
 #
-# Project envVariables are a value store — zerops.yaml maps them:
+# Project vault are a value store — zerops.yaml maps them:
 #   REACT_APP_API_URL / WASP_SERVER_URL ← ${API_URL}
 #   WASP_WEB_CLIENT_URL                 ← ${APP_URL}
 project:
   name: wasp-hello-world-ha-prod
   corePackage: SERIOUS
-  envVariables:
+  vault:
     APP_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
     API_URL: https://api-${zeropsSubdomainHost}-3001.prg1.zerops.app
 

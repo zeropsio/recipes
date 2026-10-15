@@ -1,14 +1,14 @@
 #zeropsPreprocessor=on
 
 # AI Agent environment — a dev + stage pair for the Wasp client and
-# API from one git repo, plus PostgreSQL. Project envVariables are a
+# API from one git repo, plus PostgreSQL. Project vault are a
 # value store (not runtime keys): APP_URL / API_URL point at the staged
 # subdomains; DEV_* at the interactive appdev / apidev runtimes.
 # zerops.yaml maps APP_URL → WASP_WEB_CLIENT_URL and API_URL →
 # WASP_SERVER_URL / REACT_APP_API_URL for prod-api / prod-client.
 project:
   name: wasp-hello-world-agent
-  envVariables:
+  vault:
     APP_URL: https://appstage-${zeropsSubdomainHost}.prg1.zerops.app
     API_URL: https://apistage-${zeropsSubdomainHost}-3001.prg1.zerops.app
     DEV_APP_URL: https://appdev-${zeropsSubdomainHost}-3000.prg1.zerops.app

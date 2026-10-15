@@ -8,7 +8,7 @@ project:
     - kubernetes
     - github-zerops-recipe-apps-zerops-k8s
     - zerops-k8s-profile-full
-  envVariables:
+  vault:
     K8S_MANAGED: "true"
     K8S_PROFILE: full
     K8S_REPOSITORY: zerops-recipe-apps/zerops-k8s
@@ -167,10 +167,14 @@ services:
     type: alpine@3.21
     startWithoutCode: true
     enableSubdomainAccess: true
-    envSecrets:
+    vault:
       GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: <@generateRandomString(<32>)>
-      GF_SECURITY_SECRET_KEY: <@generateRandomString(<32>)>
+      GF_SECURITY_ADMIN_PASSWORD:
+        value: <@generateRandomString(<32>)>
+        sensitive: true
+      GF_SECURITY_SECRET_KEY:
+        value: <@generateRandomString(<32>)>
+        sensitive: true
 
   - hostname: prometheus
     type: alpine@3.21
@@ -206,5 +210,7 @@ services:
     buildFromGit: https://github.com/zeropsio/recipe-elk@2a64e642ae4c94ab976af0e270e407a95f80e575
     zeropsSetup: apmserver
     maxContainers: 1
-    envSecrets:
-      SECRET_TOKEN: <@generateRandomString(<32>)>
+    vault:
+      APM_SECRET:
+        value: <@generateRandomString(<32>)>
+        sensitive: true

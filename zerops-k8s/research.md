@@ -54,3 +54,7 @@ Environment slugs: `staging`, `production`, `full`.
 - [zerops-k8s README](https://github.com/zerops-recipe-apps/zerops-k8s/blob/main/README.md)
 - [profiles.md](https://github.com/zerops-recipe-apps/zerops-k8s/blob/main/docs/profiles.md)
 - [operations.md](https://github.com/zerops-recipe-apps/zerops-k8s/blob/main/docs/operations.md)
+
+## Environment (vault)
+
+Import uses `project.vault` / `service.vault` as the value store (not `envVariables` / `envSecrets` on services). Map keys explicitly in each app `zerops.yaml` — do not rely on auto-injection. Avoid self-references (e.g. `KEY: ${KEY}`).

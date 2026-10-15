@@ -2,13 +2,13 @@
 
 # Remote (CDE) environment — same dev + stage client/API pairs as
 # the AI agent layout for a human porter coding over SSH or a
-# mounted remote filesystem. Project envVariables are a value store:
+# mounted remote filesystem. Project vault are a value store:
 # APP_URL / API_URL → staged subdomains; DEV_* → appdev / apidev.
 # zerops.yaml maps APP_URL → WASP_WEB_CLIENT_URL and API_URL →
 # WASP_SERVER_URL / REACT_APP_API_URL for prod-api / prod-client.
 project:
   name: wasp-hello-world-remote
-  envVariables:
+  vault:
     APP_URL: https://appstage-${zeropsSubdomainHost}.prg1.zerops.app
     API_URL: https://apistage-${zeropsSubdomainHost}-3001.prg1.zerops.app
     DEV_APP_URL: https://appdev-${zeropsSubdomainHost}-3000.prg1.zerops.app

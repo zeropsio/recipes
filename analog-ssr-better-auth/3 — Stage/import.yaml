@@ -6,8 +6,10 @@
 # QA pass stay valid across restarts and redeploys.
 project:
   name: analog-ssr-better-auth-stage
-  envVariables:
-    BETTER_AUTH_SECRET: <@generateRandomString(<32>)>
+  vault:
+    BETTER_AUTH_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
 
 services:
   # Single app container — bump verticalAutoscaling.minRam if a QA

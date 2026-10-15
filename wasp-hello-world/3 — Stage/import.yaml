@@ -4,12 +4,12 @@
 # Single client + API pair using production setups on minimal
 # resources — lighter than small prod (one container each, oltp-hobby DB).
 #
-# Project envVariables are a value store — zerops.yaml maps them:
+# Project vault are a value store — zerops.yaml maps them:
 #   REACT_APP_API_URL / WASP_SERVER_URL ← ${API_URL}
 #   WASP_WEB_CLIENT_URL                 ← ${APP_URL}
 project:
   name: wasp-hello-world-stage
-  envVariables:
+  vault:
     APP_URL: https://app-${zeropsSubdomainHost}.prg1.zerops.app
     API_URL: https://api-${zeropsSubdomainHost}-3001.prg1.zerops.app
 

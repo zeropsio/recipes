@@ -6,8 +6,10 @@
 # automatically instead of each one minting its own.
 project:
   name: analog-ssr-better-auth-agent
-  envVariables:
-    BETTER_AUTH_SECRET: <@generateRandomString(<32>)>
+  vault:
+    BETTER_AUTH_SECRET:
+      value: <@generateRandomString(<32>)>
+      sensitive: true
 
 services:
   # Two containers: appdev for SSH iteration with hot-reload,
