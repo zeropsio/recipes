@@ -1,7 +1,7 @@
 # recipe-output.yaml
 recipe_created: directus
 apps_created:
-  - https://github.com/kristiyan-velkov/zerops-directus-cms
+  - https://github.com/zerops-recipe-apps/directus
 apps_existing: []
 directus_fields:
   recipe_name: Directus
@@ -12,6 +12,6 @@ directus_fields:
   internal_type: example
 ready_for_testing: false
 notes:
-  - Mirror CMS repo to zerops-recipe-apps/directus before public recipe launch.
+  - CMS app published at zerops-recipe-apps/directus.
   - Add covers/svg/directus.svg to recipe-shared-assets if missing.
   - Verify small-prod deploy (/admin, /server/ping, seeded posts) before ready_for_testing true.

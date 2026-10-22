@@ -45,7 +45,7 @@ services:
     type: alpine/nodejs@22
     priority: 6
     zeropsSetup: development
-    buildFromGit: https://github.com/kristiyan-velkov/zerops-directus-cms
+    buildFromGit: https://github.com/zerops-recipe-apps/directus
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 1
@@ -62,7 +62,7 @@ services:
     type: alpine/nodejs@22
     priority: 6
     zeropsSetup: production
-    buildFromGit: https://github.com/kristiyan-velkov/zerops-directus-cms
+    buildFromGit: https://github.com/zerops-recipe-apps/directus
     enableSubdomainAccess: true
     verticalAutoscaling:
       minRam: 1

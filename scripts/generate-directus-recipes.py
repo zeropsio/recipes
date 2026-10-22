@@ -5,8 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-CMS_GIT = "https://github.com/kristiyan-velkov/zerops-directus-cms"
-NEXT_GIT = "https://github.com/kristiyan-velkov/zerops-directus-nextjs-blog"
+CMS_GIT = "https://github.com/zerops-recipe-apps/directus"
+NEXT_GIT = "https://github.com/zerops-recipe-apps/directus-next-frontend"
 MAILPIT_GIT = "https://github.com/zerops-recipe-apps/mailpit-app"
 
 HEADER_CMS = """#zeropsPreprocessor=on

@@ -8,15 +8,15 @@
 
 ## Setups
 
-- **`development`** and **`production`** in [zerops-directus-cms](https://github.com/kristiyan-velkov/zerops-directus-cms) `zerops.yaml` (extends `base`).
+- **`development`** and **`production`** in [zerops-recipe-apps/directus](https://github.com/zerops-recipe-apps/directus) `zerops.yaml` (extends `base`).
 - Recipe stage/small-prod use **`zeropsSetup: production`** on hostname `directus` / `directusstage`.
 
 ## Repos
 
 | Repo | Role |
 |------|------|
-| `kristiyan-velkov/zerops-directus-cms` | CMS (target: `zerops-recipe-apps/directus`) |
-| `kristiyan-velkov/zerops-directus-nextjs-blog` | Next blog (target: `zerops-recipe-apps/directus-next-frontend`) |
+| `zerops-recipe-apps/directus` | CMS |
+| `zerops-recipe-apps/directus-next-frontend` | Next.js blog (`directus-next` recipe) |
 
 ## Scaling
 
@@ -34,7 +34,7 @@ CMS-only import; frontend via [directus-next](../directus-next/) or any client u
 ## References
 
 - https://directus.io/docs
-- https://github.com/kristiyan-velkov/zerops-directus-cms
+- https://github.com/zerops-recipe-apps/directus
 
 ## Environment (vault)
 

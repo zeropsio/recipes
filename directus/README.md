@@ -1,7 +1,7 @@
 # Directus Recipe
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-Production-style [Directus](https://directus.io) 11 on [Zerops](https://zerops.io) ([zerops-directus-cms](https://github.com/kristiyan-velkov/zerops-directus-cms)) with PostgreSQL, Valkey, S3 object storage, schema snapshot, and idempotent demo seed. Pair with [directus-next](https://app.zerops.io/recipes/directus-next) for a Next.js blog or connect any client via `API_URL`.
+Production-style [Directus](https://directus.io) 11 on [Zerops](https://zerops.io) ([zerops-recipe-apps/directus](https://github.com/zerops-recipe-apps/directus)) with PostgreSQL, Valkey, S3 object storage, schema snapshot, and idempotent demo seed. Pair with [directus-next](https://app.zerops.io/recipes/directus-next) for a Next.js blog or connect any client via `API_URL`.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 
 ⬇️ **Full recipe page and deploy with one-click**

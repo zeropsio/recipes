@@ -1,7 +1,7 @@
 # Directus + Next.js Recipe
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-[Directus](https://directus.io) ([zerops-directus-cms](https://github.com/kristiyan-velkov/zerops-directus-cms)) with a [Next.js 16](https://nextjs.org) blog ([zerops-directus-nextjs-blog](https://github.com/kristiyan-velkov/zerops-directus-nextjs-blog)) on [Zerops](https://zerops.io). PostgreSQL, Valkey, and S3 ship with the CMS; the blog uses ISR and server-side `DIRECTUS_TOKEN` from vault `ADMIN_TOKEN`. Omit `frontend*` for CMS-only — use [directus](https://app.zerops.io/recipes/directus).
+[Directus](https://directus.io) ([zerops-recipe-apps/directus](https://github.com/zerops-recipe-apps/directus)) with a [Next.js 16](https://nextjs.org) blog ([zerops-recipe-apps/directus-next-frontend](https://github.com/zerops-recipe-apps/directus-next-frontend)) on [Zerops](https://zerops.io). PostgreSQL, Valkey, and S3 ship with the CMS; the blog uses ISR and server-side `DIRECTUS_TOKEN` from vault `ADMIN_TOKEN`. Omit `frontend*` for CMS-only — use [directus](https://app.zerops.io/recipes/directus).
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 
 ⬇️ **Full recipe page and deploy with one-click**
