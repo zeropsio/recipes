@@ -1,0 +1,17 @@
+# recipe-output.yaml
+recipe_created: directus-next
+apps_created:
+  - https://github.com/kristiyan-velkov/zerops-directus-nextjs-blog
+apps_existing:
+  - https://github.com/kristiyan-velkov/zerops-directus-cms
+directus_next_fields:
+  recipe_name: Directus + Next.js
+  slug: directus-next
+  recipe_source: directus-next
+  categories: [cms, nextjs]
+  languages_frameworks: [Directus, Next.js, TypeScript]
+  internal_type: example
+ready_for_testing: false
+notes:
+  - Requires zerops.yaml env mapping DIRECTUS_URL / DIRECTUS_TOKEN from vault on blog repo.
+  - Mirror repos to zerops-recipe-apps before GUI publish.
