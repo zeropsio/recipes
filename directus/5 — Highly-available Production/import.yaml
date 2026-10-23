@@ -1,0 +1,57 @@
+#zeropsPreprocessor=on
+# yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
+
+# Directus showcase — zerops-directus-cms (PostgreSQL, Valkey, S3, optional Mailpit).
+# Setups: `development` and `production` in app zerops.yaml.
+# Vault: SECRET + APP_URL / API_URL (+ DEV_* on Agent/Remote). Map ADMIN_* on directus service.
+project:
+  name: directus-ha-prod
+  corePackage: SERIOUS
+  vault:
+    APP_URL: https://directus-${zeropsSubdomainHost}-8055.prg1.zerops.app
+    API_URL: https://directus-${zeropsSubdomainHost}-8055.prg1.zerops.app
+    DEV_APP_URL: https://directus-${zeropsSubdomainHost}-8055.prg1.zerops.app
+    DEV_API_URL: https://directus-${zeropsSubdomainHost}-8055.prg1.zerops.app
+
+    SECRET:
+      value: <@generateRandomString(<64>)>
+      sensitive: true
+    ADMIN_TOKEN:
+      value: <@generateRandomString(<40>)>
+      sensitive: true
+
+
+services:
+  - hostname: db
+    type: postgresql:ha@17
+    profile: oltp-staging
+    priority: 10
+
+  - hostname: cache
+    type: valkey:ha@7.2
+    priority: 9
+
+  - hostname: storage
+    type: object-storage
+    priority: 8
+    objectStorageSize: 50
+    objectStoragePolicy: public-read
+
+  - hostname: directus
+    type: alpine/nodejs@24
+    priority: 6
+    zeropsSetup: production
+    buildFromGit: https://github.com/zerops-recipe-apps/directus
+    enableSubdomainAccess: true
+    verticalAutoscaling:
+      minRam: 1
+      maxRam: 16
+    minContainers: 2
+    maxContainers: 6
+    vault:
+      ADMIN_EMAIL: admin@example.com
+      ADMIN_PASSWORD:
+        value: <@generateRandomString(<20>)>
+        sensitive: true
+      SEED_VERSION: "1.0.0"
+    envIsolation: service
