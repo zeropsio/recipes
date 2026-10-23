@@ -24,7 +24,7 @@ Production-style [Directus](https://directus.io) 12 on [Zerops](https://zerops.i
 
 **Setups** — `development` and `production` in app `zerops.yaml`. Stage/small-prod hostnames use `zeropsSetup: production`.
 
-**Runtime** — `alpine/nodejs@24`, port **8055**, health `GET /server/health`.
+**Runtime** — `alpine/nodejs@24`, port **8055**, readiness `GET /server/ping` (Directus 12; `/server/health` requires auth).
 
 **Secrets** — project vault `SECRET`, `ADMIN_TOKEN`; service vault `ADMIN_PASSWORD`, `SEED_VERSION`.
 <!-- #ZEROPS_EXTRACT_END:faq# -->
