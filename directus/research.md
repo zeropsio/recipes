@@ -2,9 +2,9 @@
 
 ## Overview
 
-- **Software:** Directus 11 (npm / Alpine Node 22)
+- **Software:** Directus 12 (npm / Alpine Node 24)
 - **Type:** API + Data Studio (`/admin`)
-- **Zerops Runtime:** `alpine/nodejs@22`, `postgresql@17`, `valkey@7.2`, `object-storage`
+- **Zerops Runtime:** `alpine/nodejs@24`, `postgresql@17`, `valkey@7.2`, `object-storage`
 
 ## Setups
 

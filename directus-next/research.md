@@ -2,7 +2,7 @@
 
 ## Overview
 
-- **CMS:** Directus 11 — same stack as [directus](../directus/) recipe
+- **CMS:** Directus 12 — same stack as [directus](../directus/) recipe
 - **Frontend:** Next.js 16 App Router, standalone, ISR 60s
 - **Repos:** `zerops-directus-cms` + `zerops-directus-nextjs-blog`
 

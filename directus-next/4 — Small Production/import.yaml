@@ -37,7 +37,7 @@ services:
     objectStoragePolicy: public-read
 
   - hostname: directus
-    type: alpine/nodejs@22
+    type: alpine/nodejs@24
     priority: 6
     zeropsSetup: production
     buildFromGit: https://github.com/zerops-recipe-apps/directus
@@ -56,7 +56,7 @@ services:
     envIsolation: service
 
   - hostname: frontend
-    type: ubuntu/nodejs@22
+    type: ubuntu/nodejs@24
     priority: 5
     zeropsSetup: nextjs
     buildFromGit: https://github.com/zerops-recipe-apps/directus-next-frontend

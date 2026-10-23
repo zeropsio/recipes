@@ -155,7 +155,7 @@ def directus_svc(
     maxContainers: {max_c}
 """
     return f"""  - hostname: {hostname}
-    type: alpine/nodejs@22
+    type: alpine/nodejs@24
     priority: 6
     zeropsSetup: {setup}
     buildFromGit: {CMS_GIT}
@@ -172,7 +172,7 @@ def directus_svc(
 
 def frontend_svc(hostname: str, setup: str, min_ram: float = 0.5) -> str:
     return f"""  - hostname: {hostname}
-    type: ubuntu/nodejs@22
+    type: ubuntu/nodejs@24
     priority: 5
     zeropsSetup: {setup}
     buildFromGit: {NEXT_GIT}

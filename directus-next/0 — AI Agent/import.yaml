@@ -42,7 +42,7 @@ services:
     enableSubdomainAccess: true
 
   - hostname: directusdev
-    type: alpine/nodejs@22
+    type: alpine/nodejs@24
     priority: 6
     zeropsSetup: development
     buildFromGit: https://github.com/zerops-recipe-apps/directus
@@ -59,7 +59,7 @@ services:
     envIsolation: service
 
   - hostname: directusstage
-    type: alpine/nodejs@22
+    type: alpine/nodejs@24
     priority: 6
     zeropsSetup: production
     buildFromGit: https://github.com/zerops-recipe-apps/directus
@@ -76,7 +76,7 @@ services:
     envIsolation: service
 
   - hostname: frontenddev
-    type: ubuntu/nodejs@22
+    type: ubuntu/nodejs@24
     priority: 5
     zeropsSetup: dev
     buildFromGit: https://github.com/zerops-recipe-apps/directus-next-frontend
@@ -87,7 +87,7 @@ services:
     envIsolation: service
 
   - hostname: frontendstage
-    type: ubuntu/nodejs@22
+    type: ubuntu/nodejs@24
     priority: 5
     zeropsSetup: nextjs
     buildFromGit: https://github.com/zerops-recipe-apps/directus-next-frontend

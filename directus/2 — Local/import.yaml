@@ -42,7 +42,7 @@ services:
     enableSubdomainAccess: true
 
   - hostname: directus
-    type: alpine/nodejs@22
+    type: alpine/nodejs@24
     priority: 6
     zeropsSetup: development
     buildFromGit: https://github.com/zerops-recipe-apps/directus

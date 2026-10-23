@@ -37,7 +37,7 @@ services:
     objectStoragePolicy: public-read
 
   - hostname: directus
-    type: alpine/nodejs@22
+    type: alpine/nodejs@24
     priority: 6
     zeropsSetup: production
     buildFromGit: https://github.com/zerops-recipe-apps/directus

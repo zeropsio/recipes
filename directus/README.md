@@ -1,7 +1,7 @@
 # Directus Recipe
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-Production-style [Directus](https://directus.io) 11 on [Zerops](https://zerops.io) ([zerops-recipe-apps/directus](https://github.com/zerops-recipe-apps/directus)) with PostgreSQL, Valkey, S3 object storage, schema snapshot, and idempotent demo seed. Pair with [directus-next](https://app.zerops.io/recipes/directus-next) for a Next.js blog or connect any client via `API_URL`.
+Production-style [Directus](https://directus.io) 12 on [Zerops](https://zerops.io) ([zerops-recipe-apps/directus](https://github.com/zerops-recipe-apps/directus)) with PostgreSQL, Valkey, S3 object storage, schema snapshot, and idempotent demo seed. Pair with [directus-next](https://app.zerops.io/recipes/directus-next) for a Next.js blog or connect any client via `API_URL`.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 
 ⬇️ **Full recipe page and deploy with one-click**
@@ -24,7 +24,7 @@ Production-style [Directus](https://directus.io) 11 on [Zerops](https://zerops.i
 
 **Setups** — `development` and `production` in app `zerops.yaml`. Stage/small-prod hostnames use `zeropsSetup: production`.
 
-**Runtime** — `alpine/nodejs@22`, port **8055**, health `GET /server/ping`.
+**Runtime** — `alpine/nodejs@24`, port **8055**, health `GET /server/health`.
 
 **Secrets** — project vault `SECRET`, `ADMIN_TOKEN`; service vault `ADMIN_PASSWORD`, `SEED_VERSION`.
 <!-- #ZEROPS_EXTRACT_END:faq# -->
