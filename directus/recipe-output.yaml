@@ -1,0 +1,17 @@
+# recipe-output.yaml
+recipe_created: directus
+apps_created:
+  - https://github.com/zerops-recipe-apps/directus
+apps_existing: []
+directus_fields:
+  recipe_name: Directus
+  slug: directus
+  recipe_source: directus
+  categories: [cms]
+  languages_frameworks: [Directus, TypeScript, Node.js]
+  internal_type: example
+ready_for_testing: false
+notes:
+  - CMS app published at zerops-recipe-apps/directus.
+  - Add covers/svg/directus.svg to recipe-shared-assets if missing.
+  - Verify small-prod deploy (/admin, /server/ping, seeded posts) before ready_for_testing true.
